@@ -1,0 +1,113 @@
+/* ===============================================
+   LitClub - Dark Mode
+   =============================================== */
+
+.root,
+.landing-root {
+    -fx-background-color: linear-gradient(to bottom, #0D0E10 0%, #1A1B1E 100%);
+    -fx-font-family: "Serif";
+    -fx-text-fill: #E8E9EA;
+}
+
+/* -----------------------------------------------
+   Logo Styling - Embrace the black background
+   ----------------------------------------------- */
+.landing-logo {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0.4, 0, 4);
+    -fx-padding: 10 0 30 0;
+}
+
+/* -----------------------------------------------
+   Instance URL section
+   ----------------------------------------------- */
+.instance-container {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-background-radius: 12;
+    -fx-padding: 30 40;
+    -fx-spacing: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.3, 0, 2);
+}
+
+.instance-label {
+    -fx-font-size: 15px;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-weight: 600;
+    -fx-padding: 0 0 5 0;
+    -fx-letter-spacing: 0.5px;
+}
+
+.instance-input {
+    -fx-background-color: #0D0E10;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+    -fx-text-fill: #E8E9EA;
+    -fx-prompt-text-fill: #5A5D64;
+}
+
+.instance-input:focused {
+    -fx-border-color: #A8B5A2;
+    -fx-border-width: 2;
+    -fx-background-color: #12131a;
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.25), 8, 0.4, 0, 2);
+}
+
+/* -----------------------------------------------
+   Button Styling
+   ----------------------------------------------- */
+.instance-button {
+    -fx-background-color: linear-gradient(to bottom, #B4C1AE 0%, #A8B5A2 100%);
+    -fx-text-fill: #0D0E10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.3), 8, 0.4, 0, 2);
+}
+
+.instance-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #C1CDBB 0%, #B4C1AE 100%);
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.5), 12, 0.5, 0, 3);
+}
+
+.instance-button:pressed {
+    -fx-background-color: #9DAA94;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0.3, 0, 1);
+    -fx-translate-y: 1;
+}
+
+/* -----------------------------------------------
+   Theme Toggle Button
+   ----------------------------------------------- */
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9DAA94;
+    -fx-font-size: 12px;
+    -fx-underline: false;
+    -fx-cursor: hand;
+    -fx-padding: 8 0 0 0;
+    -fx-opacity: 0.8;
+}
+
+.toggle-button:hover {
+    -fx-text-fill: #B4C1AE;
+    -fx-opacity: 1.0;
+}
+
+/* -----------------------------------------------
+   Utility Classes
+   ----------------------------------------------- */
+.text-muted {
+    -fx-text-fill: #7A7D84;
+}
+
+.card {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 12;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.3, 0, 3);
+}
