@@ -3,7 +3,7 @@
    =============================================== */
 
 .root,
-.landing-root {
+.page-root {
     -fx-background-color: linear-gradient(to bottom, #FAFBFC 0%, #F0F2F4 100%);
     -fx-font-family: "Serif";
     -fx-text-fill: #2A2D32;
@@ -12,15 +12,15 @@
 /* -----------------------------------------------
    Logo Styling
    ----------------------------------------------- */
-.landing-logo {
+.page-logo {
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0.35, 0, 3);
     -fx-padding: 10 0 30 0;
 }
 
 /* -----------------------------------------------
-   Instance URL section
+   Container Styling
    ----------------------------------------------- */
-.instance-container {
+.container {
     -fx-background-color: rgba(255, 255, 255, 0.85);
     -fx-background-radius: 12;
     -fx-padding: 30 40;
@@ -28,7 +28,40 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0.3, 0, 3);
 }
 
-.instance-label {
+.input-section {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-radius: 12;
+    -fx-padding: 30 40;
+    -fx-spacing: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0.3, 0, 3);
+}
+
+.login-container {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-radius: 12;
+    -fx-padding: 30 40;
+    -fx-spacing: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0.3, 0, 3);
+}
+
+/* -----------------------------------------------
+   Typography
+   ----------------------------------------------- */
+.title {
+    -fx-font-size: 24px;
+    -fx-text-fill: #2A2D32;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
+.login-title {
+    -fx-font-size: 24px;
+    -fx-text-fill: #2A2D32;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
+.label {
     -fx-font-size: 15px;
     -fx-text-fill: #4A4D52;
     -fx-font-weight: 600;
@@ -36,7 +69,32 @@
     -fx-letter-spacing: 0.5px;
 }
 
-.instance-input {
+.input-label {
+    -fx-font-size: 15px;
+    -fx-text-fill: #4A4D52;
+    -fx-font-weight: 600;
+    -fx-padding: 0 0 5 0;
+    -fx-letter-spacing: 0.5px;
+}
+
+.status-label {
+    -fx-font-size: 13px;
+    -fx-padding: 10 0 0 0;
+}
+
+.error-label {
+    -fx-text-fill: #C44536;
+    -fx-font-weight: 600;
+}
+
+.text-muted {
+    -fx-text-fill: #6A6D72;
+}
+
+/* -----------------------------------------------
+   Input Fields
+   ----------------------------------------------- */
+.text-input {
     -fx-background-color: #FFFFFF;
     -fx-border-color: #C8CDD4;
     -fx-border-width: 1.5;
@@ -48,7 +106,7 @@
     -fx-prompt-text-fill: #9DA2A9;
 }
 
-.instance-input:focused {
+.text-input:focused {
     -fx-border-color: #A8B5A2;
     -fx-border-width: 2;
     -fx-background-color: #FAFBFC;
@@ -58,7 +116,7 @@
 /* -----------------------------------------------
    Button Styling
    ----------------------------------------------- */
-.instance-button {
+.button-primary {
     -fx-background-color: linear-gradient(to bottom, #B4C1AE 0%, #A8B5A2 100%);
     -fx-text-fill: #FFFFFF;
     -fx-font-size: 14px;
@@ -69,21 +127,41 @@
     -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.35), 8, 0.4, 0, 2);
 }
 
-.instance-button:hover {
+.button-primary:hover {
     -fx-background-color: linear-gradient(to bottom, #9DAA94 0%, #8C9E88 100%);
     -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.5), 12, 0.45, 0, 3);
 }
 
-.instance-button:pressed {
+.button-primary:pressed {
     -fx-background-color: #768773;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0.3, 0, 1);
     -fx-translate-y: 1;
 }
 
-/* -----------------------------------------------
-   Theme Toggle Button
-   ----------------------------------------------- */
-.toggle-button {
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #C8CDD4;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #4A4D52;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-border-color: #A8B5A2;
+    -fx-background-color: rgba(168, 181, 162, 0.05);
+}
+
+.secondary-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-translate-y: 1;
+}
+
+.theme-toggle {
     -fx-background-color: transparent;
     -fx-text-fill: #768773;
     -fx-font-size: 12px;
@@ -93,7 +171,7 @@
     -fx-opacity: 0.75;
 }
 
-.toggle-button:hover {
+.theme-toggle:hover {
     -fx-text-fill: #5D6E5A;
     -fx-opacity: 1.0;
 }
@@ -101,13 +179,13 @@
 /* -----------------------------------------------
    Utility Classes
    ----------------------------------------------- */
-.text-muted {
-    -fx-text-fill: #6A6D72;
-}
-
 .card {
     -fx-background-color: rgba(255, 255, 255, 0.9);
     -fx-background-radius: 12;
     -fx-padding: 24;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0.3, 0, 3);
+}
+
+.login-form {
+    -fx-spacing: 15;
 }
