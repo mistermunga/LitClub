@@ -55,6 +55,16 @@
     -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.25), 8, 0.4, 0, 2);
 }
 
+.status-label {
+    -fx-font-size: 13px;
+    -fx-padding: 10 0 0 0;
+}
+
+.error-label {
+    -fx-text-fill: #E57368;
+    -fx-font-weight: 600;
+}
+
 /* -----------------------------------------------
    Button Styling
    ----------------------------------------------- */
@@ -77,6 +87,29 @@
 .button-primary:pressed {
     -fx-background-color: #9DAA94;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0.3, 0, 1);
+    -fx-translate-y: 1;
+}
+
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-border-color: #A8B5A2;
+    -fx-background-color: rgba(168, 181, 162, 0.08);
+}
+
+.secondary-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
     -fx-translate-y: 1;
 }
 
