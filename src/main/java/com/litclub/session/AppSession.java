@@ -4,11 +4,10 @@ public class AppSession {
 
     private static AppSession instance;
 
-    // Hardcoded for prototype
     // TODO: make sessions generic
-    private final String username = "john-example";
-    private final String fName = "John";
-    private final String lName = "Example";
+    private String username = "john-example";
+    private String fName = "John";
+    private String lName = "Example";
     private boolean brightMode = true;
 
     private AppSession() {}
@@ -38,5 +37,23 @@ public class AppSession {
 
     public void setBrightMode(boolean brightMode) {
         this.brightMode = brightMode;
+    }
+
+    public void setlName(String lName) {
+        this.lName = lName;
+    }
+
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setCredentials(String firstname, String lastname, String username) {
+        setfName(firstname);
+        setlName(lastname);
+        setUsername(username);
     }
 }
