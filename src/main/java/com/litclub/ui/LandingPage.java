@@ -21,7 +21,7 @@ public class LandingPage extends VBox {
 
         ThemeManager.getInstance().registerComponent(this);
 
-        this.getStyleClass().add("landing-root");
+        this.getStyleClass().add("page-root");
         this.setAlignment(Pos.CENTER);
         this.setSpacing(40);
         this.setPadding(new Insets(60, 40, 60, 40));
@@ -47,7 +47,7 @@ public class LandingPage extends VBox {
         ImageView logo = new ImageView(image);
         logo.setPreserveRatio(true);
         logo.setFitWidth(350);
-        logo.getStyleClass().add("landing-logo");
+        logo.getStyleClass().add("page-logo");
 
         // Add listener to update logo when theme changes
         ThemeManager.getInstance().brightModeProperty().addListener(
@@ -72,11 +72,11 @@ public class LandingPage extends VBox {
         VBox container = new VBox();
         container.setAlignment(Pos.CENTER);
         container.setSpacing(20);
-        container.getStyleClass().add("instance-container");
+        container.getStyleClass().add("container");
 
         // Label
         Label urlLabel = new Label("Enter Instance URL");
-        urlLabel.getStyleClass().add("instance-label");
+        urlLabel.getStyleClass().add("label");
 
         // Input + Go Button Row
         HBox inputRow = new HBox();
@@ -85,12 +85,12 @@ public class LandingPage extends VBox {
 
         TextField instanceURL = new TextField();
         instanceURL.setPromptText("abulafia.litclub.com");
-        instanceURL.getStyleClass().add("instance-input");
+        instanceURL.getStyleClass().add("text-input");
         HBox.setHgrow(instanceURL, Priority.ALWAYS);
         instanceURL.setOnAction(e -> MainApplication.getInstance().showLogin());
 
         Button goButton = new Button("Go");
-        goButton.getStyleClass().add("instance-button");
+        goButton.getStyleClass().add("button-primary");
         goButton.setDefaultButton(true);
         goButton.setOnAction(e -> MainApplication.getInstance().showLogin());
 
@@ -98,7 +98,7 @@ public class LandingPage extends VBox {
 
         // Theme toggle button
         Button toggleButton = new Button();
-        toggleButton.getStyleClass().add("toggle-button");
+        toggleButton.getStyleClass().add("theme-toggle");
         updateToggleButtonText(ThemeManager.getInstance().isBrightMode(), toggleButton);
 
         // Update button text on theme change
