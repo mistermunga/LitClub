@@ -1,0 +1,85 @@
+/* ===============================================
+   LitClub - Modern Minimal Theme (Default)
+   =============================================== */
+
+.root,
+.landing-root {
+    -fx-background-color: #F5F6F7;
+    -fx-font-family: "Serif"; /* placeholder, real font later */
+    -fx-text-fill: #2E2E2E;
+}
+
+/* -----------------------------------------------
+   Logo Styling
+   ----------------------------------------------- */
+.landing-logo {
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.10) , 8, 0.3 , 0 , 2 );
+    -fx-padding: 10 0 20 0;
+}
+
+/* -----------------------------------------------
+   Instance URL section
+   ----------------------------------------------- */
+.instance-container {
+    -fx-background-color: transparent;
+    -fx-spacing: 15;
+}
+
+.instance-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #2E2E2E;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+.instance-input {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DADADA;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+    -fx-text-fill: #2E2E2E;
+}
+
+.instance-input:focused {
+    -fx-border-color: #A8B5A2;
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.4), 6, 0.3, 0, 1);
+}
+
+/* -----------------------------------------------
+   Button Styling
+   ----------------------------------------------- */
+.instance-button {
+    -fx-background-color: #A8B5A2;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 4, 0.3, 0, 1);
+}
+
+.instance-button:hover {
+    -fx-background-color: #8C9E88;
+}
+
+.instance-button:pressed {
+    -fx-background-color: #768773;
+    -fx-effect: none;
+}
+
+/* -----------------------------------------------
+   Utility Classes
+   ----------------------------------------------- */
+.text-muted {
+    -fx-text-fill: #555555;
+}
+
+.card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 8, 0.3, 0, 2);
+}
