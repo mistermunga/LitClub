@@ -36,14 +36,6 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0.3, 0, 3);
 }
 
-.login-container {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
-    -fx-background-radius: 12;
-    -fx-padding: 30 40;
-    -fx-spacing: 18;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0.3, 0, 3);
-}
-
 /* -----------------------------------------------
    Typography
    ----------------------------------------------- */
@@ -54,22 +46,7 @@
     -fx-padding: 0 0 10 0;
 }
 
-.login-title {
-    -fx-font-size: 24px;
-    -fx-text-fill: #2A2D32;
-    -fx-font-weight: bold;
-    -fx-padding: 0 0 10 0;
-}
-
 .label {
-    -fx-font-size: 15px;
-    -fx-text-fill: #4A4D52;
-    -fx-font-weight: 600;
-    -fx-padding: 0 0 5 0;
-    -fx-letter-spacing: 0.5px;
-}
-
-.input-label {
     -fx-font-size: 15px;
     -fx-text-fill: #4A4D52;
     -fx-font-weight: 600;
