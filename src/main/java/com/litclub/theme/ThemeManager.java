@@ -12,7 +12,7 @@ import java.util.Objects;
 public class ThemeManager {
 
     private static final String DEFAULT_STYLE = "/com/litclub/ui/styles.css";
-    // TODO: Add alternative styles here (ie, Dark mode)
+    private static final String DARKMODE_STYLE = "/com/litclub/ui/styles-dark.css";
 
     private static ThemeManager instance;
     private final BooleanProperty brightModeProperty;
@@ -57,6 +57,8 @@ public class ThemeManager {
         return brightModeProperty.get();
     }
 
+    public BooleanProperty brightModeProperty() { return brightModeProperty; }
+
     private void applyThemeToAllComponents() {
         for (Parent component : registeredComponents) {
             applyThemeToComponent(component);
@@ -64,7 +66,9 @@ public class ThemeManager {
     }
 
     private void applyThemeToComponent(Parent component) {
-        String styleResource = DEFAULT_STYLE; // TODO: implement theme selection down here too
+        String styleResource = isBrightMode()
+                ? DEFAULT_STYLE
+                : DARKMODE_STYLE;
 
         component.getStylesheets().clear();
         component.getStylesheets().add(Objects.requireNonNull(
