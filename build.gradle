@@ -23,9 +23,16 @@ javafx {
 }
 
 application {
-    // main bio of your app goes here
     mainClass = 'com.litclub.Launcher'
     applicationDefaultJvmArgs = [
         '--enable-native-access=javafx.graphics,javafx.web,javafx.media'
     ]
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
 }
