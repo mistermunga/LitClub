@@ -1,7 +1,8 @@
 package com.litclub.ui;
 
+import com.litclub.MainApplication;
 import com.litclub.theme.ThemeManager;
-import com.litclub.ui.component.ThemeToggleBar;
+import com.litclub.ui.component.subcomponent.ThemeToggleBar;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -29,6 +30,7 @@ public class CrossRoadsPage extends VBox {
         showToggleBar();
     }
 
+    // TODO ADD events to buttons -> update Session singleton with club details
     private void showSelections() {
         VBox container = new VBox();
         container.setSpacing(15);
@@ -51,6 +53,10 @@ public class CrossRoadsPage extends VBox {
                 clubButton.setMaxWidth(200);
                 clubButton.setWrapText(true);
                 clubButton.getStyleClass().add("club-button");
+
+                clubButton.setOnAction(e -> {
+                    MainApplication.getInstance().showClubPage(clubName);
+                });
                 row.getChildren().add(clubButton);
             }
 
