@@ -153,6 +153,37 @@
     -fx-opacity: 1.0;
 }
 
+.club-button {
+    -fx-background-color: linear-gradient(to bottom, rgba(168, 181, 162, 0.08), rgba(168, 181, 162, 0.03));
+    -fx-border-color: #A8B5A2;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #3A3D42;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-padding: 16 28;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(168, 181, 162, 0.2), 8, 0, 0, 2);
+}
+
+.club-button:hover {
+    -fx-background-color: linear-gradient(to bottom, rgba(168, 181, 162, 0.15), rgba(168, 181, 162, 0.08));
+    -fx-border-color: #8FA388;
+    -fx-effect: dropshadow(gaussian, rgba(168, 181, 162, 0.35), 12, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.club-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.25);
+    -fx-border-color: #7A9173;
+    -fx-translate-y: 1;
+    -fx-effect: dropshadow(gaussian, rgba(168, 181, 162, 0.15), 4, 0, 0, 1);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
 /* -----------------------------------------------
    Utility Classes
    ----------------------------------------------- */
