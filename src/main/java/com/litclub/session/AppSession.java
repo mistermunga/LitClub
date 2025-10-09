@@ -36,10 +36,15 @@ public class AppSession {
         this.userRecord = new UserRecord(firstname, lastname, username, email);
     }
 
-    public void setClubDetails(
-            String clubName,
-            boolean isAdministrator
-    ) {
-        this.clubRecord = new ClubRecord(clubName, isAdministrator);
+    public void setClubDetails( ClubRecord clubRecord ) {
+        this.clubRecord = clubRecord;
+    }
+
+    public UserRecord getUserRecord() {
+        return userRecord;
+    }
+
+    public ClubRecord getClubRecord() {
+        return clubRecord;
     }
 }
