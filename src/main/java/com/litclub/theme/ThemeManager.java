@@ -75,4 +75,8 @@ public class ThemeManager {
                 getClass().getResource(styleResource).toExternalForm()
         ));
     }
+
+    public void clearRegisteredComponents() {
+        registeredComponents.clear();
+    }
 }
