@@ -1,6 +1,9 @@
 package com.litclub;
 
+import com.litclub.session.AppSession;
+import com.litclub.session.construct.ClubRecord;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.ClubPage;
 import com.litclub.ui.CrossRoadsPage;
 import com.litclub.ui.LandingPage;
 import com.litclub.ui.LoginPage;
@@ -52,6 +55,23 @@ public class MainApplication extends Application {
         CrossRoadsPage crossRoadsPage = new CrossRoadsPage(clubs);
         Scene scene = new Scene(crossRoadsPage);
         primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public void showClubPage(String clubName) {
+        ThemeManager.getInstance().clearRegisteredComponents();
+
+        // TODO [CRITICAL] API call, get club details
+        boolean adminPermission = clubName.equals("Society of the Bard");
+        ClubRecord cr = new ClubRecord(clubName, adminPermission);
+        AppSession.getInstance().setClubDetails(cr);
+
+        ClubPage clubPage = new ClubPage();
+        Scene scene = new Scene(clubPage);
+        primaryStage.setTitle(clubName);
+        primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
+        primaryStage.resizableProperty().setValue(false);
         primaryStage.show();
     }
 
