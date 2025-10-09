@@ -3,7 +3,7 @@ package com.litclub.ui;
 import com.litclub.MainApplication;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
-import com.litclub.ui.component.ThemeToggleBar;
+import com.litclub.ui.component.subcomponent.ThemeToggleBar;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -54,7 +54,7 @@ public class LoginPage extends VBox {
         Label identifierLabel = new Label("Username or Email");
         identifierLabel.getStyleClass().add("label");
         identifierField = new TextField();
-        identifierField.setPromptText("'John Doe' or 'johndoe@example.com'");
+        identifierField.setPromptText("'Marie Doe' or 'Mariedoe@example.com'");
         identifierField.getStyleClass().add("text-input");
 
         Label passwordLabel = new Label("Password");
@@ -117,13 +117,13 @@ public class LoginPage extends VBox {
             String identifier = identifierField.getText().trim();
             String password = passwordField.getText().trim();
 
-            if ((identifier.equals("John Doe") || identifier.equals("johndoe@example.com")) && password.equals("Example")) {
+            if ((identifier.equals("Marie Doe") || identifier.equals("Mariedoe@example.com")) && password.equals("Example")) {
                 // TODO setting details in session -> This should be an API CALL
                 AppSession.getInstance().setCredentials(
-                        "John",
+                        "Marie",
                         "Doe",
-                        "johndoe",
-                        "johndoe@example.com");
+                        "Mariedoe",
+                        "Mariedoe@example.com");
                 // TODO Pass details about what is to be displayed
                 MainApplication.getInstance().showCrossRoads();
             } else {
