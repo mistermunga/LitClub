@@ -1,13 +1,15 @@
 package com.litclub.session;
 
+import java.util.HashMap;
+
 public class AppSession {
 
     private static AppSession instance;
 
-    // TODO: make sessions generic
-    private String username = "john-example";
-    private String fName = "John";
-    private String lName = "Example";
+    private String username;
+    private String fName;
+    private String lName;
+    private String email;
     private boolean brightMode = true;
 
     private AppSession() {}
@@ -31,6 +33,8 @@ public class AppSession {
         return lName;
     }
 
+    public String getEmail() { return email; }
+
     public boolean isBrightMode() {
         return brightMode;
     }
@@ -51,9 +55,26 @@ public class AppSession {
         this.username = username;
     }
 
-    public void setCredentials(String firstname, String lastname, String username) {
+    public void setEmail(String email) { this.email = email;}
+
+    public void setCredentials(String firstname,
+                               String lastname,
+                               String username,
+                               String email) {
         setfName(firstname);
         setlName(lastname);
         setUsername(username);
+        setEmail(email);
+    }
+
+    public HashMap<String,String> getCredentials() {
+        HashMap<String,String> credentials = new HashMap<>();
+
+        credentials.put("firstname", getfName());
+        credentials.put("lastname", getlName());
+        credentials.put("username", getUsername());
+        credentials.put("email", getEmail());
+
+        return credentials;
     }
 }
