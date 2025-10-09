@@ -1,14 +1,19 @@
 package com.litclub;
 
+import com.litclub.theme.ThemeManager;
+import com.litclub.ui.CrossRoadsPage;
 import com.litclub.ui.LandingPage;
+import com.litclub.ui.LoginPage;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.List;
+
 public class MainApplication extends Application {
 
     private static MainApplication instance;
-    private Stage primaryStage = new Stage();
+    private Stage primaryStage;
 
     public static MainApplication getInstance() {
         return instance;
@@ -17,7 +22,11 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         instance = this;
+        this.primaryStage = primaryStage;
         primaryStage.setTitle("LitClub Desktop");
+
+        primaryStage.setHeight(600);
+        primaryStage.setWidth(550);
         showLanding();
     }
 
@@ -28,7 +37,25 @@ public class MainApplication extends Application {
         primaryStage.show();
     }
 
-    public void showLogin() {}
+    public void showLogin() {
+        ThemeManager.getInstance().clearRegisteredComponents();
+        LoginPage loginPage = new LoginPage();
+        Scene scene = new Scene(loginPage);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    // TODO Another API call, find all user clubs
+    public void showCrossRoads() {
+        List<String> clubs = List.of("Society of the Bard", "Gumshoe Sleuthers");
+        ThemeManager.getInstance().clearRegisteredComponents();
+        CrossRoadsPage crossRoadsPage = new CrossRoadsPage(clubs);
+        Scene scene = new Scene(crossRoadsPage);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public void showMainPage() {}
 
     public static void main(String[] args) {
         launch(args);
