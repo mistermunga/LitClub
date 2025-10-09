@@ -3,6 +3,7 @@ package com.litclub.ui;
 import com.litclub.MainApplication;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.component.ThemeToggleBar;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -23,7 +24,7 @@ public class LoginPage extends VBox {
     public LoginPage() {
         ThemeManager.getInstance().registerComponent(this);
 
-        this.getStyleClass().add("login-root");
+        this.getStyleClass().add("root");
         this.setAlignment(Pos.CENTER);
         this.setSpacing(40);
         this.setPadding(new Insets(60, 40, 60, 40));
@@ -104,18 +105,7 @@ public class LoginPage extends VBox {
 
         buttonContainer.getChildren().addAll(loginButton, registerButton, backButton);
 
-        Button toggleButton = new Button();
-        toggleButton.getStyleClass().add("theme-toggle");
-        updateToggleButtonText(ThemeManager.getInstance().isBrightMode(), toggleButton);
-
-        ThemeManager.getInstance().brightModeProperty().addListener(
-                (observable, oldValue, newValue) -> updateToggleButtonText(newValue, toggleButton)
-        );
-        toggleButton.setOnAction(event -> ThemeManager.getInstance().toggleTheme());
-
-        VBox toggleContainer = new VBox(toggleButton);
-        toggleContainer.setAlignment(Pos.CENTER);
-        toggleContainer.setPadding(new Insets(10, 0, 0, 0));
+        VBox toggleContainer = new ThemeToggleBar();
 
         container.getChildren().addAll(buttonContainer, toggleContainer);
         this.getChildren().add(container);
@@ -129,9 +119,13 @@ public class LoginPage extends VBox {
 
             if ((identifier.equals("John Doe") || identifier.equals("johndoe@example.com")) && password.equals("Example")) {
                 // TODO setting details in session -> This should be an API CALL
-                AppSession.getInstance().setCredentials("John", "Doe", "johndoe");
-                // TODO Pass details about which main page should be opened
-                MainApplication.getInstance().showMainPage();
+                AppSession.getInstance().setCredentials(
+                        "John",
+                        "Doe",
+                        "johndoe",
+                        "johndoe@example.com");
+                // TODO Pass details about what is to be displayed
+                MainApplication.getInstance().showCrossRoads();
             } else {
                 showAccessDeniedError(identifier, password);
             }
@@ -143,9 +137,5 @@ public class LoginPage extends VBox {
         statusLabel.setText("Access denied. Please check your credentials.");
         statusLabel.setVisible(true);
         statusLabel.getStyleClass().add("error-label");
-    }
-
-    private void updateToggleButtonText(boolean isBrightMode, Button toggleButton) {
-        toggleButton.setText(isBrightMode ? "Switch to Dark Mode" : "Switch to Light Mode");
     }
 }

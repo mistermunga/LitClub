@@ -2,6 +2,7 @@ package com.litclub.ui;
 
 import com.litclub.MainApplication;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.component.ThemeToggleBar;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -96,28 +97,10 @@ public class LandingPage extends VBox {
 
         inputRow.getChildren().addAll(instanceURL, goButton);
 
-        // Theme toggle button
-        Button toggleButton = new Button();
-        toggleButton.getStyleClass().add("theme-toggle");
-        updateToggleButtonText(ThemeManager.getInstance().isBrightMode(), toggleButton);
-
-        // Update button text on theme change
-        ThemeManager.getInstance().brightModeProperty().addListener(
-                (observable, oldValue, newValue) -> updateToggleButtonText(newValue, toggleButton)
-        );
-        toggleButton.setOnAction(event -> ThemeManager.getInstance().toggleTheme());
-
-        // Sub-container for visual breathing space
-        VBox toggleContainer = new VBox(toggleButton);
-        toggleContainer.setAlignment(Pos.CENTER);
-        toggleContainer.setPadding(new Insets(20, 0, 0, 0));
+        VBox toggleContainer = new ThemeToggleBar();
 
         container.getChildren().addAll(urlLabel, inputRow, toggleContainer);
 
         return container;
-    }
-
-    private void updateToggleButtonText(boolean isBrightMode, Button button) {
-        button.setText(isBrightMode ? "Switch to Dark Mode" : "Switch to Light Mode");
     }
 }
