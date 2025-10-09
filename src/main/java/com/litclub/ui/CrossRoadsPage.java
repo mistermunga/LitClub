@@ -13,7 +13,7 @@ import java.util.*;
 public class CrossRoadsPage extends VBox {
 
     private Set<String> clubs = new HashSet<>();
-    private static final int COLUMNS = 3;
+    private static final int COLUMNS = 2;
 
     public CrossRoadsPage(List<String> clubs) {
         this.clubs.addAll(clubs);
