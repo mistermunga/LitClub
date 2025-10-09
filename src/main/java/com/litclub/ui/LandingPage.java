@@ -2,7 +2,7 @@ package com.litclub.ui;
 
 import com.litclub.MainApplication;
 import com.litclub.theme.ThemeManager;
-import com.litclub.ui.component.ThemeToggleBar;
+import com.litclub.ui.component.subcomponent.ThemeToggleBar;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -69,6 +69,7 @@ public class LandingPage extends VBox {
         return logo;
     }
 
+    // TODO API logic will come here
     private VBox createInstanceSelector() {
         VBox container = new VBox();
         container.setAlignment(Pos.CENTER);
