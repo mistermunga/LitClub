@@ -10,6 +10,7 @@ public class AppSession {
     private String fName;
     private String lName;
     private String email;
+    private String club;
     private boolean brightMode = true;
 
     private AppSession() {}
@@ -35,6 +36,8 @@ public class AppSession {
 
     public String getEmail() { return email; }
 
+    public String getClub() { return club; }
+
     public boolean isBrightMode() {
         return brightMode;
     }
@@ -55,7 +58,9 @@ public class AppSession {
         this.username = username;
     }
 
-    public void setEmail(String email) { this.email = email;}
+    public void setEmail(String email) { this.email = email; }
+
+    public void setClub(String club) { this.club = club; }
 
     public void setCredentials(String firstname,
                                String lastname,
