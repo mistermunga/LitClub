@@ -1,4 +1,4 @@
-package com.litclub.ui.component;
+package com.litclub.ui.component.subcomponent;
 
 import com.litclub.theme.ThemeManager;
 import javafx.geometry.Insets;
