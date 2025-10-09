@@ -28,6 +28,13 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.3, 0, 2);
 }
 
+.title {
+    -fx-font-size: 24px;
+    -fx-text-fill: #E8E9EA;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
 .label {
     -fx-font-size: 15px;
     -fx-text-fill: #B8BCC2;
@@ -174,4 +181,42 @@
     -fx-background-radius: 12;
     -fx-padding: 24;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.3, 0, 3);
+}
+
+/* -----------------------------------------------
+   Header Bar
+   ----------------------------------------------- */
+.header-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0.3, 0, 2);
+}
+
+.app-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E8E9EA;
+}
+
+.greeting-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #B8BCC2;
+}
+
+.user-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #E8E9EA;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+}
+
+.user-button:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-text-fill: #B4C1AE;
+}
+
+.user-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.25);
 }
