@@ -36,63 +36,44 @@ public class ContentArea extends StackPane {
         );
     }
 
-    public void showHome() {
+    private void showOnly(Node viewToShow) {
         for (Node node : this.getChildren()) {
-            if (node instanceof HomeView) {
-                node.setVisible(true);
-            } else {
-                node.setVisible(false);
-            }
+            node.setVisible(node == viewToShow);
         }
+    }
+
+    public void showHome() {
+        showOnly(homeView);
     }
 
     public void showLibrary() {
-        for (Node node : this.getChildren()) {
-            if (node instanceof LibraryView) {
-                node.setVisible(true);
-            } else {
-                node.setVisible(false);
-            }
-        }
+        showOnly(libraryView);
     }
 
     public void showMeetings() {
-        for (Node node : this.getChildren()) {
-            if (node instanceof MeetingsView) {
-                node.setVisible(true);
-            } else {
-                node.setVisible(false);
-            }
-        }
+        showOnly(meetingsView);
     }
 
-    public void showMembers () {
-        for (Node node : this.getChildren()) {
-            if (node instanceof MembersView) {
-                node.setVisible(true);
-            } else {
-                node.setVisible(false);
-            }
-        }
+    public void showMembers() {
+        showOnly(membersView);
     }
 
     public void showNotes() {
-        for (Node node : this.getChildren()) {
-            if (node instanceof NotesView) {
-                node.setVisible(true);
-            }  else {
-                node.setVisible(false);
-            }
-        }
+        showOnly(notesView);
     }
 
     public void showRecommendations() {
-        for (Node node : this.getChildren()) {
-            if (node instanceof RecommendationsView) {
-                node.setVisible(true);
-            }  else {
-                node.setVisible(false);
-            }
+        showOnly(recommendationsView);
+    }
+
+    public void showView(String text) {
+        switch (text) {
+            case "Library" -> showLibrary();
+            case "Meetings" -> showMeetings();
+            case "Members" -> showMembers();
+            case "Notes" -> showNotes();
+            case "Recommendations" -> showRecommendations();
+            default -> showHome();
         }
     }
 }
