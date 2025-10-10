@@ -2,16 +2,20 @@ package com.litclub.ui.component;
 
 import com.litclub.session.AppSession;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
 public class NavigationSideBar extends VBox {
 
-    public NavigationSideBar() {
+    ContentArea contentArea;
+
+    public NavigationSideBar(ContentArea contentArea) {
+        this.contentArea = contentArea;
         this.setSpacing(8);
         this.setPadding(new Insets(20, 15, 20, 15));
         this.setMinWidth(200);
         this.setMaxWidth(200);
-        this.getStyleClass().add("navigation-sidebar");
+        this.getStyleClass().add("nav-sidebar");
 
         // Add nav buttons
         addNavButton("🏠", "Home");
@@ -20,11 +24,22 @@ public class NavigationSideBar extends VBox {
         addNavButton("📝", "Notes");
         addNavButton("✨", "Recommendations");
 
-        // Conditionally add admin-only button
         if (AppSession.getInstance().getClubRecord().administrator()) {
             addNavButton("👥", "Members");
         }
     }
 
-    private void addNavButton(String emoji, String text) {}
+    private void addNavButton(String emoji, String text) {
+        Button button = new Button();
+        button.setText(emoji + " " + text);
+        button.getStyleClass().add("nav-button");
+
+        button.setOnAction(
+                event -> {
+                    contentArea.showView(text);
+                }
+        );
+
+        this.getChildren().add(button);
+    }
 }
