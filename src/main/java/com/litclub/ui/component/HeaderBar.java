@@ -2,8 +2,8 @@ package com.litclub.ui.component;
 
 import com.litclub.SceneManager;
 import com.litclub.theme.ThemeManager;
-import com.litclub.ui.component.subcomponent.MiniLogo;
-import com.litclub.ui.component.subcomponent.UserMessage;
+import com.litclub.ui.component.content.subcomponents.MiniLogo;
+import com.litclub.ui.component.subunits.UserMessage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;

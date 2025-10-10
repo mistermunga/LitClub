@@ -3,7 +3,7 @@ package com.litclub.ui;
 import com.litclub.SceneManager;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
-import com.litclub.ui.component.subcomponent.ThemeToggleBar;
+import com.litclub.ui.component.subunits.ThemeToggleBar;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;

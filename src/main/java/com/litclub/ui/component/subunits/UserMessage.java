@@ -1,4 +1,4 @@
-package com.litclub.ui.component.subcomponent;
+package com.litclub.ui.component.subunits;
 
 import com.litclub.session.AppSession;
 import javafx.geometry.Pos;

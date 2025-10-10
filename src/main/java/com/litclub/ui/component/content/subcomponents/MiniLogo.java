@@ -1,4 +1,4 @@
-package com.litclub.ui.component.subcomponent;
+package com.litclub.ui.component.content.subcomponents;
 
 import com.litclub.theme.ThemeManager;
 import javafx.scene.image.Image;
