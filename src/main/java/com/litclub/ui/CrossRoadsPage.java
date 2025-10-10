@@ -1,6 +1,6 @@
 package com.litclub.ui;
 
-import com.litclub.MainApplication;
+import com.litclub.SceneManager;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.component.subcomponent.ThemeToggleBar;
 import javafx.geometry.Insets;
@@ -55,7 +55,7 @@ public class CrossRoadsPage extends VBox {
                 clubButton.getStyleClass().add("club-button");
 
                 clubButton.setOnAction(e -> {
-                    MainApplication.getInstance().showClubPage(clubName);
+                    SceneManager.getInstance().showClubPage(clubName);
                 });
                 row.getChildren().add(clubButton);
             }

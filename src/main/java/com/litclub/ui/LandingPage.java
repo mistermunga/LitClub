@@ -1,6 +1,6 @@
 package com.litclub.ui;
 
-import com.litclub.MainApplication;
+import com.litclub.SceneManager;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.component.subcomponent.ThemeToggleBar;
 import javafx.geometry.Insets;
@@ -89,12 +89,12 @@ public class LandingPage extends VBox {
         instanceURL.setPromptText("abulafia.litclub.com");
         instanceURL.getStyleClass().add("text-input");
         HBox.setHgrow(instanceURL, Priority.ALWAYS);
-        instanceURL.setOnAction(e -> MainApplication.getInstance().showLogin());
+        instanceURL.setOnAction(e -> SceneManager.getInstance().showLogin());
 
         Button goButton = new Button("Go");
         goButton.getStyleClass().add("button-primary");
         goButton.setDefaultButton(true);
-        goButton.setOnAction(e -> MainApplication.getInstance().showLogin());
+        goButton.setOnAction(e -> SceneManager.getInstance().showLogin());
 
         inputRow.getChildren().addAll(instanceURL, goButton);
 

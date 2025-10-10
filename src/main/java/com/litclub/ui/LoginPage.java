@@ -1,6 +1,6 @@
 package com.litclub.ui;
 
-import com.litclub.MainApplication;
+import com.litclub.SceneManager;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.component.subcomponent.ThemeToggleBar;
@@ -101,7 +101,7 @@ public class LoginPage extends VBox {
         backButton.getStyleClass().add("secondary-button");
         HBox.setHgrow(backButton, Priority.ALWAYS);
         backButton.setMaxWidth(Double.MAX_VALUE);
-        backButton.setOnAction(e -> MainApplication.getInstance().showLanding());
+        backButton.setOnAction(e -> SceneManager.getInstance().showLanding());
 
         buttonContainer.getChildren().addAll(loginButton, registerButton, backButton);
 
@@ -125,7 +125,7 @@ public class LoginPage extends VBox {
                         "Mariedoe",
                         "Mariedoe@example.com");
                 // TODO Pass details about what is to be displayed
-                MainApplication.getInstance().showCrossRoads();
+                SceneManager.getInstance().showCrossRoads();
             } else {
                 showAccessDeniedError(identifier, password);
             }
