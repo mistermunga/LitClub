@@ -26,7 +26,7 @@ public class ClubPage extends BorderPane {
     public void showDashboard() {
         ContentArea contentArea = new ContentArea();
         RightPanel rightPanel = new RightPanel();
-        NavigationSideBar  navigationSideBar = new NavigationSideBar();
+        NavigationSideBar  navigationSideBar = new NavigationSideBar(contentArea);
 
         this.setCenter(contentArea);
         this.setRight(rightPanel);
