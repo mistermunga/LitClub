@@ -7,6 +7,7 @@
     -fx-background-color: linear-gradient(to bottom, #0D0E10 0%, #1A1B1E 100%);
     -fx-font-family: "Serif";
     -fx-text-fill: #E8E9EA;
+    -fx-accent: #4a9eff;
 }
 
 /* -----------------------------------------------
@@ -219,4 +220,77 @@
 
 .user-button:pressed {
     -fx-background-color: rgba(168, 181, 162, 0.25);
+}
+
+/* Library Control Bar */
+.library-control-bar {
+    -fx-background-color: derive(-fx-base, 5%);
+    -fx-border-color: derive(-fx-base, -10%);
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Stats Label */
+.stats-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-font-weight: 500;
+}
+
+/* Options Menu Button */
+.options-menu {
+    -fx-background-color: transparent;
+    -fx-border-color: derive(-fx-base, -15%);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
+
+.options-menu:hover {
+    -fx-background-color: derive(-fx-base, 10%);
+}
+
+.options-menu .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+/* Search Field inside Menu */
+.search-field {
+    -fx-background-color: derive(-fx-base, -5%);
+    -fx-text-fill: -fx-text-base-color;
+    -fx-prompt-text-fill: derive(-fx-text-base-color, 40%);
+    -fx-padding: 8 12 8 12;
+    -fx-border-color: derive(-fx-base, -15%);
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.search-field:focused {
+    -fx-border-color: -fx-accent;
+    -fx-background-color: derive(-fx-base, -8%);
+}
+
+/* Primary Button (Add Book) */
+.primary-button {
+    -fx-background-color: -fx-accent;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-padding: 8 20 8 20;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: derive(-fx-accent, -10%);
+}
+
+.primary-button:pressed {
+    -fx-background-color: derive(-fx-accent, -20%);
+}
+
+.add-book-button {
+    -fx-font-size: 14px;
 }
