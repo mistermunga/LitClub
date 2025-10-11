@@ -4,7 +4,6 @@ import com.litclub.theme.ThemeManager;
 import com.litclub.ui.component.ContentArea;
 import com.litclub.ui.component.HeaderBar;
 import com.litclub.ui.component.NavigationSideBar;
-import com.litclub.ui.component.RightPanel;
 import com.litclub.ui.component.subunits.ThemeToggleBar;
 import javafx.scene.layout.BorderPane;
 
@@ -25,11 +24,9 @@ public class ClubPage extends BorderPane {
 
     public void showDashboard() {
         ContentArea contentArea = new ContentArea();
-        RightPanel rightPanel = new RightPanel();
         NavigationSideBar  navigationSideBar = new NavigationSideBar(contentArea);
 
         this.setCenter(contentArea);
-        this.setRight(rightPanel);
         this.setLeft(navigationSideBar);
     }
 
