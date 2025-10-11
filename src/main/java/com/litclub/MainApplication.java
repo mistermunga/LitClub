@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class MainApplication extends Application {
 
     private static MainApplication instance;
@@ -13,19 +15,19 @@ public class MainApplication extends Application {
         return instance;
     }
 
+    static {System.setProperty("file.encoding", "UTF-8");}
+
     @Override
     public void start(Stage primaryStage) {
         instance = this;
         this.primaryStage = primaryStage;
 
-        // One-time stage setup only
         primaryStage.getIcons().add(
-                new Image(getClass().getResourceAsStream(
+                new Image(Objects.requireNonNull(getClass().getResourceAsStream(
                         "/com/litclub/ui/icons/LitClub_logo_blackText_mini.png"
                 ))
-        );
+        ));
 
-        // Delegate to SceneManager for all navigation
         SceneManager.getInstance().showLanding();
     }
 
