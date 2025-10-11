@@ -59,7 +59,7 @@ public class ControlBar extends HBox {
         buttonGroup.setAlignment(Pos.CENTER_RIGHT);
 
         // Options Menu Button
-        optionsMenu = new MenuButton("⚙️ Options");
+        optionsMenu = new MenuButton("⚙ Options");
         optionsMenu.getStyleClass().add("options-menu");
 
         // Search item (custom with text field)
@@ -84,7 +84,7 @@ public class ControlBar extends HBox {
 
         // Add Book Button
         addBookButton = new Button("+ Add Book");
-        addBookButton.getStyleClass().addAll("primary-button", "add-book-button");
+        addBookButton.getStyleClass().addAll("button-primary");
         addBookButton.setOnAction(e -> handleAddBook());
 
         buttonGroup.getChildren().addAll(optionsMenu, addBookButton);
