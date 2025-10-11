@@ -2,24 +2,62 @@
    LitClub - Dark Mode
    =============================================== */
 
+/* -----------------------------------------------
+   Root Styles
+   ----------------------------------------------- */
 .root,
 .page-root {
     -fx-background-color: linear-gradient(to bottom, #0D0E10 0%, #1A1B1E 100%);
     -fx-font-family: "Serif";
     -fx-text-fill: #E8E9EA;
-    -fx-accent: #4a9eff;
+    -fx-accent: #4A9EFF;
 }
 
 /* -----------------------------------------------
-   Logo Styling - Embrace the black background
+   Logo & Header
    ----------------------------------------------- */
 .page-logo {
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0.4, 0, 4);
     -fx-padding: 10 0 30 0;
 }
 
+.header-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0.3, 0, 2);
+}
+
+.app-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E8E9EA;
+}
+
+.greeting-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #B8BCC2;
+}
+
+.user-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #E8E9EA;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+}
+
+.user-button:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-text-fill: #B4C1AE;
+}
+
+.user-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.25);
+}
+
 /* -----------------------------------------------
-   Input Section
+   Containers & Utility Layout
    ----------------------------------------------- */
 .container {
     -fx-background-color: rgba(255, 255, 255, 0.03);
@@ -29,6 +67,24 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.3, 0, 2);
 }
 
+.card {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 12;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.3, 0, 3);
+}
+
+.login-form {
+    -fx-spacing: 15;
+}
+
+.text-muted {
+    -fx-text-fill: #7A7D84;
+}
+
+/* -----------------------------------------------
+   Typography
+   ----------------------------------------------- */
 .title {
     -fx-font-size: 24px;
     -fx-text-fill: #E8E9EA;
@@ -44,6 +100,19 @@
     -fx-letter-spacing: 0.5px;
 }
 
+.status-label {
+    -fx-font-size: 13px;
+    -fx-padding: 10 0 0 0;
+}
+
+.error-label {
+    -fx-text-fill: #E57368;
+    -fx-font-weight: 600;
+}
+
+/* -----------------------------------------------
+   Input Fields
+   ----------------------------------------------- */
 .text-input {
     -fx-background-color: #0D0E10;
     -fx-border-color: #2F3238;
@@ -59,22 +128,12 @@
 .text-input:focused {
     -fx-border-color: #A8B5A2;
     -fx-border-width: 2;
-    -fx-background-color: #12131a;
+    -fx-background-color: #12131A;
     -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.25), 8, 0.4, 0, 2);
 }
 
-.status-label {
-    -fx-font-size: 13px;
-    -fx-padding: 10 0 0 0;
-}
-
-.error-label {
-    -fx-text-fill: #E57368;
-    -fx-font-weight: 600;
-}
-
 /* -----------------------------------------------
-   Button Styling
+   Buttons
    ----------------------------------------------- */
 .button-primary {
     -fx-background-color: linear-gradient(to bottom, #B4C1AE 0%, #A8B5A2 100%);
@@ -153,7 +212,7 @@
 }
 
 /* -----------------------------------------------
-   Theme Toggle Button
+   Theme Toggle
    ----------------------------------------------- */
 .theme-toggle {
     -fx-background-color: transparent;
@@ -171,126 +230,223 @@
 }
 
 /* -----------------------------------------------
-   Utility Classes
+   Library Control Bar & Menu
    ----------------------------------------------- */
-.text-muted {
-    -fx-text-fill: #7A7D84;
-}
-
-.card {
-    -fx-background-color: rgba(255, 255, 255, 0.04);
-    -fx-background-radius: 12;
-    -fx-padding: 24;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.3, 0, 3);
-}
-
-/* -----------------------------------------------
-   Header Bar
-   ----------------------------------------------- */
-.header-bar {
-    -fx-background-color: rgba(255, 255, 255, 0.02);
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0.3, 0, 2);
-}
-
-.app-name {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #E8E9EA;
-}
-
-.greeting-label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #B8BCC2;
-}
-
-.user-button {
-    -fx-background-color: transparent;
-    -fx-text-fill: #E8E9EA;
-    -fx-font-size: 14px;
-    -fx-font-weight: 600;
-    -fx-padding: 4 8;
-    -fx-cursor: hand;
-    -fx-background-radius: 6;
-}
-
-.user-button:hover {
-    -fx-background-color: rgba(168, 181, 162, 0.15);
-    -fx-text-fill: #B4C1AE;
-}
-
-.user-button:pressed {
-    -fx-background-color: rgba(168, 181, 162, 0.25);
-}
-
-/* Library Control Bar */
 .library-control-bar {
-    -fx-background-color: derive(-fx-base, 5%);
-    -fx-border-color: derive(-fx-base, -10%);
-    -fx-border-width: 0 0 1 0;
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-border-color: rgba(168, 181, 162, 0.15);
+    -fx-border-width: 0 0 1.5 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.3, 0, 1);
 }
 
-/* Stats Label */
 .stats-label {
     -fx-font-size: 14px;
-    -fx-text-fill: -fx-text-base-color;
+    -fx-text-fill: #B8BCC2;
     -fx-font-weight: 500;
 }
 
-/* Options Menu Button */
 .options-menu {
     -fx-background-color: transparent;
-    -fx-border-color: derive(-fx-base, -15%);
-    -fx-border-width: 1;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-padding: 8 16 8 16;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 16;
     -fx-cursor: hand;
 }
 
 .options-menu:hover {
-    -fx-background-color: derive(-fx-base, 10%);
+    -fx-background-color: rgba(168, 181, 162, 0.1);
+    -fx-border-color: #A8B5A2;
+}
+
+.options-menu:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.18);
 }
 
 .options-menu .label {
-    -fx-text-fill: -fx-text-base-color;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
 }
 
-/* Search Field inside Menu */
 .search-field {
-    -fx-background-color: derive(-fx-base, -5%);
-    -fx-text-fill: -fx-text-base-color;
-    -fx-prompt-text-fill: derive(-fx-text-base-color, 40%);
-    -fx-padding: 8 12 8 12;
-    -fx-border-color: derive(-fx-base, -15%);
-    -fx-border-width: 1;
-    -fx-border-radius: 3;
-    -fx-background-radius: 3;
+    -fx-background-color: #0D0E10;
+    -fx-text-fill: #E8E9EA;
+    -fx-prompt-text-fill: #5A5D64;
+    -fx-padding: 8 12;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 13px;
 }
 
 .search-field:focused {
-    -fx-border-color: -fx-accent;
-    -fx-background-color: derive(-fx-base, -8%);
+    -fx-border-color: #A8B5A2;
+    -fx-border-width: 2;
+    -fx-background-color: #12131A;
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.2), 6, 0.3, 0, 1);
 }
 
-/* Primary Button (Add Book) */
-.primary-button {
-    -fx-background-color: -fx-accent;
-    -fx-text-fill: white;
+.menu-item {
+    -fx-padding: 8 16;
+}
+
+.menu-item:focused {
+    -fx-background-color: rgba(168, 181, 162, 0.12);
+}
+
+.menu-item .label {
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 13px;
+}
+
+.radio-menu-item:checked .label {
+    -fx-text-fill: #B4C1AE;
     -fx-font-weight: 600;
-    -fx-padding: 8 20 8 20;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-cursor: hand;
-}
-
-.primary-button:hover {
-    -fx-background-color: derive(-fx-accent, -10%);
-}
-
-.primary-button:pressed {
-    -fx-background-color: derive(-fx-accent, -20%);
 }
 
 .add-book-button {
     -fx-font-size: 14px;
+}
+
+/* -----------------------------------------------
+   Navigation Sidebar
+   ----------------------------------------------- */
+.nav-sidebar {
+    -fx-background-color: rgba(168, 181, 162, 0.04);
+    -fx-border-color: rgba(168, 181, 162, 0.2);
+    -fx-border-width: 0 1.5 0 0;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 14 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+}
+
+.nav-button:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.1);
+    -fx-text-fill: #E8E9EA;
+}
+
+.nav-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.18);
+    -fx-translate-y: 0.5;
+}
+
+
+.nav-button:focused {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-text-fill: #B4C1AE;
+    -fx-font-weight: 600;
+}
+
+/* -----------------------------------------------
+   Library Section
+   ----------------------------------------------- */
+.library-section {
+    -fx-spacing: 15;
+}
+
+.library-core {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.section-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E8E9EA;
+}
+
+.section-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7A7D84;
+}
+
+/* -----------------------------------------------
+   Books
+   ----------------------------------------------- */
+.books-container {
+    -fx-hgap: 15;
+    -fx-vgap: 15;
+    -fx-padding: 10 0 0 0;
+}
+
+.book-card {
+    -fx-background-color: rgba(168, 181, 162, 0.08);
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+    -fx-border-color: rgba(168, 181, 162, 0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-alignment: top-center;
+    -fx-spacing: 8;
+    -fx-pref-width: 140;
+    -fx-max-width: 140;
+    -fx-min-height: 220;
+}
+
+.book-card:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.12);
+    -fx-border-color: rgba(168, 181, 162, 0.4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0.4, 0, 2);
+}
+
+.book-card:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.18);
+    -fx-translate-y: 1;
+}
+
+.book-cover {
+    -fx-background-color: linear-gradient(to bottom, #8FA388, #768773);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(0, 0, 0, 0.3);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-pref-width: 116;
+    -fx-pref-height: 160;
+    -fx-max-width: 116;
+    -fx-max-height: 160;
+    -fx-alignment: center;
+}
+
+.book-cover-icon {
+    -fx-font-size: 32px;
+}
+
+.book-info {
+    -fx-spacing: 3;
+    -fx-alignment: top-left;
+}
+
+.book-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E8E9EA;
+    -fx-wrap-text: true;
+    -fx-max-width: 116;
+}
+
+.book-author {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7A7D84;
+    -fx-wrap-text: true;
+    -fx-max-width: 116;
+}
+
+.book-genre {
+    -fx-font-size: 10px;
+    -fx-font-style: italic;
+    -fx-text-fill: #7A7D84;
+    -fx-wrap-text: true;
+    -fx-max-width: 116;
 }
