@@ -2,12 +2,14 @@ package com.litclub;
 
 import com.litclub.session.AppSession;
 import com.litclub.session.construct.ClubRecord;
+import com.litclub.session.construct.UserRecord;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.*;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Set;
 
 public class SceneManager {
 
@@ -74,8 +76,22 @@ public class SceneManager {
         themeManager.clearRegisteredComponents();
 
         // TODO [CRITICAL]: API call to get club details
-        boolean adminPermission = clubName.equals("Society of the Bard");
-        ClubRecord cr = new ClubRecord(clubName, adminPermission);
+        UserRecord admin;
+        UserRecord Marie = AppSession.getInstance().getUserRecord();
+        UserRecord John = new UserRecord(
+                "John",
+                "Doe",
+                "johndoe",
+                "johndoe@example.com"
+        );
+        if (clubName.equals("Society of the Bard")) {
+            admin = Marie;
+        } else {
+            admin = John;
+        }
+
+        Set<UserRecord> members =  Set.of(Marie, John);
+        ClubRecord cr = new ClubRecord(clubName, admin, members);
         session.setClubDetails(cr);
 
         Stage stage = application.getPrimaryStage();
