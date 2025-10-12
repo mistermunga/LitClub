@@ -541,3 +541,88 @@
     -fx-padding: 40 0 0 0;
     -fx-alignment: center;
 }
+
+
+/* ===============================================
+   SCROLLBAR STYLES
+   =============================================== */
+
+/* Scrollbar Track */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: #1A1B1E;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-bar:vertical > .track,
+.scroll-bar:horizontal > .track {
+    -fx-background-color: rgba(168, 181, 162, 0.06);
+    -fx-background-radius: 4;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:vertical > .track-background,
+.scroll-bar:horizontal > .track-background {
+    -fx-background-color: transparent;
+}
+
+/* Scrollbar Thumb */
+.scroll-bar:vertical > .thumb,
+.scroll-bar:horizontal > .thumb {
+    -fx-background-color: rgba(168, 181, 162, 0.3);
+    -fx-background-radius: 4;
+    -fx-background-insets: 2;
+}
+
+.scroll-bar:vertical > .thumb:hover,
+.scroll-bar:horizontal > .thumb:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.5);
+}
+
+.scroll-bar:vertical > .thumb:pressed,
+.scroll-bar:horizontal > .thumb:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.65);
+}
+
+/* Increment/Decrement Buttons */
+.scroll-bar > .increment-button,
+.scroll-bar > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar > .increment-button > .increment-arrow,
+.scroll-bar > .decrement-button > .decrement-arrow {
+    -fx-background-color: rgba(184, 188, 194, 0.5);
+    -fx-padding: 0.25em;
+    -fx-shape: " ";
+}
+
+.scroll-bar:vertical > .increment-button > .increment-arrow {
+    -fx-shape: "M 0 0 L 4 0 L 2 4 Z";
+}
+
+.scroll-bar:vertical > .decrement-button > .decrement-arrow {
+    -fx-shape: "M 0 4 L 4 4 L 2 0 Z";
+}
+
+.scroll-bar:horizontal > .increment-button > .increment-arrow {
+    -fx-shape: "M 0 0 L 0 4 L 4 2 Z";
+}
+
+.scroll-bar:horizontal > .decrement-button > .decrement-arrow {
+    -fx-shape: "M 4 0 L 4 4 L 0 2 Z";
+}
