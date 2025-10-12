@@ -448,3 +448,94 @@
 .add-book-button {
     -fx-font-size: 14px;
 }
+
+/* ===============================================
+   Meetings View
+   ===============================================
+ */
+.meetings-view {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.meetings-container {
+    -fx-spacing: 20;
+    -fx-padding: 30 40 30 40;
+}
+
+.meetings-header {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2A2D32;
+    -fx-padding: 0 0 10 0;
+}
+
+.meeting-card {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-background-radius: 12;
+    -fx-padding: 20 24 20 24;
+    -fx-spacing: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0.3, 0, 2);
+    -fx-border-color: rgba(168, 181, 162, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-cursor: hand;
+}
+
+.meeting-card:hover {
+    -fx-background-color: rgba(255, 255, 255, 1.0);
+    -fx-border-color: rgba(168, 181, 162, 0.4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0.35, 0, 3);
+    -fx-translate-y: -2;
+}
+
+.meeting-card:pressed {
+    -fx-background-color: rgba(248, 250, 252, 0.95);
+    -fx-translate-y: 0;
+}
+
+.meeting-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2A2D32;
+    -fx-wrap-text: true;
+}
+
+.meeting-club-badge {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-background-radius: 6;
+    -fx-padding: 4 12 4 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #768773;
+}
+
+.meeting-info-section {
+    -fx-spacing: 8;
+    -fx-padding: 8 0 0 0;
+}
+
+.meeting-time {
+    -fx-font-size: 14px;
+    -fx-text-fill: #4A4D52;
+    -fx-font-weight: 500;
+}
+
+.meeting-location {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6A6D72;
+    -fx-wrap-text: true;
+}
+
+.meeting-location-link {
+    -fx-text-fill: #768773;
+    -fx-font-weight: 500;
+}
+
+.empty-state {
+    -fx-font-size: 16px;
+    -fx-text-fill: #9DA2A9;
+    -fx-font-style: italic;
+    -fx-padding: 40 0 0 0;
+    -fx-alignment: center;
+}
