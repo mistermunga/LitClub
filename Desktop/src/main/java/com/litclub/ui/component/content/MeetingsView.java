@@ -24,7 +24,7 @@ public class MeetingsView extends ScrollPane {
 
     public MeetingsView() {
         ThemeManager.getInstance().registerComponent(this);
-        this.getStyleClass().add("meetings-view");
+        this.getStyleClass().addAll("meetings-view", "scroll-pane");
         this.setFitToWidth(true);
         this.setFitToHeight(true);
         this.setHbarPolicy(ScrollBarPolicy.NEVER);

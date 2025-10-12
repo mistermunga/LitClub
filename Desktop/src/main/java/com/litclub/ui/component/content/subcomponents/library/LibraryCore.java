@@ -17,7 +17,7 @@ public class LibraryCore extends ScrollPane {
 
     public LibraryCore() {
         ThemeManager.getInstance().registerComponent(this);
-        this.getStyleClass().add("library-core");
+        this.getStyleClass().addAll("library-core", "scroll-pane");
 
         container = new VBox(30);
         container.setPadding(new Insets(20));
