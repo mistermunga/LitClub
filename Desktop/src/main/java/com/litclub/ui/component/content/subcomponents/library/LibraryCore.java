@@ -2,18 +2,16 @@ package com.litclub.ui.component.content.subcomponents.library;
 
 import com.litclub.theme.ThemeManager;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 // TODO [Important] API calls here
 public class LibraryCore extends ScrollPane {
 
-    private VBox container;
+    private final VBox container;
 
     public LibraryCore() {
         ThemeManager.getInstance().registerComponent(this);
@@ -24,6 +22,11 @@ public class LibraryCore extends ScrollPane {
         container.setFillWidth(true);
         container.getStyleClass().add("container");
 
+        this.setVvalue(0);
+        this.setPannable(false);
+
+        setupSmoothScrolling();
+
         this.setContent(container);
         this.setFitToWidth(true);
         this.setFitToHeight(true);
@@ -33,6 +36,14 @@ public class LibraryCore extends ScrollPane {
         showCurrentlyReading();
         showWantToRead();
         showReadSection();
+    }
+
+    private void setupSmoothScrolling() {
+        final double SPEED = 0.005;
+        container.setOnScroll(scrollEvent -> {
+            double deltaY = scrollEvent.getDeltaY() * SPEED;
+            this.setVvalue(this.getVvalue() - deltaY);
+        });
     }
 
     public void showCurrentlyReading() {

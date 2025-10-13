@@ -30,16 +30,17 @@ public class MeetingsView extends ScrollPane {
         this.setHbarPolicy(ScrollBarPolicy.NEVER);
         this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
-        // Main container with proper padding
         this.container = new VBox(20);
         this.container.setPadding(new Insets(30, 40, 30, 40));
         this.container.getStyleClass().add("meetings-container");
         VBox.setVgrow(this.container, Priority.ALWAYS);
 
-        // Add header
-        addHeader();
+        this.setVvalue(0);
+        this.setPannable(false);
 
-        // Add meetings
+        setupSmoothScrolling();
+
+        addHeader();
         showMeetings();
 
         this.setContent(container);
@@ -155,5 +156,13 @@ public class MeetingsView extends ScrollPane {
                         Optional.empty()
                 )
         );
+    }
+
+    private void setupSmoothScrolling() {
+        final double SPEED = 0.005;
+        this.setOnScroll(event -> {
+            double deltaY = event.getDeltaY() * SPEED;
+            this.setVvalue(this.getVvalue() - deltaY);
+        });
     }
 }
