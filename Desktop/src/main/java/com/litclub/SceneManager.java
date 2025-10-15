@@ -79,6 +79,7 @@ public class SceneManager {
         UserRecord admin;
         UserRecord Marie = AppSession.getInstance().getUserRecord();
         UserRecord John = new UserRecord(
+                1000,
                 "John",
                 "Doe",
                 "johndoe",
@@ -91,7 +92,9 @@ public class SceneManager {
         }
 
         Set<UserRecord> members =  Set.of(Marie, John);
-        ClubRecord cr = new ClubRecord(clubName, admin, members);
+        ClubRecord cr = clubName == "Society of the Bard"
+                ? new ClubRecord(1, clubName, admin, members)
+                : new ClubRecord(2, clubName, admin, members);
         session.setClubDetails(cr);
 
         Stage stage = application.getPrimaryStage();
