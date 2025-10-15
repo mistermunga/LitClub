@@ -28,12 +28,13 @@ public class AppSession {
     }
 
     public void setCredentials(
+            int id,
             String firstname,
             String lastname,
             String username,
             String email
     ) {
-        this.userRecord = new UserRecord(firstname, lastname, username, email);
+        this.userRecord = new UserRecord(id, firstname, lastname, username, email);
     }
 
     public void setClubDetails( ClubRecord clubRecord ) {
