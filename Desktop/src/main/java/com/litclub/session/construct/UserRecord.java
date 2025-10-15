@@ -1,4 +1,5 @@
 package com.litclub.session.construct;
 
-public record UserRecord(String firstname, String lastname, String username, String email) {
+public record UserRecord
+        (int userID, String firstname, String lastname, String username, String email) {
 }
