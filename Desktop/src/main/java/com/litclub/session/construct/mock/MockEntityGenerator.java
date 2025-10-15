@@ -102,9 +102,7 @@ public class MockEntityGenerator {
             default -> "A thought-provoking read that made me think differently.";
         };
 
-        // createdAt will be set by database, so we pass null or don't set it
         Review review = new Review(reviewID, bookID, userID, rating, content);
-        // Don't set createdAt - will come from database
 
         return review;
     }
