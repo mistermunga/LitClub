@@ -31,6 +31,11 @@ public class MainApplication extends Application {
         SceneManager.getInstance().showLanding();
     }
 
+    @Override
+    public void stop() {
+        CacheManager.getInstance().clearCache();
+    }
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }
