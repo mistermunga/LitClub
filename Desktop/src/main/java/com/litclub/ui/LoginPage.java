@@ -120,6 +120,7 @@ public class LoginPage extends VBox {
             if ((identifier.equals("Marie Doe") || identifier.equals("Mariedoe@example.com")) && password.equals("Example")) {
                 // TODO setting details in session -> This should be an API CALL
                 AppSession.getInstance().setCredentials(
+                        1,
                         "Marie",
                         "Doe",
                         "Mariedoe",
