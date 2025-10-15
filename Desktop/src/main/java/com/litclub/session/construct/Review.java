@@ -66,4 +66,25 @@ public class Review {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+    // Helper method to convert rating to star display (for UI components)
+    public static String getStarRating(int rating) {
+        double stars = rating / 2.0;
+        int fullStars = (int) stars;
+        boolean hasHalfStar = (stars - fullStars) >= 0.5;
+
+        StringBuilder display = new StringBuilder();
+        for (int i = 0; i < fullStars; i++) {
+            display.append("★");
+        }
+        if (hasHalfStar) {
+            display.append("⯨");
+        }
+        int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        for (int i = 0; i < emptyStars; i++) {
+            display.append("☆");
+        }
+
+        return display.toString() + " (" + stars + ")";
+    }
 }
