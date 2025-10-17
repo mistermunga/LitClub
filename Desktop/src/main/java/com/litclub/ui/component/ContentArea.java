@@ -1,5 +1,6 @@
 package com.litclub.ui.component;
 
+import com.litclub.session.construct.mock.MockDataPopulator;
 import com.litclub.ui.component.content.*;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
@@ -19,6 +20,9 @@ public class ContentArea extends StackPane {
     }
 
     private void addAllViews(){
+        MockDataPopulator populator = new MockDataPopulator();
+        populator.populateClub();
+
         this.homeView = new HomeView();
         this.libraryView = new LibraryView();
         this.meetingsView = new MeetingsView();
