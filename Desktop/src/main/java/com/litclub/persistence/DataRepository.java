@@ -7,7 +7,6 @@ import com.litclub.session.construct.Note;
 import com.litclub.session.construct.Review;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 
 import java.time.LocalDateTime;
 
@@ -111,54 +110,6 @@ public class DataRepository {
         return notes;
     }
 
-    /**
-     * Returns notes for the currently logged-in user.
-     */
-    public FilteredList<Note> getNotesForCurrentUser() {
-        int currentUserId = getCurrentUserId();
-        return notes.filtered(note -> note.getUserID() == currentUserId);
-    }
-
-    /**
-     * Returns notes for a specific book (current user only).
-     */
-    public FilteredList<Note> getNotesForBook(int bookId) {
-        int currentUserId = getCurrentUserId();
-        return notes.filtered(note ->
-                note.getBookID() == bookId &&
-                        note.getUserID() == currentUserId
-        );
-    }
-
-    /**
-     * Returns notes for a specific book (all users - for club view).
-     */
-    public FilteredList<Note> getAllNotesForBook(int bookId) {
-        return notes.filtered(note -> note.getBookID() == bookId && !note.isPrivate());
-    }
-
-    /**
-     * Returns shared (non-private) notes for a specific club.
-     */
-    public FilteredList<Note> getSharedNotesForClub(int clubId) {
-        return notes.filtered(note ->
-                note.getClubID() != null &&
-                        note.getClubID() == clubId &&
-                        !note.isPrivate()
-        );
-    }
-
-    /**
-     * Returns private notes (not shared with any club).
-     */
-    public FilteredList<Note> getPrivateNotes() {
-        int currentUserId = getCurrentUserId();
-        return notes.filtered(note ->
-                note.getUserID() == currentUserId &&
-                        note.isPrivate()
-        );
-    }
-
     public Note getNoteById(int noteId) {
         return notes.stream()
                 .filter(n -> n.getNoteID() == noteId)
@@ -205,43 +156,6 @@ public class DataRepository {
         return meetings;
     }
 
-    /**
-     * Returns meetings for the current user's club.
-     */
-    public FilteredList<MeetingRecord> getMeetingsForCurrentClub() {
-        int currentClubId = getCurrentClubId();
-        return meetings.filtered(meeting ->
-                meeting.club() != null &&
-                        meeting.club().clubID() == currentClubId
-        );
-    }
-
-    /**
-     * Returns upcoming meetings (future start time) for current club.
-     */
-    public FilteredList<MeetingRecord> getUpcomingMeetings() {
-        int currentClubId = getCurrentClubId();
-        LocalDateTime now = LocalDateTime.now();
-        return meetings.filtered(meeting ->
-                meeting.club() != null &&
-                        meeting.club().clubID() == currentClubId &&
-                        meeting.start().isAfter(now)
-        );
-    }
-
-    /**
-     * Returns past meetings for current club.
-     */
-    public FilteredList<MeetingRecord> getPastMeetings() {
-        int currentClubId = getCurrentClubId();
-        LocalDateTime now = LocalDateTime.now();
-        return meetings.filtered(meeting ->
-                meeting.club() != null &&
-                        meeting.club().clubID() == currentClubId &&
-                        meeting.end().isBefore(now)
-        );
-    }
-
     public void addMeeting(MeetingRecord meeting) {
         meetings.add(meeting);
         saveMeetings();
@@ -260,21 +174,6 @@ public class DataRepository {
 
     public ObservableList<Review> getReviews() {
         return reviews;
-    }
-
-    /**
-     * Returns reviews for the currently logged-in user.
-     */
-    public FilteredList<Review> getReviewsForCurrentUser() {
-        int currentUserId = getCurrentUserId();
-        return reviews.filtered(review -> review.getUserID() == currentUserId);
-    }
-
-    /**
-     * Returns all reviews for a specific book (from all users).
-     */
-    public FilteredList<Review> getReviewsForBook(int bookId) {
-        return reviews.filtered(review -> review.getBookID() == bookId);
     }
 
     /**
@@ -363,15 +262,6 @@ public class DataRepository {
         loadFromCache();
     }
 
-    /**
-     * Populates repository with mock data for testing.
-     * Should only be called once on first run or after clearAll().
-     */
-    public void loadMockData() {
-        // This will be implemented with MockEntityGenerator
-        System.out.println("Mock data loading not yet implemented");
-    }
-
     // ==================== HELPER METHODS ====================
 
     /**
@@ -392,15 +282,5 @@ public class DataRepository {
         return AppSession.getInstance().getClubRecord() != null
                 ? AppSession.getInstance().getClubRecord().clubID()
                 : -1;
-    }
-
-    /**
-     * Gets the current club name from AppSession.
-     * Returns empty string if no club is active.
-     */
-    private String getCurrentClubName() {
-        return AppSession.getInstance().getClubRecord() != null
-                ? AppSession.getInstance().getClubRecord().name()
-                : "";
     }
 }
