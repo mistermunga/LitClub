@@ -626,3 +626,104 @@
 .scroll-bar:horizontal > .decrement-button > .decrement-arrow {
     -fx-shape: "M 4 0 L 4 4 L 0 2 Z";
 }
+
+
+/* ===============================================
+   NOTES VIEW STYLES (Dark Mode)
+   =============================================== */
+
+.notes-core {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.notes-section {
+    -fx-spacing: 15;
+}
+
+/* -----------------------------------------------
+   Note Cards Container (Dark)
+   ----------------------------------------------- */
+.notes-container {
+    -fx-hgap: 15;
+    -fx-vgap: 15;
+    -fx-padding: 10 0 0 0;
+}
+
+/* -----------------------------------------------
+   Individual Note Card (Dark)
+   ----------------------------------------------- */
+.note-card {
+    -fx-background-color: rgba(168, 181, 162, 0.08);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(168, 181, 162, 0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-min-width: 300;
+    -fx-max-width: 320;
+    -fx-min-height: 180;
+}
+
+.note-card:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.12);
+    -fx-border-color: rgba(168, 181, 162, 0.4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0.4, 0, 2);
+}
+
+.note-card:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.18);
+    -fx-translate-y: 1;
+}
+
+/* -----------------------------------------------
+   Note Card Content (Dark)
+   ----------------------------------------------- */
+.note-content {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #E8E9EA;
+    -fx-wrap-text: true;
+    -fx-line-spacing: 2;
+}
+
+.note-book-reference {
+    -fx-font-size: 12px;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-weight: 600;
+    -fx-wrap-text: true;
+}
+
+.note-date {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7A7D84;
+    -fx-font-style: italic;
+}
+
+/* -----------------------------------------------
+   Privacy/Sharing Indicators (Dark)
+   ----------------------------------------------- */
+.note-private-indicator {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-background-radius: 4;
+    -fx-text-fill: #B4C1AE;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-padding: 3 8 3 8;
+}
+
+.note-shared-indicator {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-background-radius: 4;
+    -fx-text-fill: #B4C1AE;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-padding: 3 8 3 8;
+}
+
+.empty-notes-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #5A5D64;
+    -fx-font-style: italic;
+    -fx-padding: 30 0 0 0;
+}
