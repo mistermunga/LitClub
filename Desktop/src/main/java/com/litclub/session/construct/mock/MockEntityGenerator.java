@@ -6,116 +6,156 @@ import com.litclub.session.construct.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class MockEntityGenerator {
 
-    public Book mockBook(){
+    private static int bookIdCounter = 1000;
+    private static int noteIdCounter = 2000;
+    private static int reviewIdCounter = 3000;
+    private static int userIdCounter = 4000;
+
+    private static final List<String> FIRST_NAMES = List.of(
+            "John", "Marie", "Graham", "Dylan", "Quentin", "Fisher",
+            "Alex", "Sam", "Jordan", "Casey", "Morgan", "Riley"
+    );
+
+    private static final List<String> LAST_NAMES = List.of(
+            "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia",
+            "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez"
+    );
+
+    private static final List<String> BOOK_TITLES = List.of(
+            "The Midnight Library", "Project Hail Mary", "Atomic Habits",
+            "The Seven Husbands of Evelyn Hugo", "Lessons in Chemistry",
+            "Klara and the Sun", "The Thursday Murder Club", "Remarkably Bright",
+            "Tomorrow, and Tomorrow, and Tomorrow", "The Four Winds"
+    );
+
+    private static final List<String> AUTHORS = List.of(
+            "Matt Haig", "Andy Weir", "James Clear", "Taylor Jenkins Reid",
+            "Bonnie Garmus", "Kazuo Ishiguro", "Richard Osman", "Katherine Heiny",
+            "Gabrielle Zevin", "Kristin Hannah"
+    );
+
+    private static final List<String> NOTE_CONTENTS = List.of(
+            "Loved this passage - really resonated with me",
+            "This character development was incredible",
+            "Didn't expect that plot twist!",
+            "The writing style is so engaging",
+            "This scene made me think about my own life",
+            "Brilliant dialogue between the main characters",
+            "The pacing was perfect in this section",
+            "This theme appears throughout the novel",
+            "Reminds me of another book I read",
+            "Beautiful metaphor here"
+    );
+
+    public Book mockBook() {
         Book mockBook = new Book();
 
-        int bookID = (int) (Math.random() * 1001);
-        String title = "Book #" + bookID;
-        String author = "Author";
-        String isbn = "123456789123";
+        int bookID = ++bookIdCounter;
+        String title = BOOK_TITLES.get((int) (Math.random() * BOOK_TITLES.size()));
+        String author = AUTHORS.get((int) (Math.random() * AUTHORS.size()));
+        String isbn = generateISBN();
         String coverUrl = "https://archive.org/services/img/howtowritethesis0000ecou/full/pct:200/0/default.jpg";
 
+        mockBook.setBookID(bookID);
         mockBook.setTitle(title);
         mockBook.setAuthor(author);
         mockBook.setIsbn(isbn);
         mockBook.setCoverURL(coverUrl);
+
         return mockBook;
     }
 
-    public UserRecord mockUserRecord(){
-        int userID = (int) (Math.random() * 1005);
-        List<String> namePool = List.of("John", "Marie", "Graham", "Dylan", "Quentin", "Fisher");
-        String firstname = namePool.get((int) (Math.random() * namePool.size()));
-        String lastname = namePool.get((int) (Math.random() * namePool.size()));
-        String username = firstname + lastname;
-        String email = firstname + "@example.com";
+    public UserRecord mockUserRecord() {
+        int userID = ++userIdCounter;
+        String firstname = FIRST_NAMES.get((int) (Math.random() * FIRST_NAMES.size()));
+        String lastname = LAST_NAMES.get((int) (Math.random() * LAST_NAMES.size()));
+        String username = (firstname + lastname).toLowerCase();
+        String email = username + "@litclub.com";
 
-        return new UserRecord(
-                userID, firstname, lastname, username, email
-        );
+        return new UserRecord(userID, firstname, lastname, username, email);
     }
 
-    // TODO implement book id with referential integrity
-    public Note mockNote(boolean isPrivate){
-        int noteID = (int) (Math.random() * 1001);
-        // int BookID = repo.getBook
-        int clubID = isPrivate ? null : AppSession.getInstance().getClubRecord().clubID();
+    public Note mockNote(boolean isPrivate) {
+        int noteID = ++noteIdCounter;
+        Integer clubID = isPrivate ? null : AppSession.getInstance().getClubRecord().clubID();
         int userID = AppSession.getInstance().getUserRecord().userID();
-        String content = "Lorem ipsum dolor scribit";
-        boolean Private = isPrivate;
-        LocalDateTime date = LocalDateTime.now();
+        String content = NOTE_CONTENTS.get((int) (Math.random() * NOTE_CONTENTS.size()));
+        LocalDateTime date = LocalDateTime.now().minusDays((long) (Math.random() * 30));
 
         Note note = new Note();
+        note.setNoteID(noteID);
         note.setClubID(clubID);
-        // note.setbookid
         note.setUserID(userID);
         note.setContent(content);
-        note.setPrivate(Private);
-        note.setCreatedAt(date); // TODO use database
+        note.setPrivate(isPrivate);
+        note.setCreatedAt(date);
 
         return note;
     }
 
-    public MeetingRecord mockMeeting (boolean online) {
-        String meetingName = "Sample Meeting";
-        LocalDateTime start = LocalDateTime.now();
-        LocalDateTime end = start.plusHours(2L);
+    public MeetingRecord mockMeeting(boolean online) {
+        String[] meetingNames = {
+                "Monthly Book Discussion",
+                "Author Spotlight Session",
+                "Reading Challenge Kickoff",
+                "Genre Deep Dive",
+                "New Member Welcome",
+                "Holiday Reading Celebration"
+        };
+
+        String meetingName = meetingNames[(int) (Math.random() * meetingNames.length)];
+        LocalDateTime start = LocalDateTime.now().plusDays((long) (Math.random() * 14)).plusHours((int) (Math.random() * 12) + 1);
+        LocalDateTime end = start.plusHours(2);
         ClubRecord club = AppSession.getInstance().getClubRecord();
-        String location = null, link = null;
-        if (online){
-            link = club.name() + ".litclub.com";
-        } else  {
-            location = "Physical Room " + club.clubID();
+        String location = null;
+        Optional<String> link = Optional.empty();
+
+        if (online) {
+            link = Optional.of("https://meet.litclub.com/" + club.name().toLowerCase().replace(" ", "-"));
+        } else {
+            String[] locations = {
+                    "Central Library - Room A",
+                    "Coffee House Downtown",
+                    "Community Center",
+                    "Park Pavilion",
+                    "Bookstore - Upstairs"
+            };
+            location = locations[(int) (Math.random() * locations.length)];
         }
 
-        return new MeetingRecord(
-                meetingName,
-                start,
-                end,
-                club,
-                location,
-                Optional.ofNullable(link)
-        );
+        return new MeetingRecord(meetingName, start, end, club, location, link);
     }
-
-    // Add this method to your MockEntityGenerator class
 
     public Review mockReview() {
-        int reviewID = (int) (Math.random() * 1001);
-        // TODO: Get actual book ID from repository when implementing referential integrity
-        int bookID = (int) (Math.random() * 100); // Placeholder
+        int reviewID = ++reviewIdCounter;
         int userID = AppSession.getInstance().getUserRecord().userID();
-
-        // Random rating between 1-10 (allows half-star increments when divided by 2)
         int rating = (int) (Math.random() * 10) + 1;
 
-        // Sample review content based on rating
-        String content = switch (rating) {
-            case 10, 9 -> "Absolutely loved this book! A masterpiece that I'll recommend to everyone.";
-            case 8, 7 -> "Really enjoyed reading this. Great characters and compelling story.";
-            case 6, 5 -> "Decent read. Had its moments but nothing particularly memorable.";
-            case 4, 3 -> "Struggled to get through this one. Not quite what I was expecting.";
-            case 2, 1 -> "Unfortunately couldn't connect with this book at all.";
-            default -> "A thought-provoking read that made me think differently.";
-        };
+        String content = getReviewContent(rating);
 
-        Review review = new Review(reviewID, bookID, userID, rating, content);
-
+        Review review = new Review(reviewID, 0, userID, rating, content);
         return review;
     }
 
-    // Overloaded version with specific book and rating
     public Review mockReview(int bookID, int rating) {
-        int reviewID = (int) (Math.random() * 1001);
+        int reviewID = ++reviewIdCounter;
         int userID = AppSession.getInstance().getUserRecord().userID();
 
-        // Clamp rating to 1-10
         rating = Math.max(1, Math.min(10, rating));
+        String content = getReviewContent(rating);
 
-        String content = switch (rating) {
+        Review review = new Review(reviewID, bookID, userID, rating, content);
+        return review;
+    }
+
+    // ==================== HELPER METHODS ====================
+
+    private String getReviewContent(int rating) {
+        return switch (rating) {
             case 10, 9 -> "Absolutely loved this book! A masterpiece that I'll recommend to everyone.";
             case 8, 7 -> "Really enjoyed reading this. Great characters and compelling story.";
             case 6, 5 -> "Decent read. Had its moments but nothing particularly memorable.";
@@ -123,10 +163,14 @@ public class MockEntityGenerator {
             case 2, 1 -> "Unfortunately couldn't connect with this book at all.";
             default -> "A thought-provoking read that made me think differently.";
         };
+    }
 
-        Review review = new Review(reviewID, bookID, userID, rating, content);
-        // Don't set createdAt - will come from database
-
-        return review;
+    private String generateISBN() {
+        // Generate a fake but valid-looking ISBN-13
+        StringBuilder isbn = new StringBuilder("978");
+        for (int i = 0; i < 10; i++) {
+            isbn.append((int) (Math.random() * 10));
+        }
+        return isbn.toString();
     }
 }
