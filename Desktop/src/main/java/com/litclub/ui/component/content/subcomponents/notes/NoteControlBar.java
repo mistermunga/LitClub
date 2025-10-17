@@ -1,5 +1,8 @@
 package com.litclub.ui.component.content.subcomponents.notes;
 
+import com.litclub.persistence.DataRepository;
+import com.litclub.session.construct.Note;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -7,10 +10,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
+import java.util.HashMap;
+
 public class NoteControlBar extends HBox {
 
     private MenuButton optionsMenu;
     private Button addNoteButton;
+    private final DataRepository dataRepository = DataRepository.getInstance();
 
     // Filter and sort state
     private String currentFilter = "All notes";
@@ -29,17 +35,18 @@ public class NoteControlBar extends HBox {
 
     // TODO: Implement API calls here; currently showing placeholder stats
     private void addStats() {
-        Label stats = new Label();
-        int totalNotes = 47;
-        int privateNotes = 12;
-        int clubNotes = 35;
+        HashMap<String, Integer> stats = getStats();
+        Label statsLabel = new Label();
+        int totalNotes = stats.get("Total");
+        int privateNotes = stats.get("Private");
+        int clubNotes = stats.get("Shared");
 
-        stats.setText("📝 " + totalNotes + " notes  |  " +
+        statsLabel.setText("📝 " + totalNotes + " notes  |  " +
                 privateNotes + " private  |  " +
                 clubNotes + " shared");
-        stats.getStyleClass().add("stats-label");
+        statsLabel.getStyleClass().add("stats-label");
 
-        this.getChildren().add(stats);
+        this.getChildren().add(statsLabel);
     }
 
     private void addSpacer() {
@@ -198,5 +205,22 @@ public class NoteControlBar extends HBox {
 
     public String getCurrentSort() {
         return currentSort;
+    }
+
+    private HashMap<String, Integer> getStats() {
+        HashMap<String, Integer> stats = new HashMap<>();
+        ObservableList<Note> notes = dataRepository.getNotes();
+        int totalNotes = notes.size(), privateNotes = 0, sharedNotes = 0;
+        for (Note note : notes) {
+            if (note.isPrivate()) {
+                privateNotes++;
+            } else {
+                sharedNotes++;
+            }
+        }
+        stats.put("Total", totalNotes);
+        stats.put("Private", privateNotes);
+        stats.put("Shared", sharedNotes);
+        return stats;
     }
 }
