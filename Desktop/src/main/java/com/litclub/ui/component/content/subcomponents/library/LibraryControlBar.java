@@ -9,7 +9,7 @@ import javafx.scene.layout.Region;
 
 import java.util.Calendar;
 
-public class ControlBar extends HBox {
+public class LibraryControlBar extends HBox {
 
     private MenuButton optionsMenu;
     private Button addBookButton;
@@ -18,7 +18,7 @@ public class ControlBar extends HBox {
     private String currentFilter = "All books";
     private String currentSort = "Recently added";
 
-    public ControlBar() {
+    public LibraryControlBar() {
         this.getStyleClass().add("library-control-bar");
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(15, 20, 15, 20));

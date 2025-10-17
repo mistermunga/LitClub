@@ -1,7 +1,7 @@
 package com.litclub.ui.component.content;
 
 import com.litclub.theme.ThemeManager;
-import com.litclub.ui.component.content.subcomponents.library.ControlBar;
+import com.litclub.ui.component.content.subcomponents.library.LibraryControlBar;
 import com.litclub.ui.component.content.subcomponents.library.LibraryCore;
 import javafx.scene.layout.BorderPane;
 
@@ -14,8 +14,8 @@ public class LibraryView extends BorderPane {
     }
 
     public void showControlBar() {
-        ControlBar controlBar = new ControlBar();
-        this.setTop(controlBar);
+        LibraryControlBar libraryControlBar = new LibraryControlBar();
+        this.setTop(libraryControlBar);
     }
 
     public void showLibraryCore() {
