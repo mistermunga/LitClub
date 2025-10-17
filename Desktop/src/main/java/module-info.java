@@ -6,9 +6,10 @@ module com.litclub {
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;
 
-
     opens com.litclub to javafx.fxml, com.google.gson, com.fasterxml.jackson.databind;
     opens com.litclub.persistence to com.google.gson;
+    opens com.litclub.session.construct to com.google.gson;
+    opens com.litclub.session.construct.mock to com.google.gson;
 
     exports com.litclub;
 }
