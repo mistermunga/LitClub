@@ -1,7 +1,6 @@
 package com.litclub.ui.component.content;
 
-import com.litclub.session.AppSession;
-import com.litclub.session.construct.ClubRecord;
+import com.litclub.persistence.DataRepository;
 import com.litclub.session.construct.MeetingRecord;
 import com.litclub.theme.ThemeManager;
 import javafx.geometry.Insets;
@@ -12,14 +11,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class MeetingsView extends ScrollPane {
 
     private final VBox container;
+    private final DataRepository dataRepository;
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy  •  h:mm a");
 
     public MeetingsView() {
@@ -30,6 +29,7 @@ public class MeetingsView extends ScrollPane {
         this.setHbarPolicy(ScrollBarPolicy.NEVER);
         this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
+        this.dataRepository = DataRepository.getInstance();
         this.container = new VBox(20);
         this.container.setPadding(new Insets(30, 40, 30, 40));
         this.container.getStyleClass().add("meetings-container");
@@ -53,7 +53,9 @@ public class MeetingsView extends ScrollPane {
     }
 
     public void showMeetings() {
-        Set<MeetingRecord> meetingRecords = getMeetings();
+        var meetingRecords = dataRepository.getMeetings().stream()
+                .sorted(Comparator.comparing(MeetingRecord::start))
+                .toList();
 
         // Clear only meeting cards, keep the header
         container.getChildren().removeIf(node ->
@@ -117,45 +119,6 @@ public class MeetingsView extends ScrollPane {
         meetingCard.getChildren().addAll(topRow, infoSection);
 
         return meetingCard;
-    }
-
-    // TODO Fetch meetings for a club -> API Calls
-    public Set<MeetingRecord> getMeetings() {
-        ClubRecord club = AppSession.getInstance().getClubRecord();
-        return Set.of(
-                new MeetingRecord(
-                        "Poetry Night – Virtual Edition",
-                        LocalDateTime.of(2025, 10, 15, 19, 0),
-                        LocalDateTime.of(2025, 10, 15, 21, 0),
-                        club,
-                        "Online",
-                        Optional.of("https://meet.litclub.com/poetry-night")
-                ),
-                new MeetingRecord(
-                        "Writers' Workshop – October",
-                        LocalDateTime.of(2025, 10, 22, 18, 30),
-                        LocalDateTime.of(2025, 10, 22, 20, 30),
-                        club,
-                        "Online",
-                        Optional.of("https://meet.litclub.com/workshop-oct")
-                ),
-                new MeetingRecord(
-                        "Classic Literature Discussion",
-                        LocalDateTime.of(2025, 10, 18, 17, 0),
-                        LocalDateTime.of(2025, 10, 18, 19, 0),
-                        club,
-                        "Central Library – Room 204",
-                        Optional.empty()
-                ),
-                new MeetingRecord(
-                        "Coffee & Classics Meetup",
-                        LocalDateTime.of(2025, 10, 25, 10, 0),
-                        LocalDateTime.of(2025, 10, 25, 12, 0),
-                        club,
-                        "Maple Street Café",
-                        Optional.empty()
-                )
-        );
     }
 
     private void setupSmoothScrolling() {
