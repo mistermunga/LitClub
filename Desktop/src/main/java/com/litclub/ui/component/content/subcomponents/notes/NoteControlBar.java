@@ -2,6 +2,8 @@ package com.litclub.ui.component.content.subcomponents.notes;
 
 import com.litclub.persistence.DataRepository;
 import com.litclub.session.construct.Note;
+import com.litclub.ui.component.content.subcomponents.notes.atoms.FilteredNotesCore;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,12 +19,18 @@ public class NoteControlBar extends HBox {
     private MenuButton optionsMenu;
     private Button addNoteButton;
     private final DataRepository dataRepository = DataRepository.getInstance();
+    private ObservableList<Note> notes = FXCollections.observableArrayList();
+
+    private NotesCore notesCore;
 
     // Filter and sort state
     private String currentFilter = "All notes";
     private String currentSort = "Recently created";
 
-    public NoteControlBar() {
+    public NoteControlBar(NotesCore notesCore) {
+        initialiseNotes();
+        this.notesCore = notesCore;
+
         this.getStyleClass().add("library-control-bar");
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(15, 20, 15, 20));
@@ -33,7 +41,6 @@ public class NoteControlBar extends HBox {
         addButtons();
     }
 
-    // TODO: Implement API calls here; currently showing placeholder stats
     private void addStats() {
         HashMap<String, Integer> stats = getStats();
         Label statsLabel = new Label();
@@ -164,13 +171,17 @@ public class NoteControlBar extends HBox {
     // Event Handlers
     private void handleSearch(String query) {
         System.out.println("Searching notes for: " + query);
-        // TODO: Implement search functionality
+        notesCore.createSearchFilteredView(query);
     }
 
     private void handleFilter(String filter) {
         currentFilter = filter;
         System.out.println("Note filter changed to: " + filter);
-        // TODO: Implement filter logic
+        currentFilter = filter;
+
+        FilteredNotesCore filtered = new FilteredNotesCore(filter);
+        notesCore.clearAtoms();
+        notesCore.pushAtom(filtered);
     }
 
     private void handleSort(String sortOption) {
@@ -207,7 +218,6 @@ public class NoteControlBar extends HBox {
 
     private HashMap<String, Integer> getStats() {
         HashMap<String, Integer> stats = new HashMap<>();
-        ObservableList<Note> notes = dataRepository.getNotes();
         int totalNotes = notes.size(), privateNotes = 0, sharedNotes = 0;
         for (Note note : notes) {
             if (note.isPrivate()) {
@@ -220,5 +230,9 @@ public class NoteControlBar extends HBox {
         stats.put("Private", privateNotes);
         stats.put("Shared", sharedNotes);
         return stats;
+    }
+
+    private void initialiseNotes() {
+        this.notes = dataRepository.getNotes();
     }
 }
