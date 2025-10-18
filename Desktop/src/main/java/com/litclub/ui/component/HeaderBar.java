@@ -1,6 +1,7 @@
 package com.litclub.ui.component;
 
 import com.litclub.SceneManager;
+import com.litclub.persistence.CacheManager;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.component.content.subcomponents.MiniLogo;
 import com.litclub.ui.component.subunits.UserMessage;
@@ -32,6 +33,7 @@ public class HeaderBar extends HBox {
         MiniLogo miniLogo = new MiniLogo();
         miniLogo.setOnMouseClicked(e -> {
             SceneManager.getInstance().showCrossRoads();
+            CacheManager.getInstance().clearCache();
         });
 
         logoSection.getChildren().addAll(miniLogo);
