@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 
 public class DefaultNotesCore extends ScrollPane {
 
-    private final VBox container;
-    private final DataRepository dataRepository;
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM, yyyy");
+    protected final VBox container;
+    protected final DataRepository dataRepository;
+    protected static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM, yyyy");
 
     public DefaultNotesCore() {
         ThemeManager.getInstance().registerComponent(this);
