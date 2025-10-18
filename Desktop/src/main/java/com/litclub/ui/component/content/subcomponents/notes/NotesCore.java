@@ -2,11 +2,13 @@ package com.litclub.ui.component.content.subcomponents.notes;
 
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.component.content.subcomponents.notes.atoms.DefaultNotesCore;
+import com.litclub.ui.component.content.subcomponents.notes.atoms.FilteredNotesCore;
 import javafx.scene.layout.StackPane;
 
 public class NotesCore extends StackPane {
 
     private final DefaultNotesCore defaultNotesCore;
+    private FilteredNotesCore filteredNotesCore;
 
     public NotesCore() {
         ThemeManager.getInstance().registerComponent(this);
@@ -23,6 +25,7 @@ public class NotesCore extends StackPane {
 
     public void pushAtom(javafx.scene.Node atom) {
         if (!getChildren().contains(atom)) {
+            defaultNotesCore.setVisible(false);
             getChildren().add(atom);
         }
     }
@@ -33,5 +36,12 @@ public class NotesCore extends StackPane {
 
     public void clearAtoms() {
         getChildren().retainAll(defaultNotesCore);
+        defaultNotesCore.setVisible(true);
+    }
+
+    public void createSearchFilteredView(String query) {
+        filteredNotesCore = new FilteredNotesCore(query);
+        clearAtoms();
+        pushAtom(filteredNotesCore);
     }
 }
