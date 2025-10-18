@@ -7,19 +7,24 @@ import javafx.scene.layout.BorderPane;
 
 public class NotesView extends BorderPane {
 
+    private NotesCore notesCore;
+    private NoteControlBar controlBar;
+
     public NotesView() {
         ThemeManager.getInstance().registerComponent(this);
-        showControlBar();
         showNotesCore();
+        showControlBar();
     }
 
     public void showControlBar() {
         NoteControlBar controlBar = new NoteControlBar();
+        this.controlBar = controlBar;
         this.setTop(controlBar);
     }
 
     public void showNotesCore() {
         NotesCore notesCore = new NotesCore();
+        this.notesCore = notesCore;
         this.setCenter(notesCore);
     }
 }
