@@ -116,9 +116,7 @@ public class NoteControlBar extends HBox {
         String[] filters = {
                 "All notes",
                 "Private only",
-                "Club notes only",
-                "By book",
-                "By date"
+                "Club notes only"
         };
 
         for (String filter : filters) {
