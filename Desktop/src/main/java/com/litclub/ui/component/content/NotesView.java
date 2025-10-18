@@ -17,7 +17,7 @@ public class NotesView extends BorderPane {
     }
 
     public void showControlBar() {
-        NoteControlBar controlBar = new NoteControlBar();
+        NoteControlBar controlBar = new NoteControlBar(this.notesCore);
         this.controlBar = controlBar;
         this.setTop(controlBar);
     }
