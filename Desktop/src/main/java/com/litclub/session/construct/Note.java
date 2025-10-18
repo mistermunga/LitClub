@@ -1,5 +1,7 @@
 package com.litclub.session.construct;
 
+import com.litclub.persistence.DataRepository;
+
 import java.time.LocalDateTime;
 
 
@@ -30,6 +32,8 @@ public class Note {
 
     public void setBookID(int bookID) {
         this.bookID = bookID;
+        setBookTitle();
+        setAuthorName();
     }
 
     public Integer getClubID() {
@@ -76,16 +80,24 @@ public class Note {
         return bookTitle;
     }
 
-    public void setBookTitle(String bookTitle) {
-        this.bookTitle = bookTitle;
+    public void setBookTitle() {
+        if (this.bookID != 0) {
+            this.bookTitle = DataRepository.getInstance()
+                    .getBookById(this.bookID)
+                    .getTitle();
+        }
     }
 
     public String getAuthorName() {
         return authorName;
     }
 
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
+    public void setAuthorName() {
+        if (this.bookID != 0) {
+            this.authorName = DataRepository.getInstance()
+                    .getBookById(this.bookID)
+                    .getAuthor();
+        }
     }
 
 
