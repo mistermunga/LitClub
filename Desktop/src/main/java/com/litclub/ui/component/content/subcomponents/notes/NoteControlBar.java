@@ -85,11 +85,6 @@ public class NoteControlBar extends HBox {
 
         optionsMenu.getItems().add(new SeparatorMenuItem());
 
-        // View toggle (optional for notes)
-        MenuItem viewToggle = new MenuItem("Switch to List View");
-        viewToggle.setOnAction(e -> handleViewToggle(viewToggle));
-        optionsMenu.getItems().add(viewToggle);
-
         // Add Note Button
         addNoteButton = new Button("+ Add Note");
         addNoteButton.getStyleClass().addAll("button-primary");
@@ -200,18 +195,6 @@ public class NoteControlBar extends HBox {
             filteredCore.updateSort(sortOption);
             notesCore.clearAtoms();
             notesCore.pushAtom(filteredCore);
-        }
-    }
-
-    private void handleViewToggle(MenuItem item) {
-        if (item.getText().contains("List")) {
-            item.setText("Switch to Dashboard View");
-            System.out.println("Switched to List View");
-            // TODO: Trigger view change to list layout
-        } else {
-            item.setText("Switch to List View");
-            System.out.println("Switched to Dashboard View");
-            // TODO: Trigger view change to dashboard layout
         }
     }
 
