@@ -149,8 +149,7 @@ public class NoteControlBar extends HBox {
         String[] sortOptions = {
                 "Recently created",
                 "Oldest first",
-                "Book title (A-Z)",
-                "Most relevant"
+                "Book title (A-Z)"
         };
 
         for (String option : sortOptions) {
@@ -187,7 +186,21 @@ public class NoteControlBar extends HBox {
     private void handleSort(String sortOption) {
         currentSort = sortOption;
         System.out.println("Note sort changed to: " + sortOption);
-        // TODO: Implement sort logic
+
+        if (notesCore.getChildren().size() > 1) {
+            javafx.scene.Node topNode = notesCore.getChildren().get(notesCore.getChildren().size() - 1);
+
+            if (topNode instanceof FilteredNotesCore filteredCore) {
+                filteredCore.updateSort(sortOption);
+            }
+
+        } else {
+            // Default view is showing - need to create a filtered view to sort
+            FilteredNotesCore filteredCore = new FilteredNotesCore("All notes");
+            filteredCore.updateSort(sortOption);
+            notesCore.clearAtoms();
+            notesCore.pushAtom(filteredCore);
+        }
     }
 
     private void handleViewToggle(MenuItem item) {
