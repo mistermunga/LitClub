@@ -21,6 +21,7 @@ public class NavigationSideBar extends VBox {
 
         // Add nav buttons
         addNavButton("🏠", "Home");
+        addNavButton("\uD83D\uDDE3", "Discussion");
         addNavButton("📚", "Library");
         addNavButton("📅", "Meetings");
         addNavButton("📝", "Notes");

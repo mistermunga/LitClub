@@ -8,6 +8,7 @@ import javafx.scene.layout.StackPane;
 public class ContentArea extends StackPane {
 
     private HomeView homeView;
+    private DiscussionView discussionView;
     private LibraryView libraryView;
     private MeetingsView meetingsView;
     private MembersView membersView;
@@ -24,6 +25,7 @@ public class ContentArea extends StackPane {
         populator.populateClub();
 
         this.homeView = new HomeView();
+        this.discussionView = new DiscussionView();
         this.libraryView = new LibraryView();
         this.meetingsView = new MeetingsView();
         this.membersView = new MembersView();
@@ -32,6 +34,7 @@ public class ContentArea extends StackPane {
 
         this.getChildren().addAll(
                 homeView,
+                discussionView,
                 libraryView,
                 meetingsView,
                 membersView,
@@ -48,6 +51,10 @@ public class ContentArea extends StackPane {
 
     public void showHome() {
         showOnly(homeView);
+    }
+
+    public void showDiscussion() {
+        showOnly(discussionView);
     }
 
     public void showLibrary() {
@@ -72,6 +79,7 @@ public class ContentArea extends StackPane {
 
     public void showView(String text) {
         switch (text) {
+            case "Discussion" -> showDiscussion();
             case "Library" -> showLibrary();
             case "Meetings" -> showMeetings();
             case "Members" -> showMembers();
