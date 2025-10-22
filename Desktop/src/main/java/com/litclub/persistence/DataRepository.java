@@ -25,6 +25,7 @@ public class DataRepository {
     private final ObservableList<MeetingRecord> meetings;
     private final ObservableList<Review> reviews;
     private final ObservableList<DiscussionPromptRecord> discussionPrompts;
+    private final ObservableList<Reply> replies;
 
     private DataRepository() {
         // Initialize observable collections
@@ -33,6 +34,7 @@ public class DataRepository {
         meetings = FXCollections.observableArrayList();
         reviews = FXCollections.observableArrayList();
         discussionPrompts = FXCollections.observableArrayList();
+        replies = FXCollections.observableArrayList();
 
         // Load cached data (empty on first run)
         loadFromCache();
@@ -56,10 +58,12 @@ public class DataRepository {
         meetings.addAll(cache.loadMeetings());
         reviews.addAll(cache.loadReviews());
         discussionPrompts.addAll(cache.loadPrompts());
+        replies.addAll(cache.loadReplies());
 
         System.out.println("Loaded from cache: " + books.size() + " books, " +
                 notes.size() + " notes, " + meetings.size() + " meetings, " +
-                reviews.size() + " reviews, " + discussionPrompts.size() + " discussion prompts" );
+                reviews.size() + " reviews, " + discussionPrompts.size() + " discussion prompts, " +
+                replies.size() + " replies");
     }
 
     // ==================== BOOKS ====================
@@ -202,6 +206,40 @@ public class DataRepository {
     private void saveMeetings() {
         CacheManager.getInstance().saveMeetings(meetings);
     }
+
+    // ==================== REPLIES ===================
+    public ObservableList<Reply> getReplies() {return replies;}
+
+    public Reply getReplyById(int replyId) {
+        return replies.stream()
+                .filter(reply -> reply.getNoteID() == replyId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void addReply(Reply reply) {
+        if (reply.getCreatedAt() == null) {
+            reply.setCreatedAt(LocalDateTime.now());
+        }
+        replies.add(reply);
+        saveReplies();
+    }
+
+    public void updateReply(Reply reply) {
+        Reply existing = getReplyById(reply.getNoteID());
+        if (existing != null) {
+            int index = replies.indexOf(existing);
+            replies.set(index, reply);
+            saveReplies();
+        }
+    }
+
+    public void deleteReply(Integer replyId) {
+        replies.removeIf(reply -> reply.getNoteID() == replyId);
+        saveReplies();
+    }
+
+    private void saveReplies() {CacheManager.getInstance().saveReplies(replies);}
 
     // ==================== REVIEWS ====================
 
