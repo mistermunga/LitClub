@@ -23,6 +23,7 @@ public class CacheManager {
     private static final String MEETINGS_FILE = "meetings.json";
     private static final String REVIEWS_FILE = "reviews.json";
     private static final String PROMPTS_FILE = "prompts.json";
+    private static final String REPLIES_FILE = "replies.json";
 
     private CacheManager() throws IOException {
         String userHome = System.getProperty("user.home");
@@ -195,6 +196,29 @@ public class CacheManager {
         }
     }
 
+    // ==================== REPLIES ====================
+
+    public void saveReplies(List<Reply> replies) {
+        try {
+            String json = gson.toJson(replies);
+            Files.writeString(cacheDir.resolve(REPLIES_FILE), json);
+        }  catch (IOException e) {
+            System.err.println("Failed to save replies: " + e.getMessage());
+        }
+    }
+
+    public ArrayList<Reply> loadReplies() {
+        Path repliesFile = cacheDir.resolve(REPLIES_FILE);
+
+        if (!Files.exists(repliesFile)) {
+            return new ArrayList<>();
+        }
+
+        String json = gson.toJson(repliesFile);
+        Reply[] repliesArray = gson.fromJson(json, Reply[].class);
+        return repliesArray != null ? new ArrayList<>(List.of(repliesArray)) : new ArrayList<>();
+    }
+
     // ==================== UTILITY ====================
 
     /**
@@ -207,6 +231,7 @@ public class CacheManager {
             Files.deleteIfExists(cacheDir.resolve(MEETINGS_FILE));
             Files.deleteIfExists(cacheDir.resolve(REVIEWS_FILE));
             Files.deleteIfExists(cacheDir.resolve(PROMPTS_FILE));
+            Files.deleteIfExists(cacheDir.resolve(REPLIES_FILE));
             System.out.println("Cache cleared successfully");
         } catch (IOException e) {
             System.err.println("Failed to clear cache: " + e.getMessage());
@@ -228,7 +253,8 @@ public class CacheManager {
                 Files.exists(cacheDir.resolve(NOTES_FILE)) ||
                 Files.exists(cacheDir.resolve(MEETINGS_FILE)) ||
                 Files.exists(cacheDir.resolve(REVIEWS_FILE)) ||
-                Files.exists(cacheDir.resolve(PROMPTS_FILE));
+                Files.exists(cacheDir.resolve(PROMPTS_FILE)) ||
+                Files.exists(cacheDir.resolve(REPLIES_FILE));
     }
 
     // ==================== GSON ADAPTERS ====================
