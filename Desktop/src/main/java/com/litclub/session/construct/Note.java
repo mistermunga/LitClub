@@ -11,6 +11,7 @@ public class Note {
     private int bookID;
     private Integer clubID;
     private int userID;
+    private Integer discussionPromptID;
     private String content;
     private boolean isPrivate;
     private LocalDateTime createdAt;
@@ -24,6 +25,14 @@ public class Note {
 
     public void setNoteID(int noteID) {
         this.noteID = noteID;
+    }
+
+    public Integer getDiscussionPromptID() {
+        return discussionPromptID;
+    }
+
+    public void setDiscussionPromptID(Integer discussionPromptID) {
+        this.discussionPromptID = discussionPromptID;
     }
 
     public int getBookID() {
