@@ -1,10 +1,7 @@
 package com.litclub.persistence;
 
 import com.google.gson.*;
-import com.litclub.session.construct.Book;
-import com.litclub.session.construct.MeetingRecord;
-import com.litclub.session.construct.Note;
-import com.litclub.session.construct.Review;
+import com.litclub.session.construct.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,6 +22,7 @@ public class CacheManager {
     private static final String NOTES_FILE = "notes.json";
     private static final String MEETINGS_FILE = "meetings.json";
     private static final String REVIEWS_FILE = "reviews.json";
+    private static final String PROMPTS_FILE = "prompts.json";
 
     private CacheManager() throws IOException {
         String userHome = System.getProperty("user.home");
@@ -170,6 +168,33 @@ public class CacheManager {
         }
     }
 
+    // =================== DISCUSSION PROMPTS =======================
+    public void savePrompts(List<DiscussionPromptRecord> prompts) {
+        try {
+            String json = gson.toJson(prompts);
+            Files.writeString(cacheDir.resolve(PROMPTS_FILE), json);
+        } catch (IOException e) {
+            System.err.println("Failed to save prompts: " + e.getMessage());
+        }
+    }
+
+    public ArrayList<DiscussionPromptRecord> loadPrompts() {
+        Path promptsFile = cacheDir.resolve(PROMPTS_FILE);
+
+        if (!Files.exists(promptsFile)) {
+            return new ArrayList<>();
+        }
+
+        try {
+            String json = Files.readString(promptsFile);
+            DiscussionPromptRecord[] promptRecords = gson.fromJson(json, DiscussionPromptRecord[].class);
+            return promptRecords != null ? new ArrayList<>(List.of(promptRecords)) : new ArrayList<>();
+        } catch (IOException e) {
+            System.err.println("Failed to load prompts: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
     // ==================== UTILITY ====================
 
     /**
@@ -181,6 +206,7 @@ public class CacheManager {
             Files.deleteIfExists(cacheDir.resolve(NOTES_FILE));
             Files.deleteIfExists(cacheDir.resolve(MEETINGS_FILE));
             Files.deleteIfExists(cacheDir.resolve(REVIEWS_FILE));
+            Files.deleteIfExists(cacheDir.resolve(PROMPTS_FILE));
             System.out.println("Cache cleared successfully");
         } catch (IOException e) {
             System.err.println("Failed to clear cache: " + e.getMessage());
@@ -201,7 +227,8 @@ public class CacheManager {
         return Files.exists(cacheDir.resolve(BOOKS_FILE)) ||
                 Files.exists(cacheDir.resolve(NOTES_FILE)) ||
                 Files.exists(cacheDir.resolve(MEETINGS_FILE)) ||
-                Files.exists(cacheDir.resolve(REVIEWS_FILE));
+                Files.exists(cacheDir.resolve(REVIEWS_FILE)) ||
+                Files.exists(cacheDir.resolve(PROMPTS_FILE));
     }
 
     // ==================== GSON ADAPTERS ====================
