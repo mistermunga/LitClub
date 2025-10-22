@@ -1,10 +1,7 @@
 package com.litclub.persistence;
 
 import com.litclub.session.AppSession;
-import com.litclub.session.construct.Book;
-import com.litclub.session.construct.MeetingRecord;
-import com.litclub.session.construct.Note;
-import com.litclub.session.construct.Review;
+import com.litclub.session.construct.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -27,6 +24,7 @@ public class DataRepository {
     private final ObservableList<Note> notes;
     private final ObservableList<MeetingRecord> meetings;
     private final ObservableList<Review> reviews;
+    private final ObservableList<DiscussionPromptRecord> discussionPrompts;
 
     private DataRepository() {
         // Initialize observable collections
@@ -34,6 +32,7 @@ public class DataRepository {
         notes = FXCollections.observableArrayList();
         meetings = FXCollections.observableArrayList();
         reviews = FXCollections.observableArrayList();
+        discussionPrompts = FXCollections.observableArrayList();
 
         // Load cached data (empty on first run)
         loadFromCache();
@@ -56,10 +55,11 @@ public class DataRepository {
         notes.addAll(cache.loadNotes());
         meetings.addAll(cache.loadMeetings());
         reviews.addAll(cache.loadReviews());
+        discussionPrompts.addAll(cache.loadPrompts());
 
         System.out.println("Loaded from cache: " + books.size() + " books, " +
                 notes.size() + " notes, " + meetings.size() + " meetings, " +
-                reviews.size() + " reviews");
+                reviews.size() + " reviews, " + discussionPrompts.size() + " discussion prompts" );
     }
 
     // ==================== BOOKS ====================
@@ -104,6 +104,39 @@ public class DataRepository {
         CacheManager.getInstance().saveBooks(books);
     }
 
+    // ==================== PROMPTS ========================
+
+    public ObservableList<DiscussionPromptRecord> getDiscussionPrompts () {
+        return discussionPrompts;
+    }
+
+    public DiscussionPromptRecord getDiscussionPromptById(int discussionPromptId) {
+        return discussionPrompts.stream()
+                .filter(p -> p.id() == discussionPromptId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /*
+    Adds a prompt
+     */
+    public void addDiscussionPrompts(DiscussionPromptRecord promptRecord) {
+        if (promptRecord.id() == 0) {
+            System.err.println("Warning: Discussion prompt record id assigned");
+        }
+        discussionPrompts.add(promptRecord);
+        saveDiscussionPrompts();
+    }
+
+    public void deleteDiscussionPrompt(int promptID) {
+        discussionPrompts.removeIf(p -> p.id() == promptID);
+        saveDiscussionPrompts();
+    }
+
+    private void saveDiscussionPrompts() {
+        CacheManager.getInstance().savePrompts(discussionPrompts);
+    }
+
     // ==================== NOTES ====================
 
     public ObservableList<Note> getNotes() {
@@ -118,7 +151,7 @@ public class DataRepository {
     }
 
     /**
-     * Adds a note with ID already assigned (from MockEntityGenerator or API).
+     * Adds a note with ID already assigned.
      * Sets createdAt timestamp if not already set.
      */
     public void addNote(Note note) {
