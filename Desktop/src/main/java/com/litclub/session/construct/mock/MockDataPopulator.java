@@ -143,13 +143,24 @@ public class MockDataPopulator {
         return reviews;
     }
 
+    public Set<DiscussionPromptRecord> createFakeDiscussionPrompts(int promptCount) {
+        Set<DiscussionPromptRecord> discussionPrompts = new HashSet<>();
+
+        while (discussionPrompts.size() < promptCount) {
+            DiscussionPromptRecord discussionPromptRecord = mockEntityGenerator.mockPrompt();
+            discussionPrompts.add(discussionPromptRecord);
+            dataRepository.addDiscussionPrompts(discussionPromptRecord);
+        }
+        return discussionPrompts;
+    }
+
     /**
      * Master method to populate a club with mock data.
      * Should be called once when HomeView is initialized.
      * Uses default counts for a typical small reading group.
      */
     public void populateClub() {
-        populateClub(8, 12, 5, 2, 3);
+        populateClub(8, 12, 5, 2, 3, 2);
     }
 
     /**
@@ -161,9 +172,11 @@ public class MockDataPopulator {
      * @param reviewCount number of reviews
      * @param physicalMeetingCount number of in-person meetings
      * @param onlineMeetingCount number of virtual meetings
+     * @param discussionPromptCount number of discussion prompts
      */
     public void populateClub(int bookCount, int noteCount, int reviewCount,
-                             int physicalMeetingCount, int onlineMeetingCount) {
+                             int physicalMeetingCount, int onlineMeetingCount,
+                             int discussionPromptCount) {
 
         // Check if data already exists (avoid re-populating)
         if (!dataRepository.getBooks().isEmpty()) {
@@ -194,6 +207,10 @@ public class MockDataPopulator {
             createFakeOnlineMeetings(onlineMeetingCount);
             System.out.println("✓ Created " + physicalMeetingCount + " physical meetings");
             System.out.println("✓ Created " + onlineMeetingCount + " online meetings");
+
+            // 5. Prompts
+            createFakeDiscussionPrompts(discussionPromptCount);
+            System.out.println("✓ Created "  + discussionPromptCount + " discussion prompts");
 
             System.out.println("Mock data population complete!");
 

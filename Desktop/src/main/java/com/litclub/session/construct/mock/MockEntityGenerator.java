@@ -6,7 +6,6 @@ import com.litclub.session.construct.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class MockEntityGenerator {
 
@@ -14,6 +13,7 @@ public class MockEntityGenerator {
     private static int noteIdCounter = 2000;
     private static int reviewIdCounter = 3000;
     private static int userIdCounter = 4000;
+    private static int promptIdCounter = 5000;
 
     private static final List<String> FIRST_NAMES = List.of(
             "John", "Marie", "Graham", "Dylan", "Quentin", "Fisher",
@@ -150,6 +150,17 @@ public class MockEntityGenerator {
 
         Review review = new Review(reviewID, bookID, userID, rating, content);
         return review;
+    }
+
+    public DiscussionPromptRecord mockPrompt() {
+        int promptID = ++promptIdCounter;
+        int userID = AppSession.getInstance().getUserRecord().userID();
+
+        String content = "How are you liking the book so far?";
+
+        return new DiscussionPromptRecord(
+                promptID, userID, content, LocalDateTime.now()
+        );
     }
 
     // ==================== HELPER METHODS ====================
