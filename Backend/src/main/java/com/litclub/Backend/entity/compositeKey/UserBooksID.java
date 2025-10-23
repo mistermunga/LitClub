@@ -17,5 +17,5 @@ public class UserBooksID implements Serializable {
     private Long userID;
 
     @Column(name = "book_id")
-    private String bookID;
+    private Long bookID;
 }
