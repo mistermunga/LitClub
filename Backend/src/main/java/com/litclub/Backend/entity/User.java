@@ -32,6 +32,9 @@ public class User {
     @Column(name = "second_name")
     private String secondName;
 
+    @Column
+    private String email;
+
     @ElementCollection(targetClass = GlobalRole.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_global_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
@@ -47,4 +50,24 @@ public class User {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ClubMembership> memberships = new HashSet<>();
+
+    public User () {}
+
+    public User (
+            String username,
+            String firstName,
+            String surname,
+            String email,
+            boolean isAdmin
+    ) {
+
+        this.username = username;
+        this.firstName = firstName;
+        this.secondName = surname;
+        this.email = email;
+        this.globalRoles.add(GlobalRole.USER);
+
+        if (isAdmin) {this.globalRoles.add(GlobalRole.ADMINISTRATOR);}
+
+    }
 }
