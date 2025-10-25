@@ -7,7 +7,9 @@ import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
 import com.litclub.Backend.entity.User;
 import com.litclub.Backend.repository.UserRepository;
+import com.litclub.Backend.security.roles.GlobalRole;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -101,6 +103,36 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findUserByUserID(id);
+    }
+
+    @Transactional
+    public UserRecord updateUser(long userID, UserRegistrationRecord userRecord) throws NotFoundException {
+        Optional<User> user = getUserById(userID);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException();
+        }
+
+        User userToUpdate = user.get();
+
+        if (userRecord.username() != null) {userToUpdate.setUsername(userRecord.username());}
+        if (userRecord.firstName() != null) {userToUpdate.setFirstName(userRecord.firstName());}
+        if (userRecord.surname() != null) {userToUpdate.setSecondName(userRecord.surname());}
+        if (userRecord.email() != null) {userToUpdate.setEmail(userRecord.email());}
+
+        if (userRecord.isAdmin()) {userToUpdate.setGlobalRoles(Set.of(GlobalRole.ADMINISTRATOR));}
+
+        if (userRecord.password() != null) {
+            userToUpdate.setPasswordHash(passwordEncoder.encode(userRecord.password()));
+        }
+
+        userRepository.save(userToUpdate);
+        return convertUserToRecord(userToUpdate);
     }
 
     // ===== Utility =====
