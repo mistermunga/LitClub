@@ -6,10 +6,11 @@ import com.litclub.Backend.construct.user.UserRegistrationRecord;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
 import com.litclub.Backend.entity.User;
+import com.litclub.Backend.exception.CredentialsAlreadyTakenException;
+import com.litclub.Backend.exception.UserNotFoundException;
 import com.litclub.Backend.repository.UserRepository;
 import com.litclub.Backend.security.roles.GlobalRole;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class UserService {
             return convertUserToRecord(user.get());
         }
 
-        throw new BadCredentialsException("Invalid username");
+        throw new BadCredentialsException("Invalid Credentials");
 
     }
 
@@ -70,14 +71,14 @@ public class UserService {
             return convertUserToRecord(user.get());
         }
 
-        throw new BadCredentialsException("Invalid email");
+        throw new BadCredentialsException("Invalid Credentials");
     }
 
     // ===== CREATE =====
     @Transactional
     public UserRecord registerUser(UserRegistrationRecord userRegistrationRecord) {
         if (userRepository.existsByUsername(userRegistrationRecord.username())) {
-            throw new IllegalStateException("Username is already in use");
+            throw new CredentialsAlreadyTakenException("Username is already in use");
         }
 
         User user = new User (
@@ -111,11 +112,11 @@ public class UserService {
     }
 
     @Transactional
-    public UserRecord updateUser(long userID, UserRegistrationRecord userRecord) throws NotFoundException {
+    public UserRecord updateUser(Long userID, UserRegistrationRecord userRecord) throws UserNotFoundException {
         Optional<User> user = getUserById(userID);
 
         if (user.isEmpty()) {
-            throw new NotFoundException();
+            throw new UserNotFoundException("userID", userID.toString());
         }
 
         User userToUpdate = user.get();
@@ -134,6 +135,19 @@ public class UserService {
         userRepository.save(userToUpdate);
         return convertUserToRecord(userToUpdate);
     }
+
+    @Transactional
+    public void deleteUser(String identifier) throws UserNotFoundException {
+        Optional<User> userOpt = userRepository.findUserByUsername(identifier);
+
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findUserByEmail(identifier);
+        }
+
+        User user = userOpt.orElseThrow(() -> new UserNotFoundException("username or email", identifier));
+        userRepository.delete(user);
+    }
+
 
     // ===== Utility =====
     public UserRecord convertUserToRecord(User user) {
