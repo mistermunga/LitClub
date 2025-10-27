@@ -1,5 +1,6 @@
 package com.litclub.Backend.config;
 
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.annotation.PostConstruct;
@@ -32,6 +33,7 @@ public class ConfigurationManager {
         this.configFilePath = resolveConfigPath();
         this.objectMapper = new ObjectMapper();
         this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        this.objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
     }
 
     @PostConstruct
@@ -47,7 +49,7 @@ public class ConfigurationManager {
 
     // ====== INSTANCE-LEVEL CONFIGURATION ======
 
-    public String getRegistrationMode() {
+    public InstanceRegistrationMode getRegistrationMode() {
         lock.readLock().lock();
         try {
             return configuration.instance.registrationMode;
@@ -56,7 +58,7 @@ public class ConfigurationManager {
         }
     }
 
-    public String getClubCreationMode() {
+    public ClubCreationMode getClubCreationMode() {
         lock.readLock().lock();
         try {
             return configuration.instance.clubCreationMode;
@@ -204,8 +206,8 @@ public class ConfigurationManager {
     private void createDefaultConfiguration() throws IOException {
         configuration = new InstanceConfiguration();
         configuration.instance = new InstanceData();
-        configuration.instance.registrationMode = "INVITE_ONLY";
-        configuration.instance.clubCreationMode = "APPROVAL_REQUIRED";
+        configuration.instance.registrationMode = InstanceRegistrationMode.INVITE_ONLY;
+        configuration.instance.clubCreationMode = ClubCreationMode.APPROVAL_REQUIRED;
         configuration.instance.maxClubsPerUser = 5;
         configuration.instance.maxMembersPerClub = 50;
         configuration.clubs = new HashMap<>();
@@ -263,8 +265,8 @@ public class ConfigurationManager {
     }
 
     private static class InstanceData {
-        public String registrationMode;
-        public String clubCreationMode;
+        public InstanceRegistrationMode registrationMode;
+        public ClubCreationMode clubCreationMode;
         public int maxClubsPerUser;
         public int maxMembersPerClub;
     }
@@ -279,14 +281,10 @@ public class ConfigurationManager {
 
     /**
      * Instance-wide configuration settings.
-     * @param registrationMode Possible values: "OPEN", "INVITE_ONLY", "CLOSED"
-     * @param clubCreationMode Possible values: "FREE", "APPROVAL_REQUIRED", "ADMIN_ONLY"
-     * @param maxClubsPerUser Maximum number of clubs a user can join/create
-     * @param maxMembersPerClub Maximum number of members allowed per club
      */
     public record InstanceSettings(
-            String registrationMode,
-            String clubCreationMode,
+            InstanceRegistrationMode registrationMode,
+            ClubCreationMode clubCreationMode,
             int maxClubsPerUser,
             int maxMembersPerClub
     ) {}
@@ -305,5 +303,13 @@ public class ConfigurationManager {
         public static ClubFlags defaults() {
             return new ClubFlags(true, false, true);
         }
+    }
+
+    public enum InstanceRegistrationMode {
+        OPEN, INVITE_ONLY, CLOSED
+    }
+
+    public enum ClubCreationMode {
+        FREE, APPROVAL_REQUIRED, ADMIN_ONLY
     }
 }
