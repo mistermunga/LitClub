@@ -43,7 +43,7 @@ public class ClubMembershipService {
     @Transactional
     public ClubMembership enrollUserToClub(Club club, User user) {
 
-        var oldMembership = clubMembershipRepository.findByClubAndUser(club, user);
+        var oldMembership = clubMembershipRepository.findByClubAndMember(club, user);
 
         if (oldMembership.isPresent()) {
             return oldMembership.get();
@@ -68,7 +68,7 @@ public class ClubMembershipService {
     // ====== READ ======
     @Transactional(readOnly = true)
     public ClubMembership getMembershipByClubAndUser(Club club, User user) {
-        Optional<ClubMembership> membership = clubMembershipRepository.findByClubAndUser(club, user);
+        Optional<ClubMembership> membership = clubMembershipRepository.findByClubAndMember(club, user);
         return membership.orElseThrow(
                 () -> new MembershipNotFoundException(user.getUsername(), club.getClubName())
         );
