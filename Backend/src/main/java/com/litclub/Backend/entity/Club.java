@@ -3,6 +3,7 @@ package com.litclub.Backend.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -26,13 +27,7 @@ public class Club {
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    @PrePersist
-    public void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
 }
