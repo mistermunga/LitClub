@@ -275,8 +275,15 @@ public class ConfigurationManager {
         public boolean allowMemberInvites;
     }
 
-    // ==================== PUBLIC RECORDS ====================
+    // ====== PUBLIC RECORDS ======
 
+    /**
+     * Instance-wide configuration settings.
+     * @param registrationMode Possible values: "OPEN", "INVITE_ONLY", "CLOSED"
+     * @param clubCreationMode Possible values: "FREE", "APPROVAL_REQUIRED", "ADMIN_ONLY"
+     * @param maxClubsPerUser Maximum number of clubs a user can join/create
+     * @param maxMembersPerClub Maximum number of members allowed per club
+     */
     public record InstanceSettings(
             String registrationMode,
             String clubCreationMode,
@@ -284,6 +291,12 @@ public class ConfigurationManager {
             int maxMembersPerClub
     ) {}
 
+    /**
+     * Club-specific configuration flags.
+     * @param allowPublicNotes If true, members can create notes shared with the club
+     * @param requireMeetingRSVP If true, members must RSVP to meetings
+     * @param allowMemberInvites If true, regular members can invite others (not just admins)
+     */
     public record ClubFlags(
             boolean allowPublicNotes,
             boolean requireMeetingRSVP,
