@@ -18,4 +18,11 @@ public class ClubMembershipID implements Serializable {
 
     @Column(name = "member_id")
     private Long memberID;
+
+    public ClubMembershipID() {}
+
+    public ClubMembershipID(Long clubID, Long memberID) {
+        this.clubID = clubID;
+        this.memberID = memberID;
+    }
 }
