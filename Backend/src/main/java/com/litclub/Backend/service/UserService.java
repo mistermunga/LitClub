@@ -16,10 +16,26 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+/**
+ * Service that manages user authentication, registration, and account maintenance.
+ *
+ * <p>This service acts as the core entry point for all user-related business logic,
+ * including credential validation, persistence, and role assignment.</p>
+ *
+ * <p><strong>Responsibilities:</strong></p>
+ * <ul>
+ *   <li>Authenticate users by username or email</li>
+ *   <li>Register new users with secure password hashing</li>
+ *   <li>Update or delete user accounts</li>
+ *   <li>Retrieve associated clubs and memberships</li>
+ * </ul>
+ *
+ * @see com.litclub.Backend.entity.User
+ * @see com.litclub.Backend.repository.UserRepository
+ * @see com.litclub.Backend.security.jwt.JwtService
+ */
 @Service
 public class UserService {
 
@@ -33,7 +49,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Login
+    // ===== AUTHENTICATION =====
+
+    /**
+     * Authenticates a user by username or email and returns a {@link UserRecord}.
+     *
+     * @param userLoginRecord the login credentials containing username/email and password
+     * @return the authenticated {@link UserRecord}
+     * @throws BadCredentialsException if the credentials are invalid
+     */
     @Transactional(readOnly = true)
     public UserRecord login(UserLoginRecord userLoginRecord) {
         if (userLoginRecord.username().isPresent()) {
@@ -45,6 +69,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Authenticates a user by username.
+     *
+     * @throws BadCredentialsException if the username or password is invalid
+     */
     public UserRecord loginWithUsername(UserLoginRecord userLoginRecord) {
         Optional<User> user = userRepository.findUserByUsername(userLoginRecord.username().toString());
 
@@ -52,14 +81,18 @@ public class UserService {
             throw new BadCredentialsException("Invalid username");
         }
 
-        if (passwordEncoder.matches(userLoginRecord.password(), user.get().getPasswordHash())){
+        if (passwordEncoder.matches(userLoginRecord.password(), user.get().getPasswordHash())) {
             return convertUserToRecord(user.get());
         }
 
-        throw new BadCredentialsException("Invalid Credentials");
-
+        throw new BadCredentialsException("Invalid credentials");
     }
 
+    /**
+     * Authenticates a user by email.
+     *
+     * @throws BadCredentialsException if the email or password is invalid
+     */
     public UserRecord loginWithEmail(UserLoginRecord userLoginRecord) {
         Optional<User> user = userRepository.findUserByEmail(userLoginRecord.email().toString());
 
@@ -67,50 +100,71 @@ public class UserService {
             throw new BadCredentialsException("Invalid email");
         }
 
-        if (passwordEncoder.matches(userLoginRecord.password(), user.get().getPasswordHash())){
+        if (passwordEncoder.matches(userLoginRecord.password(), user.get().getPasswordHash())) {
             return convertUserToRecord(user.get());
         }
 
-        throw new BadCredentialsException("Invalid Credentials");
+        throw new BadCredentialsException("Invalid credentials");
     }
 
-    // ===== CREATE =====
+    // ===== REGISTRATION =====
+
+    /**
+     * Registers a new user and hashes their password securely.
+     *
+     * @param userRegistrationRecord the new user details
+     * @return the created {@link UserRecord}
+     * @throws CredentialsAlreadyTakenException if the username is already in use
+     */
     @Transactional
     public UserRecord registerUser(UserRegistrationRecord userRegistrationRecord) {
         if (userRepository.existsByUsername(userRegistrationRecord.username())) {
             throw new CredentialsAlreadyTakenException("Username is already in use");
         }
 
-        User user = new User (
+        User user = new User(
                 userRegistrationRecord.username(),
                 userRegistrationRecord.firstName(),
                 userRegistrationRecord.surname(),
                 userRegistrationRecord.email(),
-                userRegistrationRecord.isAdmin()
+                firstLaunch()
         );
 
         user.setPasswordHash(passwordEncoder.encode(userRegistrationRecord.password()));
 
         return convertUserToRecord(userRepository.save(user));
-
     }
 
-    // ===== READ =====
+    // ===== RETRIEVAL =====
+
+    /** Retrieves a user by username. */
     @Transactional(readOnly = true)
     public Optional<User> getUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }
 
+    /** Retrieves a user by email. */
     @Transactional(readOnly = true)
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
     }
 
+    /** Retrieves a user by database ID. */
     @Transactional(readOnly = true)
     public Optional<User> getUserById(Long id) {
         return userRepository.findUserByUserID(id);
     }
 
+    // ===== UPDATE =====
+
+    /**
+     * Updates a user’s details.
+     *
+     * @param userID the ID of the user to update
+     * @param userRecord the new user data
+     * @return the updated {@link UserRecord}
+     * @throws UserNotFoundException if no user with the given ID exists
+     */
     @Transactional
     public UserRecord updateUser(Long userID, UserRegistrationRecord userRecord) throws UserNotFoundException {
         Optional<User> user = getUserById(userID);
@@ -121,21 +175,26 @@ public class UserService {
 
         User userToUpdate = user.get();
 
-        if (userRecord.username() != null) {userToUpdate.setUsername(userRecord.username());}
-        if (userRecord.firstName() != null) {userToUpdate.setFirstName(userRecord.firstName());}
-        if (userRecord.surname() != null) {userToUpdate.setSecondName(userRecord.surname());}
-        if (userRecord.email() != null) {userToUpdate.setEmail(userRecord.email());}
-
-        if (userRecord.isAdmin()) {userToUpdate.setGlobalRoles(Set.of(GlobalRole.ADMINISTRATOR));}
-
-        if (userRecord.password() != null) {
+        if (userRecord.username() != null) userToUpdate.setUsername(userRecord.username());
+        if (userRecord.firstName() != null) userToUpdate.setFirstName(userRecord.firstName());
+        if (userRecord.surname() != null) userToUpdate.setSecondName(userRecord.surname());
+        if (userRecord.email() != null) userToUpdate.setEmail(userRecord.email());
+        if (userRecord.isAdmin()) userToUpdate.setGlobalRoles(Set.of(GlobalRole.ADMINISTRATOR));
+        if (userRecord.password() != null)
             userToUpdate.setPasswordHash(passwordEncoder.encode(userRecord.password()));
-        }
 
         userRepository.save(userToUpdate);
         return convertUserToRecord(userToUpdate);
     }
 
+    // ===== DELETE =====
+
+    /**
+     * Deletes a user by username or email.
+     *
+     * @param identifier either the username or email of the user
+     * @throws UserNotFoundException if the user could not be found
+     */
     @Transactional
     public void deleteUser(String identifier) throws UserNotFoundException {
         Optional<User> userOpt = userRepository.findUserByUsername(identifier);
@@ -148,8 +207,9 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    // ===== UTILITY =====
 
-    // ===== Utility =====
+    /** Converts a {@link User} entity to a {@link UserRecord}. */
     public UserRecord convertUserToRecord(User user) {
         return new UserRecord(
                 user.getUserID(),
@@ -161,14 +221,17 @@ public class UserService {
         );
     }
 
+    /** Returns all clubs the user is a member of. */
     public Set<Club> getClubsForUser(User user) {
         Set<Club> clubs = new HashSet<>();
-        Set<ClubMembership> memberships = user.getMemberships();
-
-        for (ClubMembership membership : memberships) {
+        for (ClubMembership membership : user.getMemberships()) {
             clubs.add(membership.getClub());
         }
-
         return clubs;
+    }
+
+    /** Returns true if this is the first user created in the system. */
+    private boolean firstLaunch() {
+        return userRepository.count() == 0;
     }
 }
