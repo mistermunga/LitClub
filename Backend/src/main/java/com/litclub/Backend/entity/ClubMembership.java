@@ -5,6 +5,7 @@ import com.litclub.Backend.security.roles.ClubRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -37,13 +38,7 @@ public class ClubMembership {
     @Enumerated(EnumType.STRING)
     private Set<ClubRole> roles = new HashSet<>();
 
+    @CreationTimestamp
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
-
-    @PrePersist
-    public void onCreate() {
-        if (this.joinedAt == null) {
-            this.joinedAt = LocalDateTime.now();
-        }
-    }
 }
