@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Embeddable
 @EqualsAndHashCode
 @Getter @Setter
-public class UserBooksID implements Serializable {
+public class UserBookID implements Serializable {
 
     @Column(name = "user_id")
     private Long userID;
