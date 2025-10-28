@@ -22,14 +22,17 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Service that enriches Book (JPA entity) using the OpenLibraryClient.
+ * <p>Service that enriches Book (JPA entity) using the OpenLibraryClient.</p>
  *
- * Features:
- * - Client calls are rate-limited (Resilience4j RateLimiter) tuned for Open Library (safe default ~2 req/s).
- * - Simple retry on transient failures (Resilience4j Retry).
- * - In-memory caching of enriched Book entities (Caffeine) to avoid repeated remote calls.
+ * <p>Features:</p>
+ * <ul>
+ * <li>Client calls are rate-limited {@code Resilience4j RateLimiter} tuned for Open Library {@code safe default ~2 req/s}.</li>
+ * <li>Simple retry on transient failures {@code Resilience4j Retry}.</li>
+ * <li>In-memory caching of enriched Book entities {@code Caffeine} to avoid repeated remote calls.</li>
+ *</ul>
  *
- * NOTE: adapt package imports (Book, BookRepository, BookMetadataDTO, OpenLibraryClient) to your project layout.
+ * @see OpenLibraryClient
+ *
  */
 @Service
 @Slf4j
