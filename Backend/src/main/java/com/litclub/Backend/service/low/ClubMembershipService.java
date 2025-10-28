@@ -1,4 +1,4 @@
-package com.litclub.Backend.service;
+package com.litclub.Backend.service.low;
 
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
@@ -16,7 +16,8 @@ import java.util.*;
  * Service that manages the relationship between {@link User}s and {@link Club}s.
  *
  * <p>This service provides operations for enrolling users, managing roles,
- * retrieving memberships, and removing users from clubs.
+ * retrieving memberships, and removing users from clubs. This is a low tier
+ * Service, meaning that the caller has certain Responsibilities.
  *
  * <p><strong>Responsibilities of the caller:</strong>
  * <ul>
