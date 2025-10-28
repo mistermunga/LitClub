@@ -28,7 +28,7 @@ public class UserBooks {
     private Book book;
 
     @Column(length = 30)
-    private String status;
+    private BookStatus status;
 
     @Column
     private Integer rating;
