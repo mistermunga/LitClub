@@ -3,6 +3,7 @@ package com.litclub.Backend.service.middle;
 import com.litclub.Backend.construct.user.UserLoginRecord;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.construct.user.UserRegistrationRecord;
+import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
 import com.litclub.Backend.entity.User;
@@ -12,6 +13,7 @@ import com.litclub.Backend.repository.UserRepository;
 import com.litclub.Backend.security.jwt.JwtService;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.service.low.ClubMembershipService;
+import com.litclub.Backend.service.low.UserBooksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,14 +49,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final ClubMembershipService clubMembershipService;
+    private final UserBooksService userBooksService;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       ClubMembershipService clubMembershipService) {
+                       ClubMembershipService clubMembershipService,
+                       UserBooksService userBooksService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.clubMembershipService = clubMembershipService;
+        this.userBooksService = userBooksService;
     }
 
     // ===== AUTHENTICATION =====
@@ -163,12 +168,13 @@ public class UserService {
         return userRepository.findUserByUserID(id);
     }
 
+    // ====> Clubs
     /** Retrieves a user's clubs
      * Callers must pass either the UserID or the username*/
     @Transactional(readOnly = true)
-    public List<Club> getClubsForUser(Long userId) {
-        User user = getUserById(userId)
-                .orElseThrow(() -> new UserNotFoundException("ID", userId.toString()));
+    public List<Club> getClubsForUser(Long userID) {
+        User user = getUserById(userID)
+                .orElseThrow(() -> new UserNotFoundException("ID", userID.toString()));
         return clubMembershipService.getClubsForUser(user);
     }
 
@@ -178,6 +184,22 @@ public class UserService {
                 .or(() -> getUserByEmail(identifier))
                 .orElseThrow(() -> new UserNotFoundException("Username/Email", identifier));
         return clubMembershipService.getClubsForUser(user);
+    }
+
+    // ====> Books
+    @Transactional(readOnly = true)
+    public List<Book> getBooksForUser(Long userID) {
+        User user = getUserById(userID)
+                .orElseThrow(() -> new UserNotFoundException("ID", userID.toString()));
+        return userBooksService.getBooksForUser(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Book> getBooksForUser(String identifier) {
+        User user = getUserByUsername(identifier)
+                .or(() -> getUserByEmail(identifier))
+                .orElseThrow(() -> new UserNotFoundException("Username/Email", identifier));
+        return userBooksService.getBooksForUser(user);
     }
 
     // ===== UPDATE =====
