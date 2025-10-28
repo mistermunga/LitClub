@@ -5,7 +5,7 @@ import com.litclub.Backend.construct.user.UserLoginRecord;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.construct.user.UserRegistrationRecord;
 import com.litclub.Backend.security.jwt.JwtService;
-import com.litclub.Backend.service.UserService;
+import com.litclub.Backend.service.middle.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

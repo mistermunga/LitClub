@@ -1,6 +1,7 @@
 package com.litclub.Backend.construct;
 
 import com.litclub.Backend.construct.user.UserRecord;
+import com.litclub.Backend.service.middle.UserService;
 
 /**
  * Represents the response returned after a successful authentication event
@@ -12,6 +13,6 @@ import com.litclub.Backend.construct.user.UserRecord;
  * @param userRecord the {@link UserRecord} of the authenticated user
  *
  * @see com.litclub.Backend.security.jwt.JwtService
- * @see com.litclub.Backend.service.UserService
+ * @see UserService
  */
 public record AuthResponse(String token, UserRecord userRecord) {}
