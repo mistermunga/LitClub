@@ -27,6 +27,10 @@ public class UserBooks {
     @JoinColumn(name = "book_id")
     private Book book;
 
+    /**
+     * Specifies {@link User}'s relationship with a {@link Book}.
+     * Value defined by an {@link BookStatus} enum
+     */
     @Column(length = 30)
     private BookStatus status;
 
