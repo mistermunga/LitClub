@@ -1,4 +1,4 @@
-package com.litclub.Backend.service;
+package com.litclub.Backend.service.middle;
 
 import com.litclub.Backend.construct.user.UserLoginRecord;
 import com.litclub.Backend.construct.user.UserRecord;
@@ -9,7 +9,9 @@ import com.litclub.Backend.entity.User;
 import com.litclub.Backend.exception.CredentialsAlreadyTakenException;
 import com.litclub.Backend.exception.UserNotFoundException;
 import com.litclub.Backend.repository.UserRepository;
+import com.litclub.Backend.security.jwt.JwtService;
 import com.litclub.Backend.security.roles.GlobalRole;
+import com.litclub.Backend.service.low.ClubMembershipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +24,9 @@ import java.util.*;
  * Service that manages user authentication, registration, and account maintenance.
  *
  * <p>This service acts as the core entry point for all user-related business logic,
- * including credential validation, persistence, and role assignment.</p>
+ * including credential validation, persistence, and role assignment. This is a
+ * middle tier Service meaning the caller <strong>must enforce access control;
+ * this Service does not enforce it</strong></p>
  *
  * <p><strong>Responsibilities:</strong></p>
  * <ul>
@@ -32,9 +36,9 @@ import java.util.*;
  *   <li>Retrieve associated clubs and memberships</li>
  * </ul>
  *
- * @see com.litclub.Backend.entity.User
- * @see com.litclub.Backend.repository.UserRepository
- * @see com.litclub.Backend.security.jwt.JwtService
+ * @see User
+ * @see UserRepository
+ * @see JwtService
  */
 @Service
 public class UserService {
@@ -42,11 +46,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final ClubMembershipService clubMembershipService;
+
     @Autowired
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       ClubMembershipService clubMembershipService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.clubMembershipService = clubMembershipService;
     }
 
     // ===== AUTHENTICATION =====
@@ -153,6 +161,23 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> getUserById(Long id) {
         return userRepository.findUserByUserID(id);
+    }
+
+    /** Retrieves a user's clubs
+     * Callers must pass either the UserID or the username*/
+    @Transactional(readOnly = true)
+    public List<Club> getClubsForUser(Long userId) {
+        User user = getUserById(userId)
+                .orElseThrow(() -> new UserNotFoundException("ID", userId.toString()));
+        return clubMembershipService.getClubsForUser(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Club> getClubsForUser(String identifier) {
+        User user = getUserByUsername(identifier)
+                .or(() -> getUserByEmail(identifier))
+                .orElseThrow(() -> new UserNotFoundException("Username/Email", identifier));
+        return clubMembershipService.getClubsForUser(user);
     }
 
     // ===== UPDATE =====
