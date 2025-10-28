@@ -137,4 +137,10 @@ public class ClubMembershipService {
         ClubMembership membership = getMembershipByClubAndUser(club, user);
         clubMembershipRepository.delete(membership);
     }
+
+    @Transactional
+    public void deRegisterUserFromClub(ClubMembershipID clubMembershipID) {
+        ClubMembership membership = getMembershipByClubAndUser(clubMembershipID);
+        clubMembershipRepository.delete(membership);
+    }
 }
