@@ -1,6 +1,7 @@
 package com.litclub.Backend.entity;
 
-import com.litclub.Backend.entity.compositeKey.UserBooksID;
+import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.entity.compositeKey.UserBookID;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,10 +13,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "user_books")
 @Getter @Setter
-public class UserBooks {
+public class UserBook {
 
     @EmbeddedId
-    private UserBooksID userBooksID;
+    private UserBookID userBookID;
 
     @MapsId("userID")
     @ManyToOne
