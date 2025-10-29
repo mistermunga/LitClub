@@ -20,6 +20,10 @@ public class DiscussionPrompt {
     @JoinColumn(name = "poster_id", nullable = false)
     private User poster;
 
+    @ManyToOne
+    @JoinColumn(name = "club_id", nullable = false)
+    private Club club;
+
     @Column(nullable = false)
     private String prompt;
 
