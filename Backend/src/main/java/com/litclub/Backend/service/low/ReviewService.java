@@ -83,6 +83,26 @@ public class ReviewService {
         return reviewRepository.findByContentContainsIgnoreCase(query);
     }
 
+    @Transactional(readOnly = true)
+    public List<Review> getBookReviewsRatedAbove(Book book, int rating) {
+        return reviewRepository.findByBookAndRatingGreaterThan(book, rating);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Review> getUserReviewsRatedAbove(User user, int rating) {
+        return reviewRepository.findByUserAndRatingGreaterThan(user, rating);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Review> getBookReviewsRatedBelow(Book book, int rating) {
+        return reviewRepository.findByBookAndRatingLessThan(book, rating);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Review> getUserReviewsRatedBelow(User user, int rating) {
+        return reviewRepository.findByUserAndRatingLessThan(user, rating);
+    }
+
     // ====== UPDATE ======
     @Transactional
     public Review updateReview(ReviewDTO reviewDTO) {
