@@ -108,4 +108,9 @@ public class Book {
     public void setPublishers(String publishers) {
         this.publisher = publishers;
     }
+
+    public void setAuthor(String primaryAuthor) {
+        this.primaryAuthor = primaryAuthor;
+        authors.add(primaryAuthor);
+    }
 }
