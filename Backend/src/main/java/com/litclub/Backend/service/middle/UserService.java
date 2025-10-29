@@ -7,7 +7,6 @@ import com.litclub.Backend.entity.*;
 import com.litclub.Backend.exception.CredentialsAlreadyTakenException;
 import com.litclub.Backend.exception.UserNotFoundException;
 import com.litclub.Backend.repository.UserRepository;
-import com.litclub.Backend.security.jwt.JwtService;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.service.low.ClubMembershipService;
 import com.litclub.Backend.service.low.DiscussionPromptService;
