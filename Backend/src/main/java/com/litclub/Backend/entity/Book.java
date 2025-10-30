@@ -111,6 +111,6 @@ public class Book {
 
     public void setAuthor(String primaryAuthor) {
         this.primaryAuthor = primaryAuthor;
-        authors.add(primaryAuthor);
+        authors.addFirst(primaryAuthor);
     }
 }
