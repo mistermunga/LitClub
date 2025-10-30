@@ -1,4 +1,4 @@
-package com.litclub.Backend.service.middle;
+package com.litclub.Backend.service.low;
 
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.Note;
