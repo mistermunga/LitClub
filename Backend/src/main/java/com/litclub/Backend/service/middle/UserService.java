@@ -776,6 +776,12 @@ public class UserService {
         return convertUserToRecord(userToUpdate);
     }
 
+    @Transactional
+    public UserRecord updateUser(User user) {
+        userRepository.save(user);
+        return convertUserToRecord(user);
+    }
+
     // ===== DELETE =====
 
     /**
@@ -972,7 +978,7 @@ public class UserService {
      * @param user the user entity to convert
      * @return the corresponding {@link UserRecord}
      */
-    public UserRecord convertUserToRecord(User user) {
+    public static UserRecord convertUserToRecord(User user) {
         return new UserRecord(
                 user.getUserID(),
                 user.getFirstName(),
@@ -993,7 +999,7 @@ public class UserService {
      * @param user the user entity
      * @return set of clubs the user belongs to
      */
-    public Set<Club> getClubsForUser(User user) {
+    public static Set<Club> getClubsForUser(User user) {
         Set<Club> clubs = new HashSet<>();
         for (ClubMembership membership : user.getMemberships()) {
             clubs.add(membership.getClub());
