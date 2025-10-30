@@ -10,7 +10,6 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -120,12 +119,9 @@ public class MeetingService {
      * @throws EntityNotFoundException if no meeting with the given ID exists
      */
     @Transactional(readOnly = true)
-    public Meeting getMeetingById(Long meetingID) {
-        if (meetingID == null) {
-            throw new MalformedDTOException("Meeting ID cannot be null");
-        }
+    public Meeting requireById(long meetingID) {
         return meetingRepository.findByMeetingID(meetingID)
-                .orElseThrow(() -> new EntityNotFoundException("Meeting with ID " + meetingID + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Meeting with id: " + meetingID + " not found"));
     }
 
     /**
@@ -313,9 +309,8 @@ public class MeetingService {
     public Meeting updateMeeting(Long meetingID, String title,
                                  LocalDateTime startTime, LocalDateTime endTime,
                                  String location, String link) {
-        Meeting meeting = getMeetingById(meetingID);
+        Meeting meeting = requireById(meetingID);
 
-        // Update time fields first so we can validate them together
         LocalDateTime newStart = startTime != null ? startTime : meeting.getStartTime();
         LocalDateTime newEnd = endTime != null ? endTime : meeting.getEndTime();
         validateMeetingTimes(newStart, newEnd);
@@ -342,7 +337,7 @@ public class MeetingService {
     @Transactional
     public Meeting rescheduleMeeting(Long meetingID, LocalDateTime newStartTime, LocalDateTime newEndTime) {
         validateMeetingTimes(newStartTime, newEndTime);
-        Meeting meeting = getMeetingById(meetingID);
+        Meeting meeting = requireById(meetingID);
         meeting.setStartTime(newStartTime);
         meeting.setEndTime(newEndTime);
         return meetingRepository.save(meeting);
@@ -361,9 +356,8 @@ public class MeetingService {
      */
     @Transactional
     public void deleteMeeting(Long meetingID) {
-        Meeting meeting = getMeetingById(meetingID);
+        Meeting meeting = requireById(meetingID);
 
-        // Clean up all attendee records
         List<MeetingAttendee> attendees = meetingAttendeeService.findAllMeetingAttendances(meeting);
         for (MeetingAttendee attendee : attendees) {
             meetingAttendeeService.deleteMeetingAttendee(meeting, attendee.getUser());
@@ -404,7 +398,7 @@ public class MeetingService {
         }
     }
 
-    // ====== ATTENDEE MANAGEMENT (Delegation to MeetingAttendeeService) ======
+    // ====== ATTENDEE MANAGEMENT ======
 
     /**
      * Registers a user's RSVP for a meeting.
