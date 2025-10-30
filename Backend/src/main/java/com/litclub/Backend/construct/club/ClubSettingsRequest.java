@@ -1,4 +1,4 @@
-package com.litclub.Backend.construct.meeting;
+package com.litclub.Backend.construct.club;
 
 import com.litclub.Backend.config.ConfigurationManager;
 
