@@ -29,6 +29,6 @@ public class ClubSecurityExpressionHandler {
         if (auth == null || auth.getAuthorities() == null) return false;
         return auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .allMatch(a -> a.equals(role));
+                .anyMatch(a -> a.equals(role));
     }
 }
