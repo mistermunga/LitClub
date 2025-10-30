@@ -8,6 +8,11 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Composite primary key for {@link com.litclub.Backend.entity.MeetingRegister}.
+ *
+ * <p>Represents a unique attendance record of a User in a Meeting’s register.</p>
+ */
 @Embeddable
 @EqualsAndHashCode
 @Getter @Setter

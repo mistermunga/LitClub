@@ -8,6 +8,11 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Composite primary key for {@link com.litclub.Backend.entity.ClubMembership}.
+ *
+ * <p>Represents the unique association between a Club and a Member.</p>
+ */
 @Embeddable
 @EqualsAndHashCode
 @Getter @Setter
