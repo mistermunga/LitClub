@@ -8,6 +8,52 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a published or catalogued {@code Book} within the LitClub ecosystem.
+ *
+ * <p>This entity captures bibliographic metadata such as title, authorship,
+ * publication details, and identifiers. Books form the foundation of a user's
+ * personal library and are central to many core features of LitClub, including
+ * collections, recommendations, and club reading lists.</p>
+ *
+ * <p><strong>Key Relationships:</strong></p>
+ * <ul>
+ *   <li><strong>{@link #addedBy} (Many-to-One):</strong> References the {@link User}
+ *       who added this book to the system. A user may contribute multiple books,
+ *       but each book record is attributed to exactly one uploader.</li>
+ * </ul>
+ *
+ * <p><strong>Core Attributes:</strong></p>
+ * <ul>
+ *   <li><strong>{@link #bookID}:</strong> Primary key identifier.</li>
+ *   <li><strong>{@link #title}:</strong> The book’s title, required for all records.</li>
+ *   <li><strong>{@link #authors}:</strong> A list of all authors associated with the book.</li>
+ *   <li><strong>{@link #primaryAuthor}:</strong> The first listed author, synchronized automatically with {@link #authors}.</li>
+ *   <li><strong>{@link #isbn}:</strong> A unique ISBN, used for external metadata retrieval.</li>
+ * </ul>
+ *
+ * <p><strong>Lifecycle Notes:</strong></p>
+ * <ul>
+ *   <li>When authors are set via {@link #setAuthors(List)}, the {@link #primaryAuthor} is automatically
+ *       updated to the first element of the list (or defaults to {@code "Unknown"} if empty).</li>
+ *   <li>Convenience methods such as {@link #addAuthor(String)} and {@link #getAuthorsAsString()}
+ *       maintain or expose a consistent author representation.</li>
+ *   <li>The {@link #setPublishDate(String)} method provides lenient date parsing, accommodating formats like
+ *       {@code "2001"} or {@code "September 2001"} for flexible metadata ingestion.</li>
+ * </ul>
+ *
+ * <p><strong>Integration Notes:</strong></p>
+ * <ul>
+ *   <li>Metadata enrichment is handled by {@link com.litclub.Backend.service.low.BookMetadataService},
+ *       which may populate missing information based on the title, author, or ISBN.</li>
+ *   <li>Domain-level operations such as creation, retrieval, and curation are managed by
+ *       {@link com.litclub.Backend.service.middle.BookService}.</li>
+ * </ul>
+ *
+ * @see User
+ * @see com.litclub.Backend.service.low.BookMetadataService
+ * @see com.litclub.Backend.service.middle.BookService
+ */
 @Entity
 @Table(name = "books")
 @Getter @Setter
@@ -80,12 +126,19 @@ public class Book {
         return "Unknown";
     }
 
+    /** Returns {@link Book#authors} as a string*/
     public String getAuthorsAsString() {
         return (authors != null && !authors.isEmpty())
                 ? String.join(", ", authors)
                 : "Unknown";
     }
 
+    /** <p>Parses the Year from a String value. Formatted to recognise two formats
+     * {@code "2001"} or {@code "September 2001"}. Sets the value of {@link Book#authors}
+     * </p>
+     *
+     * @param publishDate the date as a string, fetched by {@link com.litclub.Backend.service.low.BookMetadataService}
+     */
     public void setPublishDate(String publishDate) {
         if (publishDate == null || publishDate.isBlank()) return;
         try {
