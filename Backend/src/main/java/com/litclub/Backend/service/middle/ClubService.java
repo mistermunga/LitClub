@@ -201,7 +201,7 @@ public class ClubService {
         return new ClubRecord(
                 club.getClubID(),
                 club.getClubName(),
-                userService.convertUserToRecord(club.getCreator()),
+                UserService.convertUserToRecord(club.getCreator()),
                 new HashSet<>()
         );
     }
