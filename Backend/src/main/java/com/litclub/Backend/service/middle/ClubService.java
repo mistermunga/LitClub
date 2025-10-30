@@ -177,6 +177,15 @@ public class ClubService {
         return clubMembershipService.getUsersForClub(club);
     }
 
+
+    // ====== DELETE ======
+
+    @Transactional
+    public void deleteClub(Long clubID) {
+        Club club = requireClubById(clubID);
+        clubRepository.delete(club);
+    }
+
     // ===== UTILITY =====
 
     /**
