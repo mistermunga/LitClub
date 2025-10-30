@@ -1,6 +1,6 @@
 package com.litclub.Backend.controller.entry;
 
-import com.litclub.Backend.construct.AuthResponse;
+import com.litclub.Backend.construct.auth.AuthResponse;
 import com.litclub.Backend.construct.user.UserLoginRecord;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.construct.user.UserRegistrationRecord;

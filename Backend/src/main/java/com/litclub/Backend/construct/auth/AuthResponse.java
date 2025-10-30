@@ -1,4 +1,4 @@
-package com.litclub.Backend.construct;
+package com.litclub.Backend.construct.auth;
 
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.service.middle.UserService;
