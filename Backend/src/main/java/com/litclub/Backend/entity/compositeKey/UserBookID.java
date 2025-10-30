@@ -8,6 +8,11 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Composite primary key for {@link com.litclub.Backend.entity.UserBook}.
+ *
+ * <p>Defines the unique pairing of a User and a Book in the user’s library.</p>
+ */
 @Embeddable
 @EqualsAndHashCode
 @Getter @Setter
