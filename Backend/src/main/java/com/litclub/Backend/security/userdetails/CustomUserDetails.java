@@ -18,6 +18,7 @@ public class CustomUserDetails implements UserDetails {
     }
     
     public User getUser() {return user;}
+    public Long getUserID() {return user.getUserID();}
 
     @Override public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }
     @Override public String getPassword() { return user.getPasswordHash(); }
