@@ -16,6 +16,8 @@ public class CustomUserDetails implements UserDetails {
         this.user = user;
         this.authorities = AuthorityMapper.mapToAuthorities(user);
     }
+    
+    public User getUser() {return user;}
 
     @Override public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }
     @Override public String getPassword() { return user.getPasswordHash(); }
