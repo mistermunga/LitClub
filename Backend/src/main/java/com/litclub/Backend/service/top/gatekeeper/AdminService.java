@@ -10,6 +10,7 @@ import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Set;
@@ -105,6 +106,7 @@ public class AdminService {
      * @see UserService#requireUserById(Long)
      * @see UserService#updateUser(com.litclub.Backend.entity.User)
      */
+    @Transactional
     public UserRecord promoteAdmin(Long userID) {
         User user = userService.requireUserById(userID);
         Set<GlobalRole> roles = user.getGlobalRoles();
@@ -128,6 +130,7 @@ public class AdminService {
      * @see ConfigurationManager#getInstanceSettings()
      * @see ConfigurationManager#updateInstanceSettings(ConfigurationManager.InstanceSettings)
      */
+    @Transactional
     public void changeRegistrationPolicy(ConfigurationManager.InstanceRegistrationMode mode) throws IOException {
         ConfigurationManager.InstanceSettings old = configuration.getInstanceSettings();
 
@@ -152,6 +155,7 @@ public class AdminService {
      * @throws java.lang.IllegalArgumentException if {@code userRegistrationRecord} is {@code null} (or if required fields are missing — delegated to {@link UserService}).
      * @see UserService#registerUser(UserRegistrationRecord)
      */
+    @Transactional
     public UserRecord createUser(UserRegistrationRecord userRegistrationRecord) {
         return userService.registerUser(userRegistrationRecord);
     }
@@ -165,6 +169,7 @@ public class AdminService {
      * @param userID id of the user to delete (must not be {@code null}).
      * @see UserService#deleteUser(Long)
      */
+    @Transactional
     public void deleteUser(Long userID) {
         userService.deleteUser(userID);
     }
@@ -186,6 +191,7 @@ public class AdminService {
      * @see UserService#getAllUsers()
      * @see UserService#convertUserToRecord(User)
      */
+    @Transactional
     public List<UserRecord> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return users.stream()
@@ -204,6 +210,7 @@ public class AdminService {
      * @param clubID id of the club to delete (must not be {@code null}).
      * @see ClubService#deleteClub(Long)
      */
+    @Transactional
     public void deleteClub(Long clubID) {
         clubService.deleteClub(clubID);
     }
@@ -217,6 +224,7 @@ public class AdminService {
      * @return a {@link java.util.List} of {@link com.litclub.Backend.entity.Club}; never {@code null} (may be empty).
      * @see ClubService#getClubs()
      */
+    @Transactional
     public List<Club> getAllClubs() {
         return clubService.getClubs();
     }
