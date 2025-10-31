@@ -198,7 +198,9 @@ public class ConfigurationManager {
                 return new ClubFlags(
                         data.allowPublicNotes,
                         data.requireMeetingRSVP,
-                        data.allowMemberInvites
+                        data.allowMemberInvites,
+                        data.allowMemberDiscussion,
+                        data.enableRegister
                 );
             }
             // Return defaults for unconfigured clubs
@@ -223,6 +225,8 @@ public class ConfigurationManager {
             data.allowPublicNotes = flags.allowPublicNotes();
             data.requireMeetingRSVP = flags.requireMeetingRSVP();
             data.allowMemberInvites = flags.allowMemberInvites();
+            data.allowMemberDiscussion = flags.allowMemberDiscussion();
+            data.enableRegister = flags.enableRegister();
 
             configuration.clubs.put(key, data);
             persistConfiguration();
@@ -278,6 +282,14 @@ public class ConfigurationManager {
         try {
             String json = Files.readString(configFilePath);
             configuration = objectMapper.readValue(json, InstanceConfiguration.class);
+
+            // Defensive: ensure sub-structures exist for older/corrupted configs
+            if (configuration.instance == null) {
+                configuration.instance = new InstanceData();
+            }
+            if (configuration.clubs == null) {
+                configuration.clubs = new HashMap<>();
+            }
         } catch (IOException e) {
             System.err.println("Failed to parse config file. Creating backup and using defaults.");
             backupCorruptedFile();
@@ -399,6 +411,8 @@ public class ConfigurationManager {
         public boolean allowPublicNotes;
         public boolean requireMeetingRSVP;
         public boolean allowMemberInvites;
+        public boolean allowMemberDiscussion;
+        public boolean enableRegister;
     }
 
     // ====== PUBLIC RECORDS ======
@@ -424,11 +438,15 @@ public class ConfigurationManager {
      * @param allowPublicNotes If {@code true}, members can create notes shared with the club.
      * @param requireMeetingRSVP If {@code true}, members must RSVP to meetings.
      * @param allowMemberInvites If {@code true}, regular members may invite others (not only admins).
+     * @param allowMemberDiscussion If {@code true}, regular members can create discussion prompts
+     * @param enableRegister If {@code true}, {@link com.litclub.Backend.entity.MeetingRegister} functionality enabled
      */
     public record ClubFlags(
             boolean allowPublicNotes,
             boolean requireMeetingRSVP,
-            boolean allowMemberInvites
+            boolean allowMemberInvites,
+            boolean allowMemberDiscussion,
+            boolean enableRegister
     ) {
         /**
          * Returns the default flags used for newly-created clubs.
@@ -436,7 +454,7 @@ public class ConfigurationManager {
          * @return the default {@link ClubFlags}
          */
         public static ClubFlags defaults() {
-            return new ClubFlags(true, false, true);
+            return new ClubFlags(true, false, true, true, true);
         }
     }
 
