@@ -78,19 +78,34 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     /**
      * Finds replies containing specific text in their content (case-insensitive).
      *
+     * <p>Because {@code content} is stored as a {@code @Lob}, this query uses
+     * a manual {@code CAST} to allow case-insensitive searches.</p>
+     *
      * @param content the search text
      * @return list of matching replies, empty if none found
      */
-    List<Reply> findByContentContainingIgnoreCase(String content);
+    @Query("""
+        SELECT r FROM Reply r
+        WHERE LOWER(CAST(r.content AS string)) LIKE LOWER(CONCAT('%', :content, '%'))
+       """)
+    List<Reply> findByContentContainingIgnoreCase(@Param("content") String content);
 
     /**
      * Finds replies by a specific user containing specific text (case-insensitive).
+     *
+     * <p>Because {@code content} is stored as a {@code @Lob}, this query uses
+     * a manual {@code CAST} to allow case-insensitive searches.</p>
      *
      * @param user the user who created the replies
      * @param content the search text
      * @return list of matching replies, empty if none found
      */
-    List<Reply> findByUserAndContentContainingIgnoreCase(User user, String content);
+    @Query("""
+        SELECT r FROM Reply r
+        WHERE r.user = :user
+          AND LOWER(CAST(r.content AS string)) LIKE LOWER(CONCAT('%', :content, '%'))
+       """)
+    List<Reply> findByUserAndContentContainingIgnoreCase(@Param("user") User user, @Param("content") String content);
 
     /**
      * Finds all replies to notes created by a specific user.
@@ -102,9 +117,9 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
      * @return list of replies on the user's notes
      */
     @Query("""
-        SELECT r FROM Reply r\s
+        SELECT r FROM Reply r
         WHERE r.parentNote.user = :user
-       \s""")
+       """)
     List<Reply> findRepliesOnNotesCreatedBy(@Param("user") User user);
 
     /**
@@ -114,10 +129,10 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
      * @return list of recent replies, ordered by creation date descending
      */
     @Query("""
-        SELECT r FROM Reply r\s
-        ORDER BY r.createdAt DESC\s
+        SELECT r FROM Reply r
+        ORDER BY r.createdAt DESC
         LIMIT :limit
-       \s""")
+       """)
     List<Reply> findRecentReplies(@Param("limit") int limit);
 
     /**
@@ -128,10 +143,10 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
      * @return list of recent replies to this note, ordered by creation date descending
      */
     @Query("""
-        SELECT r FROM Reply r\s
-        WHERE r.parentNote = :parentNote\s
-        ORDER BY r.createdAt DESC\s
+        SELECT r FROM Reply r
+        WHERE r.parentNote = :parentNote
+        ORDER BY r.createdAt DESC
         LIMIT :limit
-       \s""")
+       """)
     List<Reply> findRecentRepliesForNote(@Param("parentNote") Note parentNote, @Param("limit") int limit);
 }
