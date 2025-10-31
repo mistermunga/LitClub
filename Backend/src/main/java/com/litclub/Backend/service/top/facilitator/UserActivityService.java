@@ -1,8 +1,10 @@
 package com.litclub.Backend.service.top.facilitator;
 
 import com.litclub.Backend.construct.book.BookDTO;
+import com.litclub.Backend.construct.book.BookStatus;
 import com.litclub.Backend.construct.user.UserProfile;
 import com.litclub.Backend.construct.user.UserActivityReport;
+import com.litclub.Backend.construct.user.UserStatistics;
 import com.litclub.Backend.entity.*;
 import com.litclub.Backend.service.low.DiscussionPromptService;
 import com.litclub.Backend.service.low.NoteService;
@@ -54,12 +56,8 @@ public class UserActivityService {
         User user = userService.requireUserById(userID);
 
         List<Meeting> meetings = getMeetingsForUser(userID);
-        List<Meeting> upcomingMeetings = meetings.stream()
-                .filter(meeting -> meeting.getStartTime().isAfter(LocalDateTime.now()))
-                .toList();
-        List<Meeting> pastMeetings = meetings.stream()
-                .filter(meeting -> meeting.getStartTime().isBefore(LocalDateTime.now()))
-                .toList();
+        List<Meeting> upcomingMeetings = filterUpcomingMeetings(meetings);
+        List<Meeting> pastMeetings = filterPastMeetings(meetings);
 
         List<Review> reviews = getReviewsForUser(userID);
         List<Note> notes = getNotesForUser(userID);
@@ -136,6 +134,42 @@ public class UserActivityService {
         return promptService.findAllByPoster(userService.requireUserById(userID));
     }
 
+    // ====== ANALYTICS ======
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public UserStatistics getUserStatistics(Long userID) {
+        User user = userService.requireUserById(userID);
+
+        List<Club> clubs = getClubsForUser(userID);
+        List<Book> books = getBooksForUser(userID);
+        List<Meeting> meetings = getMeetingsForUser(userID);
+        List<Review> reviews = getReviewsForUser(userID);
+        List<Note> notes = getNotesForUser(userID);
+        List<DiscussionPrompt> prompts = getDiscussionPromptsFromUser(userID);
+
+        List<BookDTO> bookDTOs = convertBooksToDTO(books, user);
+        int booksRead = countBooksByStatus(bookDTOs, BookStatus.READ);
+        int booksReading = countBooksByStatus(bookDTOs, BookStatus.READING);
+        int booksAbandoned = countBooksByStatus(bookDTOs, BookStatus.DNF);
+
+        int upcomingMeetings = filterUpcomingMeetings(meetings).size();
+        double averageRating = calculateAverageRating(reviews);
+
+        return new UserStatistics(
+                userID,
+                clubs.size(),
+                booksRead,
+                booksReading,
+                booksAbandoned,
+                meetings.size(),
+                upcomingMeetings,
+                reviews.size(),
+                notes.size(),
+                prompts.size(),
+                averageRating
+        );
+    }
+
     // ====== UTILITY ======
     private static <T> List<T> limitToRecent(List<T> items, Comparator<T> comparator, int limit) {
         if (items.size() <= limit) return items;
@@ -143,5 +177,46 @@ public class UserActivityService {
                 .sorted(comparator.reversed())
                 .limit(limit)
                 .toList();
+    }
+
+    private List<BookDTO> convertBooksToDTO(List<Book> books, User user) {
+        return books.stream()
+                .map(book -> bookService.convertBookToDTO(book, user))
+                .toList();
+    }
+
+    private static int countBooksByStatus(List<BookDTO> bookDTOs, BookStatus status) {
+        return (int) bookDTOs.stream()
+                .filter(bookDTO -> bookDTO.status() == status)
+                .count();
+    }
+
+    private static List<Meeting> filterUpcomingMeetings(List<Meeting> meetings) {
+        return meetings.stream()
+                .filter(meeting -> meeting.getStartTime().isAfter(LocalDateTime.now()))
+                .toList();
+    }
+
+    private static List<Meeting> filterPastMeetings(List<Meeting> meetings) {
+        return meetings.stream()
+                .filter(meeting -> meeting.getStartTime().isBefore(LocalDateTime.now()))
+                .toList();
+    }
+
+    private static double calculateAverageRating(List<Review> reviews) {
+        long reviewsWithRating = reviews.stream()
+                .filter(review -> review.getRating() != null)
+                .count();
+
+        if (reviewsWithRating == 0) {
+            return 0.0;
+        }
+
+        double sumRatings = reviews.stream()
+                .filter(review -> review.getRating() != null)
+                .mapToDouble(Review::getRating)
+                .sum();
+
+        return sumRatings / reviewsWithRating;
     }
 }
