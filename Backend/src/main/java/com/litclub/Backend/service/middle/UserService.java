@@ -1,6 +1,7 @@
 package com.litclub.Backend.service.middle;
 
 import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.meeting.RsvpStatus;
 import com.litclub.Backend.construct.user.UserLoginRecord;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.construct.user.UserRegistrationRecord;
@@ -620,7 +621,7 @@ public class UserService {
      * @throws UserNotFoundException if the user does not exist
      */
     @Transactional(readOnly = true)
-    public List<MeetingAttendee> getMeetingRSVPsByStatus(Long userID, BookStatus status) {
+    public List<MeetingAttendee> getMeetingRSVPsByStatus(Long userID, RsvpStatus status) {
         User user = requireUserById(userID);
         return meetingAttendeeService.findAllMeetingAttendances(user, status);
     }
