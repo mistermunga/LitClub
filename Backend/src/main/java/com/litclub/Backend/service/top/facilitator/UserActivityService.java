@@ -1,12 +1,14 @@
 package com.litclub.Backend.service.top.facilitator;
 
+import com.litclub.Backend.construct.book.BookDTO;
+import com.litclub.Backend.construct.user.UserProfile;
 import com.litclub.Backend.entity.*;
 import com.litclub.Backend.construct.user.UserActivityReport;
 import com.litclub.Backend.entity.Meeting;
-import com.litclub.Backend.service.low.ClubMembershipService;
 import com.litclub.Backend.service.low.DiscussionPromptService;
 import com.litclub.Backend.service.low.NoteService;
 import com.litclub.Backend.service.low.ReviewService;
+import com.litclub.Backend.service.middle.BookService;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.MeetingService;
 import com.litclub.Backend.service.middle.UserService;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -27,7 +30,7 @@ public class UserActivityService {
     private final NoteService noteService;
     private final DiscussionPromptService promptService;
     private final ClubService clubService;
-    private final ClubMembershipService clubMembershipService;
+    private final BookService bookService;
 
     public UserActivityService(
             UserService userService,
@@ -36,17 +39,17 @@ public class UserActivityService {
             NoteService noteService,
             DiscussionPromptService promptService,
             ClubService clubService,
-            ClubMembershipService clubMembershipService) {
+            BookService bookService) {
         this.userService = userService;
         this.meetingService = meetingService;
         this.reviewService = reviewService;
         this.noteService = noteService;
         this.promptService = promptService;
         this.clubService = clubService;
-        this.clubMembershipService = clubMembershipService;
+        this.bookService = bookService;
     }
 
-    // ====== STATISTICS ======
+    // ====== USERDATA ======
     @Transactional(readOnly = true)
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public UserActivityReport getUserActivity(Long userID) {
@@ -77,6 +80,34 @@ public class UserActivityService {
                         notes.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed()).limit(15)
                                 .toList(),
                 prompts
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public UserProfile getUserProfile(Long userID) {
+        User user = userService.requireUserById(userID);
+
+        List<Book> books = bookService.getBooksByUser(user);
+
+        List<BookDTO> bookDTOs = new ArrayList<>();
+        for (Book book : books) {
+            BookDTO bookObject = bookService.convertBookToDTO(book, user);
+            bookDTOs.add(bookObject);
+        }
+
+        List<Club> clubs = clubService.getClubsByUser(user);
+        List<Meeting> meetings = meetingService.getMeetingsForUser(user);
+        List<Note> notes = noteService.getAllNotes(user);
+        List<Review> reviews = reviewService.getReviews(user);
+
+        return new UserProfile(
+                UserService.convertUserToRecord(user),
+                clubs,
+                bookDTOs,
+                meetings.size(),
+                notes.size(),
+                reviews.size()
         );
     }
 }
