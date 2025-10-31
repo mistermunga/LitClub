@@ -2,17 +2,20 @@ package com.litclub.Backend.service.middle;
 
 import com.litclub.Backend.construct.club.ClubRecord;
 import com.litclub.Backend.entity.Club;
+import com.litclub.Backend.entity.ClubMembership;
 import com.litclub.Backend.entity.User;
 import com.litclub.Backend.exception.ClubNotFoundException;
 import com.litclub.Backend.exception.UserNotFoundException;
 import com.litclub.Backend.repository.ClubRepository;
+import com.litclub.Backend.security.roles.ClubRole;
 import com.litclub.Backend.service.low.ClubMembershipService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Middle-tier service managing club creation, retrieval, and membership queries.
@@ -187,6 +190,18 @@ public class ClubService {
         return clubMembershipService.getClubsForUser(user);
     }
 
+    @Transactional(readOnly = true)
+    public List<User> getClubOwners(Long clubID) {
+        Club club = requireClubById(clubID);
+        List<ClubMembership> ownerMemberships = clubMembershipService.getMembershipsByClubAndRole(club, ClubRole.OWNER);
+        List<User> ownerUsers = new ArrayList<>();
+        for (ClubMembership membership : ownerMemberships) {
+            ownerUsers.add(membership.getMember());
+        }
+        return ownerUsers;
+    }
+
+
 
     // ====== DELETE ======
 
@@ -211,8 +226,8 @@ public class ClubService {
         return new ClubRecord(
                 club.getClubID(),
                 club.getClubName(),
-                UserService.convertUserToRecord(club.getCreator()),
-                new HashSet<>()
+                getClubOwners(club.getClubID()).stream().map(UserService::convertUserToRecord).toList(),
+                clubMembershipService.getUsersForClub(club).stream().map(UserService::convertUserToRecord).collect(Collectors.toSet())
         );
     }
 }
