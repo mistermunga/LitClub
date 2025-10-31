@@ -2,9 +2,8 @@ package com.litclub.Backend.service.top.facilitator;
 
 import com.litclub.Backend.construct.book.BookDTO;
 import com.litclub.Backend.construct.user.UserProfile;
-import com.litclub.Backend.entity.*;
 import com.litclub.Backend.construct.user.UserActivityReport;
-import com.litclub.Backend.entity.Meeting;
+import com.litclub.Backend.entity.*;
 import com.litclub.Backend.service.low.DiscussionPromptService;
 import com.litclub.Backend.service.low.NoteService;
 import com.litclub.Backend.service.low.ReviewService;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -54,31 +52,25 @@ public class UserActivityService {
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public UserActivityReport getUserActivity(Long userID) {
         User user = userService.requireUserById(userID);
-        List<Meeting> meetings = meetingService.getMeetingsForUser(user);
 
+        List<Meeting> meetings = getMeetingsForUser(userID);
         List<Meeting> upcomingMeetings = meetings.stream()
                 .filter(meeting -> meeting.getStartTime().isAfter(LocalDateTime.now()))
                 .toList();
-
-        List<Meeting> pastMeetings = meetings
-                .stream()
+        List<Meeting> pastMeetings = meetings.stream()
                 .filter(meeting -> meeting.getStartTime().isBefore(LocalDateTime.now()))
                 .toList();
 
-        List<Review> reviews = reviewService.getReviews(user);
-        List<Note> notes = noteService.getAllNotes(user);
-        List<DiscussionPrompt> prompts = promptService.findAllByPoster(user);
+        List<Review> reviews = getReviewsForUser(userID);
+        List<Note> notes = getNotesForUser(userID);
+        List<DiscussionPrompt> prompts = getDiscussionPromptsFromUser(userID);
 
         return new UserActivityReport(
                 UserService.convertUserToRecord(user),
                 upcomingMeetings,
                 pastMeetings,
-                (long) reviews.size() <= 15 ? reviews :
-                        reviews.stream().sorted(Comparator.comparing(Review::getCreatedAt).reversed()).limit(15)
-                                .toList(),
-                (long) notes.size() <= 15 ? notes :
-                        notes.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed()).limit(15)
-                                .toList(),
+                limitToRecent(reviews, Comparator.comparing(Review::getCreatedAt), 15),
+                limitToRecent(notes, Comparator.comparing(Note::getCreatedAt), 20),
                 prompts
         );
     }
@@ -88,18 +80,14 @@ public class UserActivityService {
     public UserProfile getUserProfile(Long userID) {
         User user = userService.requireUserById(userID);
 
-        List<Book> books = bookService.getBooksByUser(user);
+        List<BookDTO> bookDTOs = getBooksForUser(userID).stream()
+                .map(book -> bookService.convertBookToDTO(book, user))
+                .toList();
 
-        List<BookDTO> bookDTOs = new ArrayList<>();
-        for (Book book : books) {
-            BookDTO bookObject = bookService.convertBookToDTO(book, user);
-            bookDTOs.add(bookObject);
-        }
-
-        List<Club> clubs = clubService.getClubsByUser(user);
-        List<Meeting> meetings = meetingService.getMeetingsForUser(user);
-        List<Note> notes = noteService.getAllNotes(user);
-        List<Review> reviews = reviewService.getReviews(user);
+        List<Club> clubs = getClubsForUser(userID);
+        List<Meeting> meetings = getMeetingsForUser(userID);
+        List<Note> notes = getNotesForUser(userID);
+        List<Review> reviews = getReviewsForUser(userID);
 
         return new UserProfile(
                 UserService.convertUserToRecord(user),
@@ -115,48 +103,45 @@ public class UserActivityService {
     @Transactional(readOnly = true)
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public List<Meeting> getMeetingsForUser(Long userID) {
-        return meetingService.getMeetingsForUser(
-                userService.requireUserById(userID)
-        );
+        return meetingService.getMeetingsForUser(userService.requireUserById(userID));
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public List<Review> getReviewsForUser(Long userID) {
-        return reviewService.getReviews(
-                userService.requireUserById(userID)
-        );
+        return reviewService.getReviews(userService.requireUserById(userID));
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public List<Note> getNotesForUser(Long userID) {
-        return noteService.getAllNotes(
-                userService.requireUserById(userID)
-        );
+        return noteService.getAllNotes(userService.requireUserById(userID));
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public List<Club> getClubsForUser(Long userID) {
-        return clubService.getClubsByUser(
-                userService.requireUserById(userID)
-        );
+        return clubService.getClubsByUser(userService.requireUserById(userID));
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public List<Book> getBooksForUser(Long userID) {
-        return bookService.getBooksByUser(
-                userService.requireUserById(userID)
-        );
+        return bookService.getBooksByUser(userService.requireUserById(userID));
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public List<DiscussionPrompt> getDiscussionPromptsFromUser(Long userID) {
-        return promptService.findAllByPoster(
-                userService.requireUserById(userID)
-        );
+        return promptService.findAllByPoster(userService.requireUserById(userID));
+    }
+
+    // ====== UTILITY ======
+    private static <T> List<T> limitToRecent(List<T> items, Comparator<T> comparator, int limit) {
+        if (items.size() <= limit) return items;
+        return items.stream()
+                .sorted(comparator.reversed())
+                .limit(limit)
+                .toList();
     }
 }
