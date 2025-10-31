@@ -54,17 +54,17 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getReviews(int rating) {
+    public List<Review> getReviews(Integer rating) {
         return reviewRepository.findByRatingEquals(rating);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getRatedReviewsForUser(User user, int rating) {
+    public List<Review> getRatedReviewsForUser(User user, Integer rating) {
         return reviewRepository.findByUserAndRatingEquals(user, rating);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getRatedReviewsForBook(Book book, int rating) {
+    public List<Review> getRatedReviewsForBook(Book book, Integer rating) {
         return reviewRepository.findByBookAndRatingEquals(book, rating);
     }
 
@@ -84,22 +84,22 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getBookReviewsRatedAbove(Book book, int rating) {
+    public List<Review> getBookReviewsRatedAbove(Book book, Integer rating) {
         return reviewRepository.findByBookAndRatingGreaterThan(book, rating);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getUserReviewsRatedAbove(User user, int rating) {
+    public List<Review> getUserReviewsRatedAbove(User user, Integer rating) {
         return reviewRepository.findByUserAndRatingGreaterThan(user, rating);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getBookReviewsRatedBelow(Book book, int rating) {
+    public List<Review> getBookReviewsRatedBelow(Book book, Integer rating) {
         return reviewRepository.findByBookAndRatingLessThan(book, rating);
     }
 
     @Transactional(readOnly = true)
-    public List<Review> getUserReviewsRatedBelow(User user, int rating) {
+    public List<Review> getUserReviewsRatedBelow(User user, Integer rating) {
         return reviewRepository.findByUserAndRatingLessThan(user, rating);
     }
 
