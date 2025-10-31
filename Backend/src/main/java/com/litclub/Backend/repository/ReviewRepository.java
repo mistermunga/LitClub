@@ -20,8 +20,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByBook(Book book);
     List<Review> findByRatingEquals(int rating);
 
-    List<Review> findByUserAndRatingEquals(User user, int rating);
-    List<Review> findByBookAndRatingEquals(Book book, int rating);
+    List<Review> findByUserAndRatingEquals(User user, Integer rating);
+    List<Review> findByBookAndRatingEquals(Book book, Integer rating);
     @Query("""
     SELECT r FROM Review r
     WHERE r.book = :book
@@ -42,9 +42,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 """)
     List<Review> findByContentContainsIgnoreCase(@Param("content") String content);
 
-    List<Review> findByBookAndRatingGreaterThan(Book book, int rating);
-    List<Review> findByUserAndRatingGreaterThan(User user, int rating);
-    List<Review> findByBookAndRatingLessThan(Book book, int rating);
-    List<Review> findByUserAndRatingLessThan(User user, int rating);
+    List<Review> findByBookAndRatingGreaterThan(Book book, Integer rating);
+    List<Review> findByUserAndRatingGreaterThan(User user, Integer rating);
+    List<Review> findByBookAndRatingLessThan(Book book, Integer rating);
+    List<Review> findByUserAndRatingLessThan(User user, Integer rating);
 
 }
