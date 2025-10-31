@@ -1,5 +1,6 @@
 package com.litclub.Backend.entity;
 
+import com.litclub.Backend.construct.meeting.RsvpStatus;
 import com.litclub.Backend.entity.compositeKey.MeetingAttendeeID;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -67,7 +68,7 @@ public class MeetingAttendee {
     private User user;
 
     @Column(name = "rsvp_status")
-    private String rsvpStatus;  // attending, maybe, pass
+    private RsvpStatus rsvpStatus;  // attending, maybe, pass
 
     @CreationTimestamp
     @Column(name = "created_at")
