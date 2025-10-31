@@ -1,6 +1,7 @@
 package com.litclub.Backend.repository;
 
 import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.meeting.RsvpStatus;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.Meeting;
 import com.litclub.Backend.entity.MeetingAttendee;
@@ -20,10 +21,10 @@ public interface MeetingAttendeeRepository extends JpaRepository<MeetingAttendee
     List<MeetingAttendee> findByMeeting(Meeting meeting);
     List<MeetingAttendee> findByMeeting_Club(Club club);
     List<MeetingAttendee> findByUser(User user);
-    List<MeetingAttendee> findByRsvpStatus(String status);
+    List<MeetingAttendee> findByRsvpStatus(RsvpStatus status);
 
-    List<MeetingAttendee> findByMeetingAndRsvpStatus(Meeting meeting, String status);
-    List<MeetingAttendee> findByMeeting_ClubAndRsvpStatus(Club club, String status);
-    List<MeetingAttendee> findByUserAndRsvpStatus(User user, String status);
+    List<MeetingAttendee> findByMeetingAndRsvpStatus(Meeting meeting, RsvpStatus status);
+    List<MeetingAttendee> findByMeeting_ClubAndRsvpStatus(Club club, RsvpStatus status);
+    List<MeetingAttendee> findByUserAndRsvpStatus(User user, RsvpStatus status);
 
 }
