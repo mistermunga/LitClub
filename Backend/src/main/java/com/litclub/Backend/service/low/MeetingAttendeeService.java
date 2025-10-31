@@ -1,6 +1,6 @@
 package com.litclub.Backend.service.low;
 
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.meeting.RsvpStatus;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.Meeting;
 import com.litclub.Backend.entity.MeetingAttendee;
@@ -24,7 +24,7 @@ public class MeetingAttendeeService {
 
     // ====== CREATE ======
     @Transactional
-    public MeetingAttendee createMeetingAttendee(User user, Meeting meeting, BookStatus bookStatus) {
+    public MeetingAttendee createMeetingAttendee(User user, Meeting meeting, RsvpStatus bookStatus) {
         if (meetingAttendeeRepository.existsByMeetingAndUser(meeting, user)) {
             throw new EntityExistsException("User already enrolled to meetings");
         }
@@ -32,7 +32,7 @@ public class MeetingAttendeeService {
         MeetingAttendee meetingAttendee = new MeetingAttendee();
         meetingAttendee.setUser(user);
         meetingAttendee.setMeeting(meeting);
-        meetingAttendee.setRsvpStatus(bookStatus.toString());
+        meetingAttendee.setRsvpStatus(bookStatus);
 
         return meetingAttendeeRepository.save(meetingAttendee);
     }
@@ -65,30 +65,30 @@ public class MeetingAttendeeService {
     }
 
     @Transactional(readOnly = true)
-    public List<MeetingAttendee> findAllMeetingAttendances(BookStatus bookStatus) {
-        return meetingAttendeeRepository.findByRsvpStatus(bookStatus.toString());
+    public List<MeetingAttendee> findAllMeetingAttendances(RsvpStatus bookStatus) {
+        return meetingAttendeeRepository.findByRsvpStatus(bookStatus);
     }
 
     @Transactional(readOnly = true)
-    public List<MeetingAttendee> findAllMeetingAttendances(Meeting meeting, BookStatus bookStatus) {
-        return meetingAttendeeRepository.findByMeetingAndRsvpStatus(meeting, bookStatus.toString());
+    public List<MeetingAttendee> findAllMeetingAttendances(Meeting meeting, RsvpStatus bookStatus) {
+        return meetingAttendeeRepository.findByMeetingAndRsvpStatus(meeting, bookStatus);
     }
 
     @Transactional(readOnly = true)
-    public List<MeetingAttendee> findAllMeetingAttendances(Club club, BookStatus bookStatus) {
-        return meetingAttendeeRepository.findByMeeting_ClubAndRsvpStatus(club, bookStatus.toString());
+    public List<MeetingAttendee> findAllMeetingAttendances(Club club, RsvpStatus bookStatus) {
+        return meetingAttendeeRepository.findByMeeting_ClubAndRsvpStatus(club, bookStatus);
     }
 
     @Transactional(readOnly = true)
-    public List<MeetingAttendee> findAllMeetingAttendances(User user, BookStatus status) {
-        return meetingAttendeeRepository.findByUserAndRsvpStatus(user, status.toString());
+    public List<MeetingAttendee> findAllMeetingAttendances(User user, RsvpStatus status) {
+        return meetingAttendeeRepository.findByUserAndRsvpStatus(user, status);
     }
 
     // ====== UPDATE ======
     @Transactional
-    public MeetingAttendee updateStatus(Meeting meeting, User user, BookStatus status) {
+    public MeetingAttendee updateStatus(Meeting meeting, User user, RsvpStatus status) {
         MeetingAttendee meetingAttendance = getMeetingAttendance(meeting, user);
-        meetingAttendance.setRsvpStatus(status.toString());
+        meetingAttendance.setRsvpStatus(status);
         return meetingAttendeeRepository.save(meetingAttendance);
     }
 
