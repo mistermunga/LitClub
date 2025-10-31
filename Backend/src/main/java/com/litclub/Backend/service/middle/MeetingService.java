@@ -325,6 +325,19 @@ public class MeetingService {
     }
 
     /**
+     * Updates meeting details.
+     *
+     * <p>Trusts the caller to have created a valid {@code Meeting} object</p>
+     *
+     * @param meeting
+     * @return {@code Meeting}
+     */
+    @Transactional
+    public Meeting updateMeeting(Meeting meeting) {
+        return meetingRepository.save(meeting);
+    }
+
+    /**
      * Reschedules a meeting to new start and end times.
      *
      * @param meetingID the ID of the meeting to reschedule
