@@ -173,6 +173,20 @@ public class ClubService {
         return clubMembershipService.getUsersForClub(club);
     }
 
+    /**
+     * Retrieves all clubs a user is a part of
+     *
+     * <p><strong>Note:</strong> The {@code club} parameter is assumed to be a valid,
+     * persisted entity. Callers must validate user existence before calling this method.</p>
+     *
+     * @param user the User entity (must be valid)
+     * @return list of {@link Club} entities who are members
+     */
+    @Transactional(readOnly = true)
+    public List<Club> getClubsByUser(User user) {
+        return clubMembershipService.getClubsForUser(user);
+    }
+
 
     // ====== DELETE ======
 
