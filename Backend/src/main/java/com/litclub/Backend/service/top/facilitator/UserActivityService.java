@@ -110,4 +110,53 @@ public class UserActivityService {
                 reviews.size()
         );
     }
+
+    // ====== CROSSDOMAIN QUERIES ======
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public List<Meeting> getMeetingsForUser(Long userID) {
+        return meetingService.getMeetingsForUser(
+                userService.requireUserById(userID)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public List<Review> getReviewsForUser(Long userID) {
+        return reviewService.getReviews(
+                userService.requireUserById(userID)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public List<Note> getNotesForUser(Long userID) {
+        return noteService.getAllNotes(
+                userService.requireUserById(userID)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public List<Club> getClubsForUser(Long userID) {
+        return clubService.getClubsByUser(
+                userService.requireUserById(userID)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public List<Book> getBooksForUser(Long userID) {
+        return bookService.getBooksByUser(
+                userService.requireUserById(userID)
+        );
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public List<DiscussionPrompt> getDiscussionPromptsFromUser(Long userID) {
+        return promptService.findAllByPoster(
+                userService.requireUserById(userID)
+        );
+    }
 }
