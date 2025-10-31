@@ -1,6 +1,6 @@
 package com.litclub.Backend.service.middle;
 
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.meeting.RsvpStatus;
 import com.litclub.Backend.entity.*;
 import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.MeetingRepository;
@@ -426,7 +426,7 @@ public class MeetingService {
      * @throws jakarta.persistence.EntityExistsException if user already has an RSVP
      */
     @Transactional
-    public MeetingAttendee registerAttendee(Meeting meeting, User user, BookStatus rsvpStatus) {
+    public MeetingAttendee registerAttendee(Meeting meeting, User user, RsvpStatus rsvpStatus) {
         return meetingAttendeeService.createMeetingAttendee(user, meeting, rsvpStatus);
     }
 
@@ -440,7 +440,7 @@ public class MeetingService {
      * @throws EntityNotFoundException if no RSVP record exists
      */
     @Transactional
-    public MeetingAttendee updateAttendeeStatus(Meeting meeting, User user, BookStatus newStatus) {
+    public MeetingAttendee updateAttendeeStatus(Meeting meeting, User user, RsvpStatus newStatus) {
         return meetingAttendeeService.updateStatus(meeting, user, newStatus);
     }
 
@@ -477,7 +477,7 @@ public class MeetingService {
      * @return list of users with matching RSVP status
      */
     @Transactional(readOnly = true)
-    public List<User> getAttendeesByStatus(Meeting meeting, BookStatus status) {
+    public List<User> getAttendeesByStatus(Meeting meeting, RsvpStatus status) {
         return meetingAttendeeService.findAllMeetingAttendances(meeting, status)
                 .stream()
                 .map(MeetingAttendee::getUser)
@@ -503,7 +503,7 @@ public class MeetingService {
      * @return number of RSVPs with the specified status
      */
     @Transactional(readOnly = true)
-    public int getAttendeeCountByStatus(Meeting meeting, BookStatus status) {
+    public int getAttendeeCountByStatus(Meeting meeting, RsvpStatus status) {
         return meetingAttendeeService.findAllMeetingAttendances(meeting, status).size();
     }
 
@@ -514,11 +514,11 @@ public class MeetingService {
      * @return map of RSVP status to count
      */
     @Transactional(readOnly = true)
-    public Map<BookStatus, Long> getAttendeeStatusBreakdown(Meeting meeting) {
+    public Map<RsvpStatus, Long> getAttendeeStatusBreakdown(Meeting meeting) {
         return meetingAttendeeService.findAllMeetingAttendances(meeting)
                 .stream()
                 .collect(Collectors.groupingBy(
-                        attendee -> BookStatus.valueOf(attendee.getRsvpStatus()),
+                        attendee -> RsvpStatus.valueOf(attendee.getRsvpStatus().toString()),
                         Collectors.counting()
                 ));
     }
@@ -562,7 +562,7 @@ public class MeetingService {
      * @return list of meetings matching the criteria
      */
     @Transactional(readOnly = true)
-    public List<Meeting> getMeetingsForUserByStatus(User user, BookStatus status) {
+    public List<Meeting> getMeetingsForUserByStatus(User user, RsvpStatus status) {
         return meetingAttendeeService.findAllMeetingAttendances(user, status)
                 .stream()
                 .map(MeetingAttendee::getMeeting)
