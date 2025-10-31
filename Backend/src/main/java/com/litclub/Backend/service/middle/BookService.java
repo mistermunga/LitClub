@@ -1,7 +1,9 @@
 package com.litclub.Backend.service.middle;
 
+import com.litclub.Backend.construct.book.BookDTO;
 import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.User;
+import com.litclub.Backend.entity.UserBook;
 import com.litclub.Backend.exception.BookNotFoundException;
 import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.BookRepository;
@@ -105,7 +107,12 @@ public class BookService {
         return userBooksService.getUsersForBook(book);
     }
 
-    // ====== UPDATE ======
+    @Transactional(readOnly = true)
+    public List<Book> getBooksByUser(User user) {
+        List<UserBook> userBooks = userBooksService.getUserBooksForUser(user);
+        return userBooks.stream().map(UserBook::getBook).toList();
+    }
+
     // ====== UPDATE ======
     @Transactional
     public Book updateBook(Map<String, String> identifier) {
@@ -149,5 +156,18 @@ public class BookService {
     public Book updateBookByTitleAndAuthor(String title, String author) {
         return metadataService.enrichAndSaveByTitleAndAuthor(title, author)
                 .orElseThrow(() -> new RuntimeException("failed to update book"));
+    }
+
+    public BookDTO convertBookToDTO(Book book, User user) {
+        return new BookDTO(
+                book.getBookID(),
+                book.getTitle(),
+                book.getAuthors(),
+                book.getIsbn(),
+                book.getCoverUrl(),
+                book.getPublisher(),
+                book.getYear(),
+                userBooksService.getUserBookByUserAndBook(user, book).getStatus()
+        );
     }
 }
