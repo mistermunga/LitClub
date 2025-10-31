@@ -89,6 +89,16 @@ public class ClubMembershipService {
     }
 
     @Transactional(readOnly = true)
+    public List<ClubMembership> getMembershipsByRole(ClubRole role) {
+        return clubMembershipRepository.findClubMembershipsByRoles(Set.of(role));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClubMembership> getMembershipsByClubAndRole(Club club, ClubRole role) {
+        return clubMembershipRepository.findClubMembershipsByClubAndRoles(club, Set.of(role));
+    }
+
+    @Transactional(readOnly = true)
     public List<ClubMembership> getAllClubMemberships() {
         return clubMembershipRepository.findAll();
     }
@@ -131,6 +141,16 @@ public class ClubMembershipService {
         membership.setRoles(clubRoles);
         return clubMembershipRepository.save(membership);
     }
+
+    @Transactional
+    public ClubMembership removeClubRole(Set<ClubRole> clubRoles, User user, Club club) {
+        ClubMembership membership = getMembershipByClubAndUser(club, user);
+        Set<ClubRole> updatedRoles = new HashSet<>(membership.getRoles());
+        updatedRoles.removeAll(clubRoles);
+        membership.setRoles(updatedRoles);
+        return clubMembershipRepository.save(membership);
+    }
+
 
     // ====== DELETE ======
     @Transactional
