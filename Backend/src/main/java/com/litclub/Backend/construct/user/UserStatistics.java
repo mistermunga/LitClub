@@ -5,6 +5,7 @@ public record UserStatistics(
         int clubsJoined,
         int booksRead,
         int booksReading,
+        int booksDropped,
         int meetingsAttended,
         int meetingsUpcoming,
         int reviewsWritten,
