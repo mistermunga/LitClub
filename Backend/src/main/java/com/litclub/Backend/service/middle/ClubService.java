@@ -39,14 +39,11 @@ import java.util.Optional;
 public class ClubService {
 
     private final ClubRepository clubRepository;
-    private final UserService userService;
     private final ClubMembershipService clubMembershipService;
 
     public ClubService(ClubRepository clubRepository,
-                       UserService userService,
                        ClubMembershipService clubMembershipService) {
         this.clubRepository = clubRepository;
-        this.userService = userService;
         this.clubMembershipService = clubMembershipService;
     }
 
@@ -59,13 +56,12 @@ public class ClubService {
      * The club entity will be automatically enrolled in the membership system after creation.</p>
      *
      * @param club the club entity to register
-     * @param userID the ID of the user creating the club
+     * @param creator the creator of the club
      * @return the persisted {@link Club} entity
      * @throws UserNotFoundException if no user with the given ID exists
      */
     @Transactional
-    public Club registerClub(Club club, Long userID) {
-        User creator = userService.requireUserById(userID);
+    public Club registerClub(Club club, User creator) {
         club.setCreator(creator);
         return clubRepository.save(club);
     }
