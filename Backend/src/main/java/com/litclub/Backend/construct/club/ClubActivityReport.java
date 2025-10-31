@@ -1,9 +1,6 @@
 package com.litclub.Backend.construct.club;
 
-import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 public record ClubActivityReport(
