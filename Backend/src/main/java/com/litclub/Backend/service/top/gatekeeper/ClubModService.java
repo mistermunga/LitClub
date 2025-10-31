@@ -3,6 +3,7 @@ package com.litclub.Backend.service.top.gatekeeper;
 import com.litclub.Backend.construct.meeting.MeetingCreateRequest;
 import com.litclub.Backend.construct.meeting.MeetingUpdateRequest;
 import com.litclub.Backend.entity.*;
+import com.litclub.Backend.exception.InsufficientPermissionsException;
 import com.litclub.Backend.security.roles.ClubRole;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
 import com.litclub.Backend.service.low.ClubMembershipService;
@@ -91,12 +92,18 @@ public class ClubModService {
         return membershipService.enrollUserToClub(club, user);
     }
 
-    // TODO what if the owner gets removed; set next oldest member as OWNER
     @Transactional
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or @userSecurity.isAdmin(authentication)")
     public void removeMember(Long clubID, Long userID) {
         User user = userService.requireUserById(userID);
         Club club = clubService.requireClubById(clubID);
+        if (membershipService.getMembershipByClubAndUser(club, user)
+                .getRoles()
+                .stream()
+                .anyMatch(role -> role == ClubRole.MODERATOR || role == ClubRole.OWNER)) {
+            throw new InsufficientPermissionsException(ClubRole.OWNER.toString());
+        }
+
         membershipService.deRegisterUserFromClub(user, club);
     }
 
