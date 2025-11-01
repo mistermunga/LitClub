@@ -10,6 +10,7 @@ public record UserLibrary(
         List<BookWithStatus> currentlyReading,
         List<BookWithStatus> wantToRead,
         List<BookWithStatus> read,
+        List<BookWithStatus> dnf,
         List<Review> recentReviews
 ) {}
 
