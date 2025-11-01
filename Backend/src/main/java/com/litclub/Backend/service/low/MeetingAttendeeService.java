@@ -64,9 +64,14 @@ public class MeetingAttendeeService {
         return meetingAttendeeRepository.findByUser(user);
     }
 
+    @Transactional
+    public List<MeetingAttendee> findAllMeetingAttendances(Club club, User user) {
+        return meetingAttendeeRepository.findByMeeting_ClubAndUser(club, user);
+    }
+
     @Transactional(readOnly = true)
-    public List<MeetingAttendee> findAllMeetingAttendances(RsvpStatus bookStatus) {
-        return meetingAttendeeRepository.findByRsvpStatus(bookStatus);
+    public List<MeetingAttendee> findAllMeetingAttendances(RsvpStatus rsvpStatus) {
+        return meetingAttendeeRepository.findByRsvpStatus(rsvpStatus);
     }
 
     @Transactional(readOnly = true)
