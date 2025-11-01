@@ -146,6 +146,14 @@ public class BookMetadataService {
             // In enrichAndSaveByTitleAndAuthor method:
             String isbnKey = dto.getIsbn();
 
+            if (isbnKey != null) {
+                Optional<Book> existingByIsbn = bookRepository.findBookByisbn(isbnKey);
+                if (existingByIsbn.isPresent()) {
+                    isbnCache.put(isbnKey, existingByIsbn.get());
+                    return existingByIsbn;
+                }
+            }
+
             // If no ISBN, check DB by title+author first
             if (isbnKey == null) {
                 // Try to find existing book by title and author
@@ -212,6 +220,4 @@ public class BookMetadataService {
 
         return book;
     }
-
 }
-
