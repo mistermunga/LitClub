@@ -174,6 +174,13 @@ public class MeetingService {
         return meetingRepository.findAllByCreatorAndClub(creator, club);
     }
 
+    @Transactional(readOnly = true)
+    public List<Meeting> getMeetings(User user, Club club) {
+        return meetingAttendeeService.findAllMeetingAttendances(club, user).stream()
+                .map(MeetingAttendee::getMeeting)
+                .collect(Collectors.toList());
+    }
+
     /**
      * Retrieves all upcoming meetings for a club.
      *
