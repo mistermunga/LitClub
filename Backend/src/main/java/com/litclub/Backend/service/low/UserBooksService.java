@@ -121,6 +121,12 @@ public class UserBooksService {
         return userBooksRepository.save(userBook);
     }
 
+    @Transactional
+    public UserBook changeRating(UserBook userBook, Integer newRating) {
+        userBook.setRating(newRating);
+        return userBooksRepository.save(userBook);
+    }
+
     // ====== DELETE ======
     @Transactional
     public void removeUserBook(User user, Book book) {
