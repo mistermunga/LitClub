@@ -1,9 +1,6 @@
 package com.litclub.Backend.service.low;
 
-import com.litclub.Backend.entity.Club;
-import com.litclub.Backend.entity.Note;
-import com.litclub.Backend.entity.User;
-import com.litclub.Backend.entity.Book;
+import com.litclub.Backend.entity.*;
 import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.NoteRepository;
 import jakarta.persistence.EntityExistsException;
@@ -94,6 +91,9 @@ public class NoteService {
     public List<Note> getAllNotes(Book book, Club club) {
         return noteRepository.findAllByBookAndClub(book, club);
     }
+
+    @Transactional(readOnly = true)
+    public List<Note> getAllNotes(DiscussionPrompt prompt) { return noteRepository.findAllByDiscussionPrompt(prompt); }
 
     @Transactional(readOnly = true)
     public List<Note> searchNotes(User user, String content) {
