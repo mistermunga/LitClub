@@ -222,7 +222,7 @@ public class ClubService {
      * @param club the club entity to convert
      * @return the corresponding {@link ClubRecord}
      */
-    public ClubRecord createClubRecordFromClub(Club club) {
+    public ClubRecord convertClubToDTO(Club club) {
         return new ClubRecord(
                 club.getClubID(),
                 club.getClubName(),
