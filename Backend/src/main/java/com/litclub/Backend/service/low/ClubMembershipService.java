@@ -10,6 +10,7 @@ import com.litclub.Backend.security.roles.ClubRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -86,6 +87,12 @@ public class ClubMembershipService {
                         clubMembershipID.getClubID().toString()
                         )
         );
+    }
+
+    @Transactional(readOnly = true)
+    public LocalDateTime getJoined(Club club, User user) {
+        ClubMembership membership = getMembershipByClubAndUser(club, user);
+        return membership.getJoinedAt();
     }
 
     @Transactional(readOnly = true)
