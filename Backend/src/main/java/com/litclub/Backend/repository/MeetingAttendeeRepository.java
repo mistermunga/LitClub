@@ -20,6 +20,7 @@ public interface MeetingAttendeeRepository extends JpaRepository<MeetingAttendee
 
     List<MeetingAttendee> findByMeeting(Meeting meeting);
     List<MeetingAttendee> findByMeeting_Club(Club club);
+    List<MeetingAttendee> findByMeeting_ClubAndUser(Club club, User user);
     List<MeetingAttendee> findByUser(User user);
     List<MeetingAttendee> findByRsvpStatus(RsvpStatus status);
 
