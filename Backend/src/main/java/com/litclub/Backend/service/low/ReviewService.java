@@ -49,6 +49,11 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
+    public Review getReview(Long reviewID) {
+        return reviewRepository.findById(reviewID).orElseThrow(() -> new EntityNotFoundException("Review not found"));
+    }
+
+    @Transactional(readOnly = true)
     public List<Review> getReviews(Book book) {
         return reviewRepository.findByBook(book);
     }
@@ -120,6 +125,11 @@ public class ReviewService {
     @Transactional
     public void deleteReview(User user, Book book) {
         Review review = getReviewByUserAndBook(user, book);
+        reviewRepository.delete(review);
+    }
+
+    @Transactional
+    public void deleteReview(Review review) {
         reviewRepository.delete(review);
     }
 
