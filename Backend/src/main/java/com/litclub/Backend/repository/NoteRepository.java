@@ -1,9 +1,6 @@
 package com.litclub.Backend.repository;
 
-import com.litclub.Backend.entity.Book;
-import com.litclub.Backend.entity.Club;
-import com.litclub.Backend.entity.Note;
-import com.litclub.Backend.entity.User;
+import com.litclub.Backend.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -23,5 +20,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findAllByUserAndClub(User user, Club club);
     List<Note> findAllByBookAndClub(Book book, Club club);
     List<Note> findAllByUserAndContentContaining(User user, String content);
+    List<Note> findAllByDiscussionPrompt(DiscussionPrompt prompt);
 
 }
