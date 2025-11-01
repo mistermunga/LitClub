@@ -1,6 +1,7 @@
 package com.litclub.Backend.service.middle;
 
 import com.litclub.Backend.construct.book.BookDTO;
+import com.litclub.Backend.construct.library.BookAddRequest;
 import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.User;
 import com.litclub.Backend.entity.UserBook;
@@ -31,12 +32,12 @@ public class BookService {
 
     // ====== CREATE ======
     @Transactional
-    public Book createBook(Book book) {
-        if (book.getTitle() != null && book.getPrimaryAuthor() != null) {
-            return metadataService.enrichAndSaveByTitleAndAuthor(book.getTitle(), book.getPrimaryAuthor())
+    public Book createBook(BookAddRequest book) {
+        if (book.title() != null && book.author() != null) {
+            return metadataService.enrichAndSaveByTitleAndAuthor(book.title(), book.author())
                     .orElseThrow(() -> new RuntimeException("failed to create book"));
-        } else if (book.getIsbn() != null) {
-            return metadataService.enrichAndSaveByIsbn(book.getIsbn())
+        } else if (book.isbn() != null) {
+            return metadataService.enrichAndSaveByIsbn(book.isbn())
                     .orElseThrow(() -> new RuntimeException("failed to create book"));
         } else {
             throw new MalformedDTOException("book title or isbn is null");
