@@ -49,6 +49,7 @@ public class DiscussionManagementService {
         this.userService = userService;
     }
 
+    // ====== DiscussionPrompt ======
     @Transactional
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or @userSecurity.isAdmin(authentication)")
     public DiscussionThread getDiscussionThread(Long clubID, Long promptID) {
@@ -72,6 +73,7 @@ public class DiscussionManagementService {
         return discussionThreads;
     }
 
+    // ====== Notes ======
     @Transactional
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or @userSecurity.isAdmin(authentication)")
     public Note createClubNote(Long clubID,
@@ -115,11 +117,48 @@ public class DiscussionManagementService {
         noteService.deleteNote(noteID);
     }
 
+    // ====== replies ======
+    @Transactional
+    @PreAuthorize("@userSecurity.isCurrentUser(authentication, #userID)")
+    public Reply createReply(Long userID, Long noteID, String content) {
+        User user = userService.requireUserById(userID);
+        Note note = noteService.getNoteById(noteID);
+        return replyService.createReply(user, note, content);
+    }
+
+    @Transactional
+    @PreAuthorize("@userSecurity.isCurrentUser(authentication, #userID)")
+    public Reply updateReply(Long userID, Long replyID, String content) {
+        User user = userService.requireUserById(userID);
+        Reply reply = replyService.getReplyById(replyID);
+        if (!reply.getUser().equals(user)) {
+            throw new AccessDeniedException("Reply doesn't belong to this User");
+        }
+        return replyService.updateReplyContent(replyID, content);
+    }
+    @Transactional
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public void deleteReply(Long userID, Long replyID) {
+        User user = userService.requireUserById(userID);
+        Reply reply = replyService.getReplyById(replyID);
+        if (!reply.getUser().equals(user)) {
+            throw new AccessDeniedException("Reply doesn't belong to this User");
+        }
+        replyService.deleteReply(replyID);
+    }
+
+    // ====== Threads
+    @Transactional
+    public List<Reply> getRepliesForNote(Long noteID) {
+        Note note = noteService.getNoteById(noteID);
+        return replyService.getRepliesForNote(note);
+    }
+
     // ------ Utility ------
     @Transactional
     public NoteWithReplies getNoteWithReplies(long noteID) {
         Note note = noteService.getNoteById(noteID);
-        List<Reply> replies = replyService.getRepliesForNote(note);
+        List<Reply> replies = getRepliesForNote(noteID);
 
         return new NoteWithReplies(
                 note,
