@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReviewService {
@@ -62,6 +63,29 @@ public class ReviewService {
     public List<Review> getReviews(Integer rating) {
         return reviewRepository.findByRatingEquals(rating);
     }
+
+    @Transactional(readOnly = true)
+    public double getAverageRating(User user) {
+        List<Review> reviews = getReviews(user);
+        return reviews.stream()
+                .map(Review::getRating)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0.0);
+    }
+
+    @Transactional(readOnly = true)
+    public double getAverageRating(Book book) {
+        List<Review> reviews = getReviews(book);
+        return reviews.stream()
+                .map(Review::getRating)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .average()
+                .orElse(0.0);
+    }
+
 
     @Transactional(readOnly = true)
     public List<Review> getRatedReviewsForUser(User user, Integer rating) {
