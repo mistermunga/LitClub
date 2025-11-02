@@ -1,6 +1,6 @@
 package com.litclub.Backend.service.middle;
 
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.construct.meeting.RsvpStatus;
 import com.litclub.Backend.construct.user.UserLoginRecord;
 import com.litclub.Backend.construct.user.UserRecord;

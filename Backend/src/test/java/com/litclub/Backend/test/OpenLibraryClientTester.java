@@ -1,6 +1,6 @@
 package com.litclub.Backend.test;
 
-import com.litclub.Backend.construct.book.clientDTO.BookMetadataDTO;
+import com.litclub.Backend.construct.library.book.clientDTO.BookMetadataDTO;
 import com.litclub.Backend.service.OpenLibraryClient;
 
 import java.util.List;

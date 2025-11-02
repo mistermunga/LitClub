@@ -1,6 +1,6 @@
 package com.litclub.Backend.service.low;
 
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.User;
 import com.litclub.Backend.entity.UserBook;

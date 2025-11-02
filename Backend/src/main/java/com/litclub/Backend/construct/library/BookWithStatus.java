@@ -1,6 +1,6 @@
 package com.litclub.Backend.construct.library;
 
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.entity.Book;
 
 import java.time.LocalDate;

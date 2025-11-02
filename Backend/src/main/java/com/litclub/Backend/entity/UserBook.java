@@ -1,6 +1,6 @@
 package com.litclub.Backend.entity;
 
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.entity.compositeKey.UserBookID;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
  * <p><strong>Core Attributes:</strong></p>
  * <ul>
  *   <li><strong>{@link #status}:</strong> Defines the user's relationship to the book —
- *       e.g., reading, want to read, read, or did not finish — represented by {@link com.litclub.Backend.construct.book.BookStatus}.</li>
+ *       e.g., reading, want to read, read, or did not finish — represented by {@link BookStatus}.</li>
  *   <li><strong>{@link #rating}:</strong> Optional numeric rating given by the user for this book. Inherited from
  *   {@link Review}</li>
  *   <li><strong>{@link #dateStarted}:</strong> The date the user began reading the book.</li>
@@ -47,7 +47,7 @@ import java.time.LocalDateTime;
  *
  * @see Book
  * @see User
- * @see com.litclub.Backend.construct.book.BookStatus
+ * @see BookStatus
  * @see com.litclub.Backend.entity.compositeKey.UserBookID
  */
 

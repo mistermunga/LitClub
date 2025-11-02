@@ -1,6 +1,6 @@
 package com.litclub.Backend.controller.user;
 
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.construct.library.BookAddRequest;
 import com.litclub.Backend.construct.library.BookWithStatus;
 import com.litclub.Backend.construct.library.ReviewRequest;

@@ -1,6 +1,8 @@
 package com.litclub.Backend.service;
 
-import com.litclub.Backend.construct.book.clientDTO.*;
+import com.litclub.Backend.construct.library.book.clientDTO.BookMetadataDTO;
+import com.litclub.Backend.construct.library.book.clientDTO.OpenLibDoc;
+import com.litclub.Backend.construct.library.book.clientDTO.OpenLibSearchResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;

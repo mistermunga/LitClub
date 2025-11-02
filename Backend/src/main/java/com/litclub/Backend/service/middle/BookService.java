@@ -1,6 +1,6 @@
 package com.litclub.Backend.service.middle;
 
-import com.litclub.Backend.construct.book.BookDTO;
+import com.litclub.Backend.construct.library.book.BookDTO;
 import com.litclub.Backend.construct.library.BookAddRequest;
 import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.User;
@@ -10,6 +10,8 @@ import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.BookRepository;
 import com.litclub.Backend.service.low.BookMetadataService;
 import com.litclub.Backend.service.low.UserBooksService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,11 @@ public class BookService {
     @Transactional(readOnly = true)
     public List<Book> getBooks() {
         return bookRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Book> getBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
