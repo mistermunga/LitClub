@@ -2,6 +2,7 @@ package com.litclub.Backend.service.middle;
 
 import com.litclub.Backend.construct.library.book.BookDTO;
 import com.litclub.Backend.construct.library.BookAddRequest;
+import com.litclub.Backend.construct.library.book.BookSearchRequest;
 import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.User;
 import com.litclub.Backend.entity.UserBook;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -101,7 +103,7 @@ public class BookService {
     public List<User> getUsersForBook(Map<String, Object> identifierMap) {
         Book book;
         if (identifierMap.containsKey("bookID")) {
-            book = getBookByISBN((String) identifierMap.get("bookID"));
+            book = getBook((Long) identifierMap.get("bookID"));
         } else if (identifierMap.containsKey("isbn")) {
             book = getBookByISBN((String) identifierMap.get("isbn"));
         } else if (identifierMap.containsKey("title") && !identifierMap.containsKey("primaryAuthor")) {
@@ -119,6 +121,21 @@ public class BookService {
     public List<Book> getBooksByUser(User user) {
         List<UserBook> userBooks = userBooksService.getUserBooksForUser(user);
         return userBooks.stream().map(UserBook::getBook).toList();
+    }
+
+    @Transactional
+    public List<Book> searchBook(BookSearchRequest bookSearchRequest) {
+        List<Book> results = new ArrayList<>();
+        if (bookSearchRequest.isbn() != null && !bookSearchRequest.isbn().isEmpty()) {
+            results.addAll(bookRepository.findBookByisbnContainingIgnoreCase(bookSearchRequest.isbn()));
+        }
+        if (bookSearchRequest.title() != null && !bookSearchRequest.title().isEmpty()) {
+            results.addAll(bookRepository.findBookByTitleContainingIgnoreCase(bookSearchRequest.title()));
+        }
+        if (bookSearchRequest.author() != null && !bookSearchRequest.author().isEmpty()) {
+            results.addAll(bookRepository.findBookByPrimaryAuthorContainingIgnoreCase(bookSearchRequest.author()));
+        }
+        return results;
     }
 
     // ====== UPDATE ======
