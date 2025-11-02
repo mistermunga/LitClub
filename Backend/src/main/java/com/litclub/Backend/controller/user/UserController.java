@@ -170,7 +170,7 @@ public class UserController {
         return ResponseEntity.ok(libraryManagementService.rateAndReviewBook(userID, bookID, reviewRequest));
     }
 
-    @PutMapping("/{userID}/reviews/{bookID}")
+    @DeleteMapping("/{userID}/reviews/{bookID}")
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public ResponseEntity<Boolean> deleteReview(
             @PathVariable("userID") Long userID,
