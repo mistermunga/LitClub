@@ -108,9 +108,12 @@ public class LibraryManagementService {
 
     @Transactional
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public void deleteReview(Long userID, Long reviewID) {
+    public void deleteReview(Long userID, Long BookID) {
         User user = userService.requireUserById(userID);
-        Review review = reviewService.getReview(reviewID);
+        Review review = reviewService.getReviewByUserAndBook(
+                user,
+                bookService.getBook(BookID)
+        );
         if (user.getGlobalRoles().contains(GlobalRole.ADMINISTRATOR) || review.getUser().equals(user)) {
             reviewService.deleteReview(review);
         }
