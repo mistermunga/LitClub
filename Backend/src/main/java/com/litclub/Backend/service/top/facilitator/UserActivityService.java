@@ -1,7 +1,7 @@
 package com.litclub.Backend.service.top.facilitator;
 
-import com.litclub.Backend.construct.book.BookDTO;
-import com.litclub.Backend.construct.book.BookStatus;
+import com.litclub.Backend.construct.library.book.BookDTO;
+import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.construct.user.UserProfile;
 import com.litclub.Backend.construct.user.UserActivityReport;
 import com.litclub.Backend.construct.user.UserStatistics;
