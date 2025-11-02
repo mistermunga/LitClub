@@ -26,6 +26,7 @@ public class NoteService {
                      Book book,
                      String content,
                      Optional<Club> club,
+                     Optional<DiscussionPrompt> prompt,
                      boolean isPrivate) {
 
         if (isPrivate) {
@@ -46,6 +47,7 @@ public class NoteService {
         if (!isPrivate) note.setClub(club.get());
         note.setContent(content);
         note.setPrivate(isPrivate);
+        prompt.ifPresent(note::setDiscussionPrompt);
 
         return noteRepository.save(note);
     }
