@@ -8,6 +8,8 @@ import com.litclub.Backend.entity.User;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -218,15 +220,15 @@ public class AdminService {
     /**
      * Return all clubs known to the system.
      *
-     * <p>This is a thin delegation to {@link ClubService#getClubs()} and returns whatever representation that service exposes
+     * <p>This is a thin delegation to {@link ClubService#getClubs(Pageable)} and returns whatever representation that service exposes
      * (a list of {@link com.litclub.Backend.entity.Club} instances).</p>
      *
      * @return a {@link java.util.List} of {@link com.litclub.Backend.entity.Club}; never {@code null} (may be empty).
-     * @see ClubService#getClubs()
+     * @see ClubService#getClubs(Pageable)
      */
     @Transactional
-    public List<Club> getAllClubs() {
-        return clubService.getClubs();
+    public Page<Club> getAllClubs(Pageable pageable) {
+        return clubService.getClubs(pageable);
     }
 
     // ====== SYS CONFIG ======
