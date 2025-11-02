@@ -92,7 +92,25 @@ public class DiscussionManagementService {
                 bookService.getBook(noteCreateRequest.bookID()),
                 noteCreateRequest.content(),
                 Optional.of(club),
+                Optional.of(prompt),
                 false
+        );
+    }
+
+    @Transactional
+    @PreAuthorize("@userSecurity.isCurrentUser(authentication, #userID)")
+    public Note createPrivateNote(
+            Long userID,
+            NoteCreateRequest createRequest
+    ) {
+        User user = userService.requireUserById(userID);
+        return noteService.save(
+                user,
+                bookService.getBook(createRequest.bookID()),
+                createRequest.content(),
+                Optional.empty(),
+                Optional.empty(),
+                true
         );
     }
 
