@@ -1,6 +1,5 @@
 package com.litclub.Backend.repository;
 
-import com.litclub.Backend.construct.book.BookStatus;
 import com.litclub.Backend.construct.meeting.RsvpStatus;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.Meeting;
