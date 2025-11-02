@@ -1,4 +1,4 @@
-package com.litclub.Backend.construct.book.clientDTO;
+package com.litclub.Backend.construct.library.book.clientDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

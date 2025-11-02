@@ -1,4 +1,4 @@
-package com.litclub.Backend.construct.book;
+package com.litclub.Backend.construct.library.book;
 
 import java.time.LocalDate;
 import java.util.List;

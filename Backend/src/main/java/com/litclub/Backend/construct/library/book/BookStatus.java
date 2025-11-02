@@ -1,4 +1,4 @@
-package com.litclub.Backend.construct.book;
+package com.litclub.Backend.construct.library.book;
 
 public enum BookStatus {
     READ,
