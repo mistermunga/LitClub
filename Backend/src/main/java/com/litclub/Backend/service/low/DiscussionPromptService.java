@@ -100,6 +100,12 @@ public class DiscussionPromptService {
     }
 
     @Transactional
+    public void deletePrompt(Long promptID){
+        DiscussionPrompt prompt = findPromptById(promptID);
+        discussionPromptRepository.delete(prompt);
+    }
+
+    @Transactional
     public void purgeClubPrompts(Club club) {
         List<DiscussionPrompt> prompts = discussionPromptRepository.findAllByClub(club);
         discussionPromptRepository.deleteAll(prompts);
