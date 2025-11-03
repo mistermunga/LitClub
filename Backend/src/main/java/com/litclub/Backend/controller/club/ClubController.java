@@ -5,20 +5,21 @@ import com.litclub.Backend.construct.club.ClubActivityReport;
 import com.litclub.Backend.construct.club.ClubCreateRequest;
 import com.litclub.Backend.construct.club.ClubDashboard;
 import com.litclub.Backend.construct.club.ClubStatistics;
+import com.litclub.Backend.construct.discussion.DiscussionThread;
 import com.litclub.Backend.construct.meeting.MeetingCreateRequest;
 import com.litclub.Backend.construct.meeting.MeetingUpdateRequest;
 import com.litclub.Backend.construct.user.UserRecord;
-import com.litclub.Backend.entity.Club;
-import com.litclub.Backend.entity.ClubMembership;
-import com.litclub.Backend.entity.Meeting;
-import com.litclub.Backend.entity.User;
+import com.litclub.Backend.entity.*;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
 import com.litclub.Backend.service.low.ClubMembershipService;
+import com.litclub.Backend.service.low.DiscussionPromptService;
+import com.litclub.Backend.service.low.NoteService;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.MeetingService;
 import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.ClubActivityService;
+import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
 import com.litclub.Backend.service.top.gatekeeper.AdminService;
 import com.litclub.Backend.service.top.gatekeeper.ClubModService;
 import jakarta.validation.Valid;
@@ -46,12 +47,20 @@ public class ClubController {
     private final ClubMembershipService clubMembershipService;
     private final ClubActivityService clubActivityService;
     private final MeetingService meetingService;
+    private final DiscussionPromptService discussionPromptService;
+    private final DiscussionManagementService discussionManagementService;
+    private final NoteService noteService;
 
     public ClubController(ClubService clubService,
                           AdminService adminService,
                           ConfigurationManager configuration,
                           UserService userService,
-                          ClubModService clubModService, ClubMembershipService clubMembershipService, ClubActivityService clubActivityService, MeetingService meetingService) {
+                          ClubModService clubModService,
+                          ClubMembershipService clubMembershipService,
+                          ClubActivityService clubActivityService,
+                          MeetingService meetingService,
+                          DiscussionPromptService discussionPromptService,
+                          DiscussionManagementService discussionManagementService, NoteService noteService) {
         this.clubService = clubService;
         this.adminService = adminService;
         this.userService = userService;
@@ -60,6 +69,9 @@ public class ClubController {
         this.clubMembershipService = clubMembershipService;
         this.clubActivityService = clubActivityService;
         this.meetingService = meetingService;
+        this.discussionPromptService = discussionPromptService;
+        this.discussionManagementService = discussionManagementService;
+        this.noteService = noteService;
     }
 
     @GetMapping
@@ -274,5 +286,67 @@ public class ClubController {
         }
         clubModService.deleteMeeting(clubID, meetingID);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/{clubID}/discussions")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Page<DiscussionPrompt>> getDiscussionPrompts(
+            @PathVariable Long clubID,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                discussionPromptService.findAllPromptsByClub(
+                        clubService.requireClubById(clubID), pageable
+                )
+        );
+    }
+
+    @PostMapping("/{clubID}/discussions")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ResponseEntity<DiscussionPrompt> addDiscussionPrompt(
+            @PathVariable Long clubID,
+            @RequestBody String prompt,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        return ResponseEntity
+                .ok(discussionPromptService
+                .createPrompt(
+                        prompt,
+                        customUserDetails.getUser(),
+                        clubService.requireClubById(clubID)));
+    }
+
+    @GetMapping("/{clubID}/discussions/{promptID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ResponseEntity<DiscussionThread> getDiscussionThread(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID
+    ) {
+        DiscussionThread thread = discussionManagementService.getDiscussionThread(clubID, promptID);
+        return ResponseEntity.ok(thread);
+    }
+
+    @DeleteMapping("/{clubID}/discussions/{promptID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ResponseEntity<Void> deleteDiscussionThread(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID
+    ) {
+        discussionPromptService.deletePrompt(clubID, promptID);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/{clubID}/notes")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Page<Note>> getNotes(
+            @PathVariable Long clubID,
+            Pageable pageable
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        return ResponseEntity.ok(
+                noteService.getAllNotes(club, pageable)
+        );
     }
 }
