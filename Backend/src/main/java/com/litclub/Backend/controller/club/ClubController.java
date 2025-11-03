@@ -436,4 +436,81 @@ public class ClubController {
         Page<Reply> replies = replyService.getRepliesForNote(note, pageable);
         return ResponseEntity.ok(replies);
     }
+
+    @PostMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Reply> createReply(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID,
+            @PathVariable Long noteID,
+            @RequestBody String content,
+            @AuthenticationPrincipal CustomUserDetails cud
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
+        if (!prompt.getClub().equals(club)) {
+            throw new MalformedDTOException("prompt does not belong to club");
+        }
+        Note note = noteService.getNoteById(noteID);
+        if (!note.getDiscussionPrompt().equals(prompt)) {
+            throw new MalformedDTOException("note does not belong to prompt");
+        }
+        Reply reply = replyService.createReply(cud.getUser(), note, content);
+        return ResponseEntity.ok(reply);
+    }
+
+    @PutMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies/{replyID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Reply> updateReply(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID,
+            @PathVariable Long noteID,
+            @PathVariable Long replyID,
+            @RequestBody String content,
+            @AuthenticationPrincipal CustomUserDetails cud
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
+        if (!prompt.getClub().equals(club)) {
+            throw new MalformedDTOException("prompt does not belong to club");
+        }
+        Note note = noteService.getNoteById(noteID);
+        if (!note.getDiscussionPrompt().equals(prompt)) {
+            throw new MalformedDTOException("note does not belong to prompt");
+        }
+        Reply reply = replyService.getReplyById(replyID);
+        if (!reply.getParentNote().equals(note)) {
+            throw new MalformedDTOException("reply does not belong to note");
+        }
+        return ResponseEntity.ok(replyService.updateReplyContent(replyID, content));
+    }
+
+    @DeleteMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies/{replyID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Void> deleteReply(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID,
+            @PathVariable Long noteID,
+            @PathVariable Long replyID,
+            @AuthenticationPrincipal CustomUserDetails cud
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
+        if (!prompt.getClub().equals(club)) {
+            throw new MalformedDTOException("prompt does not belong to club");
+        }
+        Note note = noteService.getNoteById(noteID);
+        if (!note.getDiscussionPrompt().equals(prompt)) {
+            throw new MalformedDTOException("note does not belong to prompt");
+        }
+        Reply reply = replyService.getReplyById(replyID);
+        if (!reply.getParentNote().equals(note)) {
+            throw new MalformedDTOException("reply does not belong to note");
+        }
+        if (!reply.getUser().equals(cud.getUser()) && !cud.getAuthorities().contains(GlobalRole.ADMINISTRATOR)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        replyService.deleteReply(replyID);
+        return ResponseEntity.ok().build();
+    }
 }
