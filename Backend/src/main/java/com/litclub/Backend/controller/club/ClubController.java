@@ -2,12 +2,17 @@ package com.litclub.Backend.controller.club;
 
 import com.litclub.Backend.config.ConfigurationManager;
 import com.litclub.Backend.construct.club.ClubCreateRequest;
+import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.Club;
+import com.litclub.Backend.entity.ClubMembership;
 import com.litclub.Backend.entity.User;
+import com.litclub.Backend.security.roles.GlobalRole;
+import com.litclub.Backend.security.userdetails.CustomUserDetails;
+import com.litclub.Backend.service.low.ClubMembershipService;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.UserService;
-import com.litclub.Backend.service.top.facilitator.ClubActivityService;
 import com.litclub.Backend.service.top.gatekeeper.AdminService;
+import com.litclub.Backend.service.top.gatekeeper.ClubModService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,29 +20,34 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/clubs")
 public class ClubController {
 
     private final ClubService clubService;
-    private final ClubActivityService clubActivityService;
     private final AdminService adminService;
     private final UserService userService;
     private final ConfigurationManager configuration;
+    private final ClubModService clubModService;
+    private final ClubMembershipService clubMembershipService;
 
     public ClubController(ClubService clubService,
-                          ClubActivityService clubActivityService,
                           AdminService adminService,
                           ConfigurationManager configuration,
-                          UserService userService) {
+                          UserService userService,
+                          ClubModService clubModService, ClubMembershipService clubMembershipService) {
         this.clubService = clubService;
-        this.clubActivityService = clubActivityService;
         this.adminService = adminService;
         this.userService = userService;
         this.configuration = configuration;
+        this.clubModService = clubModService;
+        this.clubMembershipService = clubMembershipService;
     }
 
     @GetMapping
@@ -98,6 +108,69 @@ public class ClubController {
             @PathVariable("clubID") Long clubID
     ) {
         clubService.deleteClub(clubID);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/{clubID}/members")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMINISTRATOR')")
+    public ResponseEntity<Page<UserRecord>> getClubMembers(
+            @PathVariable Long clubID,
+            @PageableDefault Pageable pageable
+    ) {
+        List<User> members = clubService.getUsersForClub(clubID);
+        Page<UserRecord> page = UserService.convertUserListToRecordPage(members, pageable);
+        return ResponseEntity.ok(page);
+    }
+
+    @PostMapping("/{clubID}/members")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMINISTRATOR')")
+    public ResponseEntity<ClubMembership> addUserToClub(
+            @PathVariable Long clubID,
+            @RequestBody UserRecord userRecord
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                clubModService.addMember(clubID, userRecord.userID())
+        );
+    }
+
+    @DeleteMapping("/{clubID}/members/{userID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMINISTRATOR')")
+    public ResponseEntity<Void> removeUserFromClub(
+            @PathVariable Long clubID,
+            @PathVariable Long userID
+    ) {
+        clubModService.removeMember(clubID, userID);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{clubID}/join")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ClubMembership> joinClub(
+            @PathVariable Long clubID,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        boolean isClubOpen = configuration.getClubFlags(clubID).enableRegister();
+        User user = customUserDetails.getUser();
+        Club club = clubService.requireClubById(clubID);
+        if (!isClubOpen && !user.getGlobalRoles().contains(GlobalRole.ADMINISTRATOR)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(clubMembershipService.enrollUserToClub(club, user));
+    }
+
+    @PostMapping("/{clubID}/leave")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> leaveClub(
+            @PathVariable Long clubID,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        User user = customUserDetails.getUser();
+        ClubMembership clubMembership = clubMembershipService.getMembershipByClubAndUser(club, user);
+        clubMembershipService.deRegisterUserFromClub(clubMembership.getClubMembershipID());
         return ResponseEntity.noContent().build();
     }
 }
