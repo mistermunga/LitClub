@@ -5,6 +5,8 @@ import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.NoteRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +79,11 @@ public class NoteService {
     @Transactional(readOnly = true)
     public List<Note> getAllNotes(Club club) {
         return noteRepository.findAllByClub(club);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Note> getAllNotes(Club club, Pageable pageable) {
+        return noteRepository.findAllByClub(club, pageable);
     }
 
     @Transactional(readOnly = true)
