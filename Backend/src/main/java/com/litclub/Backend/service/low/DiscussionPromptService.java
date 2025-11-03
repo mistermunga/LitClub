@@ -3,6 +3,7 @@ package com.litclub.Backend.service.low;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.DiscussionPrompt;
 import com.litclub.Backend.entity.User;
+import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.DiscussionPromptRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -87,6 +88,15 @@ public class DiscussionPromptService {
     public void deleteByPromptAndClub(String prompt, Club club) {
         var discussionPrompt = discussionPromptRepository.findByPromptAndClub(prompt, club);
         discussionPrompt.ifPresent(discussionPromptRepository::delete);
+    }
+
+    @Transactional
+    public void deletePrompt(Long clubID, Long promptID) {
+        DiscussionPrompt prompt = findPromptById(promptID);
+        if (!prompt.getClub().getClubID().equals(clubID)) {
+            throw new MalformedDTOException("Prompt does not belong to club");
+        }
+        discussionPromptRepository.delete(prompt);
     }
 
     @Transactional
