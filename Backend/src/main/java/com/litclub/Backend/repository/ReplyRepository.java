@@ -3,6 +3,8 @@ package com.litclub.Backend.repository;
 import com.litclub.Backend.entity.Note;
 import com.litclub.Backend.entity.Reply;
 import com.litclub.Backend.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +26,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
      * @return list of direct replies, empty if none exist
      */
     List<Reply> findAllByParentNote(Note parentNote);
+
+    Page<Reply> findAllByParentNote(Note parentNote, Pageable pageable);
 
     /**
      * Finds all replies created by a specific user.

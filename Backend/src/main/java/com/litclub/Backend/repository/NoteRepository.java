@@ -25,5 +25,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findAllByDiscussionPrompt(DiscussionPrompt prompt);
 
     Page<Note> findAllByClub(Club club, Pageable pageable);
+    Page<Note> findAllByDiscussionPrompt(DiscussionPrompt prompt, Pageable pageable);
 
 }
