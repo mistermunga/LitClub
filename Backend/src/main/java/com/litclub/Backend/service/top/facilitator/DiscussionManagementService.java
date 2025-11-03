@@ -16,7 +16,6 @@ import com.litclub.Backend.service.middle.ReplyService;
 import com.litclub.Backend.service.middle.UserService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,7 +78,7 @@ public class DiscussionManagementService {
     public Note createClubNote(Long clubID,
                                Long promptID,
                                NoteCreateRequest noteCreateRequest,
-                               @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                               CustomUserDetails customUserDetails) {
         if (!clubID.equals(noteCreateRequest.clubID())) {
             throw new MalformedDTOException("Incorrect Club in Request");
         }
