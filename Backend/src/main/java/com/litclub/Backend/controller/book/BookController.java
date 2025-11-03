@@ -11,6 +11,7 @@ import com.litclub.Backend.service.middle.BookService;
 import com.litclub.Backend.service.middle.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,8 @@ public class BookController {
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Book> addBook(@RequestBody BookAddRequest bookAddRequest) {
-        return ResponseEntity.ok(bookService.createBook(bookAddRequest));
+        Book book = bookService.createBook(bookAddRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(book);
     }
 
     @GetMapping("/{bookID}")
@@ -74,13 +76,13 @@ public class BookController {
     }
 
     @GetMapping("/{bookID}/reviews/average")
-    @PreAuthorize("hasRole('User')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Double> getBookAverage(@PathVariable("bookID") Long bookID) {
         return ResponseEntity.ok(reviewService.getAverageRating(bookService.getBook(bookID)));
     }
 
     @GetMapping("/{bookID}/readers")
-    @PreAuthorize("hasRole('User')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Page<UserRecord>> getReaders(
             Pageable pageable,
             @PathVariable("bookID") Long bookID
