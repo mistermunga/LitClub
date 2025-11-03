@@ -12,6 +12,9 @@ import com.litclub.Backend.repository.UserRepository;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.service.low.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -988,6 +991,21 @@ public class UserService {
                 user.getEmail(),
                 getClubsForUser(user)
         );
+    }
+
+    public static Page<UserRecord> convertUserListToRecordPage(List<User> users, Pageable pageable) {
+        List<UserRecord> userRecords = users
+                .stream()
+                .map(UserService::convertUserToRecord)
+                .toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), userRecords.size());
+        Page<UserRecord> page = new PageImpl<>(
+                userRecords.subList(start, end),
+                pageable,
+                userRecords.size()
+        );
+        return page;
     }
 
     /**
