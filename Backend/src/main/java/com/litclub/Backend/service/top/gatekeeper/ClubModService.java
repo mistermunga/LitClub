@@ -12,7 +12,6 @@ import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.MeetingService;
 import com.litclub.Backend.service.middle.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +44,7 @@ public class ClubModService {
     @Transactional
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubId) or @userSecurity.isAdmin(authentication)")
     public Meeting createMeeting(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            CustomUserDetails userDetails,
             Long clubId,
             MeetingCreateRequest meetingCreateRequest) {
 
@@ -120,7 +119,9 @@ public class ClubModService {
 
     @Transactional
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or @userSecurity.isAdmin(authentication)")
-    public DiscussionPrompt createDiscussion(Long clubID, String promptText, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public DiscussionPrompt createDiscussion(Long clubID,
+                                             String promptText,
+                                             CustomUserDetails userDetails) {
         Club club = clubService.requireClubById(clubID);
         User user = userDetails.getUser();
         return discussionPromptService.createPrompt(promptText, user, club);
