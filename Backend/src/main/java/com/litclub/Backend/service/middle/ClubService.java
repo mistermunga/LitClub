@@ -1,5 +1,6 @@
 package com.litclub.Backend.service.middle;
 
+import com.litclub.Backend.construct.club.ClubCreateRequest;
 import com.litclub.Backend.construct.club.ClubRecord;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
@@ -203,6 +204,17 @@ public class ClubService {
         return ownerUsers;
     }
 
+    // ====== UPDATE ======
+    @Transactional
+    public Club updateClub(ClubCreateRequest updateRequest, Club club) {
+        if (updateRequest.clubName() != null && !updateRequest.clubName().isEmpty()) {
+            club.setClubName(updateRequest.clubName());
+        }
+        if (updateRequest.description() != null && !updateRequest.description().isEmpty()) {
+            club.setDescription(updateRequest.description());
+        }
+        return clubRepository.save(club);
+    }
 
 
     // ====== DELETE ======
