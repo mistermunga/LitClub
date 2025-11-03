@@ -3,6 +3,8 @@ package com.litclub.Backend.repository;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.Meeting;
 import com.litclub.Backend.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,10 +36,19 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     /**
      * Finds all meetings for a specific club.
      *
-     * @param club the club
+     * @param club     the club
      * @return list of meetings, empty if none exist
      */
     List<Meeting> findAllByClub(Club club);
+
+    /**
+     * Finds all meetings for a specific club.
+     *
+     * @param club     the club
+     * @param pageable pageable argument
+     * @return list of meetings, empty if none exist
+     */
+    Page<Meeting> findAllByClub(Club club, Pageable pageable);
 
     /**
      * Finds all meetings created by a specific user.

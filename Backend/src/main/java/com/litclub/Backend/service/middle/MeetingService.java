@@ -7,6 +7,8 @@ import com.litclub.Backend.repository.MeetingRepository;
 import com.litclub.Backend.service.low.MeetingAttendeeService;
 import com.litclub.Backend.service.low.MeetingRegisterService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,6 +148,11 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public List<Meeting> getMeetingsForClub(Club club) {
         return meetingRepository.findAllByClub(club);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Meeting> getMeetingsForClub(Club club, Pageable pageable) {
+        return meetingRepository.findAllByClub(club, pageable);
     }
 
     /**
