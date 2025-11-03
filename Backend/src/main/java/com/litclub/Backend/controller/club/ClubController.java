@@ -5,14 +5,18 @@ import com.litclub.Backend.construct.club.ClubActivityReport;
 import com.litclub.Backend.construct.club.ClubCreateRequest;
 import com.litclub.Backend.construct.club.ClubDashboard;
 import com.litclub.Backend.construct.club.ClubStatistics;
+import com.litclub.Backend.construct.meeting.MeetingCreateRequest;
+import com.litclub.Backend.construct.meeting.MeetingUpdateRequest;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
+import com.litclub.Backend.entity.Meeting;
 import com.litclub.Backend.entity.User;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
 import com.litclub.Backend.service.low.ClubMembershipService;
 import com.litclub.Backend.service.middle.ClubService;
+import com.litclub.Backend.service.middle.MeetingService;
 import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.ClubActivityService;
 import com.litclub.Backend.service.top.gatekeeper.AdminService;
@@ -41,12 +45,13 @@ public class ClubController {
     private final ClubModService clubModService;
     private final ClubMembershipService clubMembershipService;
     private final ClubActivityService clubActivityService;
+    private final MeetingService meetingService;
 
     public ClubController(ClubService clubService,
                           AdminService adminService,
                           ConfigurationManager configuration,
                           UserService userService,
-                          ClubModService clubModService, ClubMembershipService clubMembershipService, ClubActivityService clubActivityService) {
+                          ClubModService clubModService, ClubMembershipService clubMembershipService, ClubActivityService clubActivityService, MeetingService meetingService) {
         this.clubService = clubService;
         this.adminService = adminService;
         this.userService = userService;
@@ -54,6 +59,7 @@ public class ClubController {
         this.clubModService = clubModService;
         this.clubMembershipService = clubMembershipService;
         this.clubActivityService = clubActivityService;
+        this.meetingService = meetingService;
     }
 
     @GetMapping
@@ -204,4 +210,69 @@ public class ClubController {
         return ResponseEntity.ok(clubActivityService.getClubStatistics(clubID));
     }
 
+
+    @GetMapping("/{clubID}/meetings")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Page<Meeting>> getClubMeetings(
+            @PathVariable Long clubID,
+            @PageableDefault Pageable pageable
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        Page<Meeting> meetings = meetingService.getMeetingsForClub(club, pageable);
+        return ResponseEntity.ok(meetings);
+    }
+
+    @PostMapping("/{clubID}/meetings")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ResponseEntity<Meeting> addMeeting(
+            @PathVariable Long clubID,
+            @RequestBody MeetingCreateRequest createRequest,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(clubModService.createMeeting(customUserDetails, clubID, createRequest));
+    }
+
+    @GetMapping("/{clubID}/meetings/{meetingID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Meeting> getMeeting(
+            @PathVariable("clubID") Long clubID,
+            @PathVariable("meetingID") Long meetingID
+    ) {
+        Meeting meeting = meetingService.requireById(meetingID);
+        if (!meeting.getClub().getClubID().equals(clubID)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(meeting);
+    }
+
+    @PostMapping("/{clubID}/meetings/{meetingID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ResponseEntity<Meeting> updateMeeting(
+            @PathVariable("clubID") Long clubID,
+            @PathVariable("meetingID") Long meetingID,
+            @RequestBody MeetingUpdateRequest meetingUpdateRequest
+    ) {
+        Meeting meeting = meetingService.requireById(meetingID);
+        if (!meeting.getClub().getClubID().equals(clubID)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(clubModService.updateMeeting(
+                clubID, meetingID, meetingUpdateRequest
+        ));
+    }
+
+    @DeleteMapping("/{clubID}/meetings/{meetingID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ResponseEntity<Void> deleteMeeting(
+            @PathVariable("clubID") Long clubID,
+            @PathVariable("meetingID") Long meetingID
+    ) {
+        Meeting meeting = meetingService.requireById(meetingID);
+        if (!meeting.getClub().getClubID().equals(clubID)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        clubModService.deleteMeeting(clubID, meetingID);
+        return ResponseEntity.noContent().build();
+    }
 }
