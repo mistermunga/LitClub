@@ -8,6 +8,8 @@ import com.litclub.Backend.repository.NoteRepository;
 import com.litclub.Backend.repository.ReplyRepository;
 import com.litclub.Backend.service.low.NoteService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,6 +126,11 @@ public class ReplyService {
     @Transactional(readOnly = true)
     public List<Reply> getRepliesForNote(Note parentNote) {
         return replyRepository.findAllByParentNote(parentNote);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Reply> getRepliesForNote(Note parentNote, Pageable pageable) {
+        return replyRepository.findAllByParentNote(parentNote, pageable);
     }
 
     /**
