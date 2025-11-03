@@ -132,8 +132,8 @@ public class MeetingService {
      * @return list of all meetings, empty if none exist
      */
     @Transactional(readOnly = true)
-    public List<Meeting> getAllMeetings() {
-        return meetingRepository.findAll();
+    public Page<Meeting> getAllMeetings(Pageable pageable) {
+        return meetingRepository.findAll(pageable);
     }
 
     /**
