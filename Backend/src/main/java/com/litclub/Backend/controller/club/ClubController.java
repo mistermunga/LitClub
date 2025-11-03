@@ -1,7 +1,10 @@
 package com.litclub.Backend.controller.club;
 
 import com.litclub.Backend.config.ConfigurationManager;
+import com.litclub.Backend.construct.club.ClubActivityReport;
 import com.litclub.Backend.construct.club.ClubCreateRequest;
+import com.litclub.Backend.construct.club.ClubDashboard;
+import com.litclub.Backend.construct.club.ClubStatistics;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
@@ -11,6 +14,7 @@ import com.litclub.Backend.security.userdetails.CustomUserDetails;
 import com.litclub.Backend.service.low.ClubMembershipService;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.UserService;
+import com.litclub.Backend.service.top.facilitator.ClubActivityService;
 import com.litclub.Backend.service.top.gatekeeper.AdminService;
 import com.litclub.Backend.service.top.gatekeeper.ClubModService;
 import jakarta.validation.Valid;
@@ -36,18 +40,20 @@ public class ClubController {
     private final ConfigurationManager configuration;
     private final ClubModService clubModService;
     private final ClubMembershipService clubMembershipService;
+    private final ClubActivityService clubActivityService;
 
     public ClubController(ClubService clubService,
                           AdminService adminService,
                           ConfigurationManager configuration,
                           UserService userService,
-                          ClubModService clubModService, ClubMembershipService clubMembershipService) {
+                          ClubModService clubModService, ClubMembershipService clubMembershipService, ClubActivityService clubActivityService) {
         this.clubService = clubService;
         this.adminService = adminService;
         this.userService = userService;
         this.configuration = configuration;
         this.clubModService = clubModService;
         this.clubMembershipService = clubMembershipService;
+        this.clubActivityService = clubActivityService;
     }
 
     @GetMapping
@@ -173,4 +179,29 @@ public class ClubController {
         clubMembershipService.deRegisterUserFromClub(clubMembership.getClubMembershipID());
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{clubID}/dashboard")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<ClubDashboard> getClubDashboard(
+            @PathVariable Long clubID
+    ) {
+        return ResponseEntity.ok(clubActivityService.getClubDashboard(clubID));
+    }
+
+    @GetMapping("/{clubID}/activity")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<ClubActivityReport> getClubActivityReport(
+            @PathVariable Long clubID
+    ) {
+        return ResponseEntity.ok(clubActivityService.getClubActivity(clubID));
+    }
+
+    @GetMapping("/{clubID}/activity/stats")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<ClubStatistics> getClubActivityStats(
+            @PathVariable Long clubID
+    ) {
+        return ResponseEntity.ok(clubActivityService.getClubStatistics(clubID));
+    }
+
 }
