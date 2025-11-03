@@ -6,6 +6,8 @@ import com.litclub.Backend.entity.User;
 import com.litclub.Backend.repository.DiscussionPromptRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +40,8 @@ public class DiscussionPromptService {
 
     // ====== READ ======
     @Transactional(readOnly = true)
-    public List<DiscussionPrompt> findAllPrompts(){
-        return discussionPromptRepository.findAll();
+    public Page<DiscussionPrompt> findAllPrompts(Pageable pageable){
+        return discussionPromptRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +64,11 @@ public class DiscussionPromptService {
     @Transactional(readOnly = true)
     public List<DiscussionPrompt> findAllPromptsByClub(Club club) {
         return discussionPromptRepository.findAllByClub(club);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DiscussionPrompt> findAllPromptsByClub(Club club, Pageable pageable) {
+        return discussionPromptRepository.findAllByClub(club, pageable);
     }
 
     @Transactional(readOnly = true)
