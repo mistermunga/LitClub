@@ -88,17 +88,7 @@ public class BookController {
             @PathVariable("bookID") Long bookID
     ) {
         List<User> users = bookService.getUsersForBook(Map.of("bookID", bookID));
-        List<UserRecord> userRecords = users.stream()
-                .map(UserService::convertUserToRecord)
-                .toList();
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), userRecords.size());
-        Page<UserRecord> page = new PageImpl<>(
-                userRecords.subList(start, end),
-                pageable,
-                userRecords.size()
-        );
+        Page<UserRecord> page = UserService.convertUserListToRecordPage(users, pageable);
 
         return ResponseEntity.ok(page);
     }
