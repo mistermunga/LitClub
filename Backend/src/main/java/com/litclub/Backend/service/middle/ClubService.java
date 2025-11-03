@@ -9,6 +9,8 @@ import com.litclub.Backend.exception.UserNotFoundException;
 import com.litclub.Backend.repository.ClubRepository;
 import com.litclub.Backend.security.roles.ClubRole;
 import com.litclub.Backend.service.low.ClubMembershipService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,8 +79,8 @@ public class ClubService {
      * @return list of all clubs
      */
     @Transactional(readOnly = true)
-    public List<Club> getClubs() {
-        return clubRepository.findAll();
+    public Page<Club> getClubs(Pageable pageable) {
+        return clubRepository.findAll(pageable);
     }
 
     /**
