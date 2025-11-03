@@ -224,6 +224,7 @@ public class ClubService {
      * @param club the club entity to convert
      * @return the corresponding {@link ClubRecord}
      */
+    @Transactional(readOnly = true)
     public ClubRecord convertClubToDTO(Club club) {
         return new ClubRecord(
                 club.getClubID(),
