@@ -14,6 +14,7 @@ import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
 import com.litclub.Backend.service.top.facilitator.LibraryManagementService;
 import com.litclub.Backend.service.top.facilitator.UserActivityService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -65,9 +66,9 @@ public class UserController {
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<Boolean> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<Void> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails){
         userService.deleteUser(userDetails.getUserID());
-        return ResponseEntity.ok(true);
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -114,11 +115,12 @@ public class UserController {
 
     @PostMapping("/{userID}/library")
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public BookWithStatus addBookToLibrary(
+    public ResponseEntity<BookWithStatus> addBookToLibrary(
             @PathVariable("userID") Long userID,
             @RequestBody BookAddRequest bookAddRequest
     ) {
-        return libraryManagementService.addBookToLibrary(userID, bookAddRequest);
+        BookWithStatus book = libraryManagementService.addBookToLibrary(userID, bookAddRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(book);
     }
 
     @PutMapping("/{userID}/library/{bookID}")
@@ -133,12 +135,12 @@ public class UserController {
 
     @DeleteMapping("/{userID}/library/{bookID}")
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public ResponseEntity<Boolean> deleteBookFromLibrary(
+    public ResponseEntity<Void> deleteBookFromLibrary(
             @PathVariable("userID") Long userID,
             @PathVariable("bookID") Long bookID
     ) {
         userService.removeBookFromLibrary(userID, bookService.getBook(bookID));
-        return ResponseEntity.ok(true);
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -157,7 +159,8 @@ public class UserController {
             @RequestParam Long bookID,
             @RequestBody ReviewRequest reviewRequest
     ) {
-        return ResponseEntity.ok(libraryManagementService.rateAndReviewBook(userID, bookID, reviewRequest));
+        Review review = libraryManagementService.rateAndReviewBook(userID, bookID, reviewRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
 
     @PutMapping("/{userID}/reviews/{bookID}")
@@ -172,12 +175,12 @@ public class UserController {
 
     @DeleteMapping("/{userID}/reviews/{bookID}")
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public ResponseEntity<Boolean> deleteReview(
+    public ResponseEntity<Void> deleteReview(
             @PathVariable("userID") Long userID,
             @PathVariable("bookID") Long bookID
     ){
         libraryManagementService.deleteReview(userID, bookID);
-        return ResponseEntity.ok(true);
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -194,8 +197,9 @@ public class UserController {
     public ResponseEntity<Note> addNote(
             @PathVariable("userID") Long userID,
             @RequestBody NoteCreateRequest createRequest
-            ){
-        return ResponseEntity.ok(discussionManagementService.createPrivateNote(userID, createRequest));
+    ){
+        Note note = discussionManagementService.createPrivateNote(userID, createRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(note);
     }
 
     @PutMapping("{userID}/notes/{noteID}")
@@ -210,11 +214,11 @@ public class UserController {
 
     @DeleteMapping("{userID}/notes/{noteID}")
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public ResponseEntity<Boolean> deleteNote(
+    public ResponseEntity<Void> deleteNote(
             @PathVariable("userID") Long userID,
             @PathVariable("noteID") Long noteID
     ) {
         discussionManagementService.deleteNote(userID, noteID);
-        return ResponseEntity.ok(true);
+        return ResponseEntity.noContent().build();
     }
 }
