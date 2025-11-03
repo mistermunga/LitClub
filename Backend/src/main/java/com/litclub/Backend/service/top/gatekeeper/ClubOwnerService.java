@@ -47,7 +47,7 @@ public class ClubOwnerService {
             Long userID,
             boolean completeTransfer,
             boolean unmakeModerator,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
+            CustomUserDetails customUserDetails
     ) {
         Club club = clubService.requireClubById(clubID);
         User oldOwner = resolveOldOwner(club, customUserDetails);
