@@ -1000,12 +1000,11 @@ public class UserService {
                 .toList();
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), userRecords.size());
-        Page<UserRecord> page = new PageImpl<>(
+        return new PageImpl<>(
                 userRecords.subList(start, end),
                 pageable,
                 userRecords.size()
         );
-        return page;
     }
 
     /**
