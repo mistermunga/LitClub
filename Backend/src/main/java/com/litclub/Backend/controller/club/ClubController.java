@@ -8,8 +8,10 @@ import com.litclub.Backend.construct.club.ClubStatistics;
 import com.litclub.Backend.construct.discussion.DiscussionThread;
 import com.litclub.Backend.construct.meeting.MeetingCreateRequest;
 import com.litclub.Backend.construct.meeting.MeetingUpdateRequest;
+import com.litclub.Backend.construct.note.NoteCreateRequest;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.*;
+import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
 import com.litclub.Backend.service.low.ClubMembershipService;
@@ -17,6 +19,7 @@ import com.litclub.Backend.service.low.DiscussionPromptService;
 import com.litclub.Backend.service.low.NoteService;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.MeetingService;
+import com.litclub.Backend.service.middle.ReplyService;
 import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.ClubActivityService;
 import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
@@ -50,6 +53,7 @@ public class ClubController {
     private final DiscussionPromptService discussionPromptService;
     private final DiscussionManagementService discussionManagementService;
     private final NoteService noteService;
+    private final ReplyService replyService;
 
     public ClubController(ClubService clubService,
                           AdminService adminService,
@@ -60,7 +64,9 @@ public class ClubController {
                           ClubActivityService clubActivityService,
                           MeetingService meetingService,
                           DiscussionPromptService discussionPromptService,
-                          DiscussionManagementService discussionManagementService, NoteService noteService) {
+                          DiscussionManagementService discussionManagementService,
+                          NoteService noteService,
+                          ReplyService replyService) {
         this.clubService = clubService;
         this.adminService = adminService;
         this.userService = userService;
@@ -72,6 +78,7 @@ public class ClubController {
         this.discussionPromptService = discussionPromptService;
         this.discussionManagementService = discussionManagementService;
         this.noteService = noteService;
+        this.replyService = replyService;
     }
 
     @GetMapping
@@ -348,5 +355,85 @@ public class ClubController {
         return ResponseEntity.ok(
                 noteService.getAllNotes(club, pageable)
         );
+    }
+
+    @PostMapping("/{clubID}/discussions/{promptID}/notes")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Note> saveClubNote(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID,
+            @RequestBody NoteCreateRequest noteCreateRequest,
+            @AuthenticationPrincipal CustomUserDetails cud
+    ) {
+        return ResponseEntity.ok(
+                discussionManagementService.createClubNote(
+                        clubID,
+                        promptID,
+                        noteCreateRequest,
+                        cud
+                )
+        );
+    }
+
+    @PostMapping("/{clubID}/discussions/{promptID}/notes/{noteID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Note> updateClubNote(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID,
+            @PathVariable Long noteID,
+            @RequestBody NoteCreateRequest noteCreateRequest,
+            @AuthenticationPrincipal CustomUserDetails cud
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
+        if (!prompt.getClub().equals(club)) {
+            throw new MalformedDTOException("prompt does not belong to club");
+        }
+        return ResponseEntity.ok(
+                discussionManagementService.updateNote(
+                        cud.getUserID(), noteID, noteCreateRequest.content()
+                )
+        );
+    }
+
+    @GetMapping("/{clubID}/discussions/{promptID}/notes")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Page<Note>> getNotes(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID,
+            Pageable pageable
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
+        if (!prompt.getClub().equals(club)) {
+            throw new MalformedDTOException("prompt does not belong to club");
+        }
+        Page<Note> notes = noteService.getAllNotes(
+                prompt,
+                pageable
+        );
+        return ResponseEntity.ok(notes);
+    }
+
+
+    @GetMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Page<Reply>> getReplies(
+            @PathVariable Long clubID,
+            @PathVariable Long promptID,
+            @PathVariable Long noteID,
+            Pageable pageable
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
+        if (!prompt.getClub().equals(club)) {
+            throw new MalformedDTOException("prompt does not belong to club");
+        }
+        Note note = noteService.getNoteById(noteID);
+        if (!note.getDiscussionPrompt().equals(prompt)) {
+            throw new MalformedDTOException("note does not belong to prompt");
+        }
+        Page<Reply> replies = replyService.getRepliesForNote(note, pageable);
+        return ResponseEntity.ok(replies);
     }
 }
