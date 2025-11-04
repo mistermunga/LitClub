@@ -77,6 +77,11 @@ public class NoteService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Note> getAllNotes(Book book, Pageable pageable) {
+        return noteRepository.findAllByBook(book, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public List<Note> getAllNotes(Club club) {
         return noteRepository.findAllByClub(club);
     }
