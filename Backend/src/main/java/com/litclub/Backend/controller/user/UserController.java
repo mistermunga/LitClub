@@ -9,11 +9,14 @@ import com.litclub.Backend.construct.note.NoteCreateRequest;
 import com.litclub.Backend.entity.*;
 import com.litclub.Backend.construct.user.*;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
+import com.litclub.Backend.service.low.ReviewService;
 import com.litclub.Backend.service.middle.BookService;
 import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
 import com.litclub.Backend.service.top.facilitator.LibraryManagementService;
 import com.litclub.Backend.service.top.facilitator.UserActivityService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,17 +34,20 @@ public class UserController {
     private final LibraryManagementService libraryManagementService;
     private final BookService bookService;
     private final DiscussionManagementService discussionManagementService;
+    private final ReviewService reviewService;
 
     public UserController(UserService userService,
                           UserActivityService userActivityService,
                           LibraryManagementService libraryManagementService,
                           BookService bookService,
-                          DiscussionManagementService discussionManagementService) {
+                          DiscussionManagementService discussionManagementService,
+                          ReviewService reviewService) {
         this.userService = userService;
         this.userActivityService = userActivityService;
         this.libraryManagementService = libraryManagementService;
         this.bookService = bookService;
         this.discussionManagementService = discussionManagementService;
+        this.reviewService = reviewService;
     }
 
     // ====== USER INFO ======
@@ -220,5 +226,20 @@ public class UserController {
     ) {
         discussionManagementService.deleteNote(userID, noteID);
         return ResponseEntity.noContent().build();
+    }
+
+
+    // ====== REVIEWS ======
+    @GetMapping("/{userID}/reviews")
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public ResponseEntity<Page<Review>> getUserReviews(
+            @PathVariable Long userID,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                reviewService.getReviews(
+                        userService.requireUserById(userID), pageable
+                )
+        );
     }
 }
