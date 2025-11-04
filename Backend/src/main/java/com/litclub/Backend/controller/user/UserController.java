@@ -154,8 +154,15 @@ public class UserController {
 
     @GetMapping("/{userID}/reviews")
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public ResponseEntity<List<Review>> getUserReviews(@PathVariable("userID") Long userID) {
-        return ResponseEntity.ok(userActivityService.getReviewsForUser(userID));
+    public ResponseEntity<Page<Review>> getUserReviews(
+            @PathVariable Long userID,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                reviewService.getReviews(
+                        userService.requireUserById(userID), pageable
+                )
+        );
     }
 
     @PostMapping("/{userID}/reviews")
@@ -226,20 +233,5 @@ public class UserController {
     ) {
         discussionManagementService.deleteNote(userID, noteID);
         return ResponseEntity.noContent().build();
-    }
-
-
-    // ====== REVIEWS ======
-    @GetMapping("/{userID}/reviews")
-    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public ResponseEntity<Page<Review>> getUserReviews(
-            @PathVariable Long userID,
-            Pageable pageable
-    ) {
-        return ResponseEntity.ok(
-                reviewService.getReviews(
-                        userService.requireUserById(userID), pageable
-                )
-        );
     }
 }
