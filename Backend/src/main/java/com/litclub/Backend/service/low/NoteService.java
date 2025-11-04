@@ -82,6 +82,15 @@ public class NoteService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Note> getAllNotes(Book book, Pageable pageable, boolean isAdmin) {
+        if (isAdmin) {
+            return getAllNotes(book, pageable);
+        } else {
+            return noteRepository.findAllByBookAndIsPrivate(book, false, pageable); // return public notes
+        }
+    }
+
+    @Transactional(readOnly = true)
     public List<Note> getAllNotes(Club club) {
         return noteRepository.findAllByClub(club);
     }
