@@ -7,6 +7,8 @@ import com.litclub.Backend.entity.User;
 import com.litclub.Backend.repository.ReviewRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +49,11 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<Review> getReviews(User user) {
         return reviewRepository.findByUser(user);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Review> getReviews(User user, Pageable pageable) {
+        return reviewRepository.findByUser(user, pageable);
     }
 
     @Transactional(readOnly = true)
