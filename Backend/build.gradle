@@ -31,6 +31,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.82'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'
     implementation 'io.github.resilience4j:resilience4j-retry:2.3.0'

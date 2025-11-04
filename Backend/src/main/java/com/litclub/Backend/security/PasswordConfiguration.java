@@ -2,7 +2,7 @@ package com.litclub.Backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
@@ -10,12 +10,6 @@ public class PasswordConfiguration {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new Argon2PasswordEncoder(
-                16,
-                32,
-                2,
-                65536,
-                3
-        );
+        return new BCryptPasswordEncoder(12);
     }
 }

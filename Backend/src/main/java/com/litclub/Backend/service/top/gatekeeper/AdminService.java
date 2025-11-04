@@ -255,8 +255,9 @@ public class AdminService {
      * @throws java.io.IOException if persisting the configuration fails.
      * @see ConfigurationManager#updateInstanceSettings(ConfigurationManager.InstanceSettings)
      */
-    public void updateInstanceSettings(ConfigurationManager.InstanceSettings newInstanceSettings) throws IOException {
+    public ConfigurationManager.InstanceSettings updateInstanceSettings(ConfigurationManager.InstanceSettings newInstanceSettings) throws IOException {
         configuration.updateInstanceSettings(newInstanceSettings);
+        return getInstanceSettings();
     }
 }
 

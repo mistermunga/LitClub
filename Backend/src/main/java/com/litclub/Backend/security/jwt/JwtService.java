@@ -48,7 +48,7 @@ public class JwtService {
         System.out.println(
                 "Initialised JWT settings." +
                         "\nKey length (bytes): " + signingKey.getEncoded().length +
-                        "\nExpiration time: " + (jwtExpiration / 3600000) + " hrs"
+                        "\nExpiration time: " + (jwtExpiration / 3600) + " hrs"
         );
 
     }
@@ -85,7 +85,7 @@ public class JwtService {
 
         Instant now = Instant.now();
         Date issuedAt = Date.from(now);
-        Date expirationAt = Date.from(now.plusMillis(jwtExpiration));
+        Date expirationAt = Date.from(now.plusSeconds(jwtExpiration));
 
         return Jwts.builder()
                 .claims(claims)
