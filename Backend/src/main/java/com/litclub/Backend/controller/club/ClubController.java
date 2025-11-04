@@ -83,37 +83,26 @@ public class ClubController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public ResponseEntity<Page<Club>> getClubs(
-            @PageableDefault Pageable pageable
-    ) {
+    public ResponseEntity<Page<Club>> getClubs(@PageableDefault Pageable pageable) {
         return ResponseEntity.ok(adminService.getAllClubs(pageable));
     }
 
     @GetMapping("/{clubID}")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMINISTRATOR')")
-    public ResponseEntity<Club> getClub(
-            @PathVariable("clubID") Long clubID
-    ) {
+    public ResponseEntity<Club> getClub(@PathVariable Long clubID) {
         return ResponseEntity.ok(clubService.requireClubById(clubID));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Club> createClub(@Valid @RequestBody ClubCreateRequest clubRequest) {
-        // TODO Club queues
-        if (configuration
-                .getInstanceSettings()
-                .clubCreationMode()
-                .equals(ConfigurationManager.ClubCreationMode.ADMIN_ONLY)
-                &&
-                SecurityContextHolder.getContext().getAuthentication()
-                        .getAuthorities().stream()
+        if (configuration.getInstanceSettings().clubCreationMode().equals(ConfigurationManager.ClubCreationMode.ADMIN_ONLY) &&
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                         .noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMINISTRATOR"))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         User creator = userService.requireUserById(clubRequest.creator().userID());
-
         Club club = new Club();
         club.setClubName(clubRequest.clubName());
         club.setDescription(clubRequest.description());
@@ -125,30 +114,21 @@ public class ClubController {
 
     @PutMapping("/{clubID}")
     @PreAuthorize("@clubSecurity.isOwner(authentication, clubID) or hasRole('ADMINISTRATOR')")
-    public ResponseEntity<Club> updateClub(
-            @PathVariable("clubID") Long clubID,
-            @Valid @RequestBody ClubCreateRequest clubRequest
-    ) {
+    public ResponseEntity<Club> updateClub(@PathVariable Long clubID, @Valid @RequestBody ClubCreateRequest clubRequest) {
         Club club = clubService.requireClubById(clubID);
-        return ResponseEntity.status(HttpStatus.OK).body(clubService.updateClub(clubRequest, club));
+        return ResponseEntity.ok(clubService.updateClub(clubRequest, club));
     }
 
     @DeleteMapping("/{clubID}")
     @PreAuthorize("@clubSecurity.isOwner(authentication, clubID) or hasRole('ADMINISTRATOR')")
-    public ResponseEntity<Void> deleteClub(
-            @PathVariable("clubID") Long clubID
-    ) {
+    public ResponseEntity<Void> deleteClub(@PathVariable Long clubID) {
         clubService.deleteClub(clubID);
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/{clubID}/members")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMINISTRATOR')")
-    public ResponseEntity<Page<UserRecord>> getClubMembers(
-            @PathVariable Long clubID,
-            @PageableDefault Pageable pageable
-    ) {
+    public ResponseEntity<Page<UserRecord>> getClubMembers(@PathVariable Long clubID, @PageableDefault Pageable pageable) {
         List<User> members = clubService.getUsersForClub(clubID);
         Page<UserRecord> page = UserService.convertUserListToRecordPage(members, pageable);
         return ResponseEntity.ok(page);
@@ -156,48 +136,34 @@ public class ClubController {
 
     @PostMapping("/{clubID}/members")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMINISTRATOR')")
-    public ResponseEntity<ClubMembership> addUserToClub(
-            @PathVariable Long clubID,
-            @RequestBody UserRecord userRecord
-    ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                clubModService.addMember(clubID, userRecord.userID())
-        );
+    public ResponseEntity<ClubMembership> addUserToClub(@PathVariable Long clubID, @RequestBody UserRecord userRecord) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clubModService.addMember(clubID, userRecord.userID()));
     }
 
     @DeleteMapping("/{clubID}/members/{userID}")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMINISTRATOR')")
-    public ResponseEntity<Void> removeUserFromClub(
-            @PathVariable Long clubID,
-            @PathVariable Long userID
-    ) {
+    public ResponseEntity<Void> removeUserFromClub(@PathVariable Long clubID, @PathVariable Long userID) {
         clubModService.removeMember(clubID, userID);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{clubID}/join")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ClubMembership> joinClub(
-            @PathVariable Long clubID,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ) {
+    public ResponseEntity<ClubMembership> joinClub(@PathVariable Long clubID, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         boolean isClubOpen = configuration.getClubFlags(clubID).enableRegister();
         User user = customUserDetails.getUser();
         Club club = clubService.requireClubById(clubID);
+
         if (!isClubOpen && !user.getGlobalRoles().contains(GlobalRole.ADMINISTRATOR)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(clubMembershipService.enrollUserToClub(club, user));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(clubMembershipService.enrollUserToClub(club, user));
     }
 
     @PostMapping("/{clubID}/leave")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> leaveClub(
-            @PathVariable Long clubID,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ) {
+    public ResponseEntity<Void> leaveClub(@PathVariable Long clubID, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Club club = clubService.requireClubById(clubID);
         User user = customUserDetails.getUser();
         ClubMembership clubMembership = clubMembershipService.getMembershipByClubAndUser(club, user);
@@ -207,35 +173,25 @@ public class ClubController {
 
     @GetMapping("/{clubID}/dashboard")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<ClubDashboard> getClubDashboard(
-            @PathVariable Long clubID
-    ) {
+    public ResponseEntity<ClubDashboard> getClubDashboard(@PathVariable Long clubID) {
         return ResponseEntity.ok(clubActivityService.getClubDashboard(clubID));
     }
 
     @GetMapping("/{clubID}/activity")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<ClubActivityReport> getClubActivityReport(
-            @PathVariable Long clubID
-    ) {
+    public ResponseEntity<ClubActivityReport> getClubActivityReport(@PathVariable Long clubID) {
         return ResponseEntity.ok(clubActivityService.getClubActivity(clubID));
     }
 
     @GetMapping("/{clubID}/activity/stats")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<ClubStatistics> getClubActivityStats(
-            @PathVariable Long clubID
-    ) {
+    public ResponseEntity<ClubStatistics> getClubActivityStats(@PathVariable Long clubID) {
         return ResponseEntity.ok(clubActivityService.getClubStatistics(clubID));
     }
 
-
     @GetMapping("/{clubID}/meetings")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Page<Meeting>> getClubMeetings(
-            @PathVariable Long clubID,
-            @PageableDefault Pageable pageable
-    ) {
+    public ResponseEntity<Page<Meeting>> getClubMeetings(@PathVariable Long clubID, @PageableDefault Pageable pageable) {
         Club club = clubService.requireClubById(clubID);
         Page<Meeting> meetings = meetingService.getMeetingsForClub(club, pageable);
         return ResponseEntity.ok(meetings);
@@ -243,274 +199,233 @@ public class ClubController {
 
     @PostMapping("/{clubID}/meetings")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
-    public ResponseEntity<Meeting> addMeeting(
-            @PathVariable Long clubID,
-            @RequestBody MeetingCreateRequest createRequest,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ) {
+    public ResponseEntity<Meeting> addMeeting(@PathVariable Long clubID, @RequestBody MeetingCreateRequest createRequest,
+                                              @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(clubModService.createMeeting(customUserDetails, clubID, createRequest));
     }
 
     @GetMapping("/{clubID}/meetings/{meetingID}")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Meeting> getMeeting(
-            @PathVariable("clubID") Long clubID,
-            @PathVariable("meetingID") Long meetingID
-    ) {
+    public ResponseEntity<Meeting> getMeeting(@PathVariable Long clubID, @PathVariable Long meetingID) {
         Meeting meeting = meetingService.requireById(meetingID);
-        if (!meeting.getClub().getClubID().equals(clubID)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        validateMeetingBelongsToClub(meeting, clubID);
         return ResponseEntity.ok(meeting);
     }
 
     @PostMapping("/{clubID}/meetings/{meetingID}")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
-    public ResponseEntity<Meeting> updateMeeting(
-            @PathVariable("clubID") Long clubID,
-            @PathVariable("meetingID") Long meetingID,
-            @RequestBody MeetingUpdateRequest meetingUpdateRequest
-    ) {
+    public ResponseEntity<Meeting> updateMeeting(@PathVariable Long clubID, @PathVariable Long meetingID,
+                                                 @RequestBody MeetingUpdateRequest meetingUpdateRequest) {
         Meeting meeting = meetingService.requireById(meetingID);
-        if (!meeting.getClub().getClubID().equals(clubID)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        return ResponseEntity.ok(clubModService.updateMeeting(
-                clubID, meetingID, meetingUpdateRequest
-        ));
+        validateMeetingBelongsToClub(meeting, clubID);
+        return ResponseEntity.ok(clubModService.updateMeeting(clubID, meetingID, meetingUpdateRequest));
     }
 
     @DeleteMapping("/{clubID}/meetings/{meetingID}")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
-    public ResponseEntity<Void> deleteMeeting(
-            @PathVariable("clubID") Long clubID,
-            @PathVariable("meetingID") Long meetingID
-    ) {
+    public ResponseEntity<Void> deleteMeeting(@PathVariable Long clubID, @PathVariable Long meetingID) {
         Meeting meeting = meetingService.requireById(meetingID);
-        if (!meeting.getClub().getClubID().equals(clubID)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        validateMeetingBelongsToClub(meeting, clubID);
         clubModService.deleteMeeting(clubID, meetingID);
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/{clubID}/discussions")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Page<DiscussionPrompt>> getDiscussionPrompts(
-            @PathVariable Long clubID,
-            Pageable pageable
-    ) {
-        return ResponseEntity.ok(
-                discussionPromptService.findAllPromptsByClub(
-                        clubService.requireClubById(clubID), pageable
-                )
-        );
+    public ResponseEntity<Page<DiscussionPrompt>> getDiscussionPrompts(@PathVariable Long clubID, Pageable pageable) {
+        return ResponseEntity.ok(discussionPromptService.findAllPromptsByClub(clubService.requireClubById(clubID), pageable));
     }
 
     @PostMapping("/{clubID}/discussions")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
-    public ResponseEntity<DiscussionPrompt> addDiscussionPrompt(
-            @PathVariable Long clubID,
-            @RequestBody String prompt,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ) {
-        return ResponseEntity
-                .ok(discussionPromptService
-                .createPrompt(
-                        prompt,
-                        customUserDetails.getUser(),
-                        clubService.requireClubById(clubID)));
+    public ResponseEntity<DiscussionPrompt> addDiscussionPrompt(@PathVariable Long clubID, @RequestBody String prompt,
+                                                                @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ResponseEntity.ok(discussionPromptService.createPrompt(prompt, customUserDetails.getUser(),
+                clubService.requireClubById(clubID)));
     }
 
     @GetMapping("/{clubID}/discussions/{promptID}")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
-    public ResponseEntity<DiscussionThread> getDiscussionThread(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID
-    ) {
+    public ResponseEntity<DiscussionThread> getDiscussionThread(@PathVariable Long clubID, @PathVariable Long promptID) {
         DiscussionThread thread = discussionManagementService.getDiscussionThread(clubID, promptID);
         return ResponseEntity.ok(thread);
     }
 
     @DeleteMapping("/{clubID}/discussions/{promptID}")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
-    public ResponseEntity<Void> deleteDiscussionThread(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID
-    ) {
+    public ResponseEntity<Void> deleteDiscussionThread(@PathVariable Long clubID, @PathVariable Long promptID) {
         discussionPromptService.deletePrompt(clubID, promptID);
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/{clubID}/notes")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Page<Note>> getNotes(
-            @PathVariable Long clubID,
-            Pageable pageable
-    ) {
+    public ResponseEntity<Page<Note>> getClubNotes(@PathVariable Long clubID, Pageable pageable) {
         Club club = clubService.requireClubById(clubID);
-        return ResponseEntity.ok(
-                noteService.getAllNotes(club, pageable)
-        );
+        return ResponseEntity.ok(noteService.getAllNotes(club, pageable));
     }
 
-    @PostMapping("/{clubID}/discussions/{promptID}/notes")
+    @PostMapping("/{clubID}/notes")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Note> saveClubNote(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID,
-            @RequestBody NoteCreateRequest noteCreateRequest,
-            @AuthenticationPrincipal CustomUserDetails cud
-    ) {
-        return ResponseEntity.ok(
-                discussionManagementService.createClubNote(
-                        clubID,
-                        promptID,
-                        noteCreateRequest,
-                        cud
-                )
-        );
+    public ResponseEntity<Note> createClubNote(@PathVariable Long clubID, @RequestBody NoteCreateRequest noteCreateRequest,
+                                               @AuthenticationPrincipal CustomUserDetails cud) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(discussionManagementService.createClubNote(clubID, null, noteCreateRequest, cud));
     }
 
-    @PostMapping("/{clubID}/discussions/{promptID}/notes/{noteID}")
+    @PutMapping("/{clubID}/notes/{noteID}")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Note> updateClubNote(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID,
-            @PathVariable Long noteID,
-            @RequestBody NoteCreateRequest noteCreateRequest,
-            @AuthenticationPrincipal CustomUserDetails cud
-    ) {
-        Club club = clubService.requireClubById(clubID);
-        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
-        if (!prompt.getClub().equals(club)) {
-            throw new MalformedDTOException("prompt does not belong to club");
+    public ResponseEntity<Note> updateClubNote(@PathVariable Long clubID, @PathVariable Long noteID,
+                                               @RequestBody NoteCreateRequest noteCreateRequest,
+                                               @AuthenticationPrincipal CustomUserDetails cud) {
+        Note note = noteService.getNoteById(noteID);
+        validateNoteBelongsToClub(note, clubID);
+        return ResponseEntity.ok(discussionManagementService.updateNote(cud.getUserID(), noteID, noteCreateRequest.content()));
+    }
+
+    @DeleteMapping("/{clubID}/notes/{noteID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Void> deleteClubNote(@PathVariable Long clubID, @PathVariable Long noteID,
+                                               @AuthenticationPrincipal CustomUserDetails cud) {
+        Note note = noteService.getNoteById(noteID);
+        validateNoteBelongsToClub(note, clubID);
+
+        if (!note.getUser().equals(cud.getUser()) && !cud.getAuthorities().contains(GlobalRole.ADMINISTRATOR)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        return ResponseEntity.ok(
-                discussionManagementService.updateNote(
-                        cud.getUserID(), noteID, noteCreateRequest.content()
-                )
-        );
+
+        noteService.deleteNote(noteID);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{clubID}/discussions/{promptID}/notes")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Page<Note>> getNotes(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID,
-            Pageable pageable
-    ) {
-        Club club = clubService.requireClubById(clubID);
-        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
-        if (!prompt.getClub().equals(club)) {
-            throw new MalformedDTOException("prompt does not belong to club");
-        }
-        Page<Note> notes = noteService.getAllNotes(
-                prompt,
-                pageable
-        );
-        return ResponseEntity.ok(notes);
+    public ResponseEntity<Page<Note>> getPromptNotes(@PathVariable Long clubID, @PathVariable Long promptID, Pageable pageable) {
+        DiscussionPrompt prompt = validatePromptBelongsToClub(clubID, promptID);
+        return ResponseEntity.ok(noteService.getAllNotes(prompt, pageable));
     }
 
+    @PostMapping("/{clubID}/discussions/{promptID}/notes")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Note> createPromptNote(@PathVariable Long clubID, @PathVariable Long promptID,
+                                                 @RequestBody NoteCreateRequest noteCreateRequest,
+                                                 @AuthenticationPrincipal CustomUserDetails cud) {
+        validatePromptBelongsToClub(clubID, promptID);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(discussionManagementService.createClubNote(clubID, promptID, noteCreateRequest, cud));
+    }
+
+    @PutMapping("/{clubID}/discussions/{promptID}/notes/{noteID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Note> updatePromptNote(@PathVariable Long clubID, @PathVariable Long promptID,
+                                                 @PathVariable Long noteID, @RequestBody NoteCreateRequest noteCreateRequest,
+                                                 @AuthenticationPrincipal CustomUserDetails cud) {
+        DiscussionPrompt prompt = validatePromptBelongsToClub(clubID, promptID);
+        Note note = noteService.getNoteById(noteID);
+        validateNotePromptRelationship(note, prompt);
+        return ResponseEntity.ok(discussionManagementService.updateNote(cud.getUserID(), noteID, noteCreateRequest.content()));
+    }
+
+    @DeleteMapping("/{clubID}/discussions/{promptID}/notes/{noteID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<Void> deletePromptNote(@PathVariable Long clubID, @PathVariable Long promptID,
+                                                 @PathVariable Long noteID, @AuthenticationPrincipal CustomUserDetails cud) {
+        DiscussionPrompt prompt = validatePromptBelongsToClub(clubID, promptID);
+        Note note = noteService.getNoteById(noteID);
+        validateNotePromptRelationship(note, prompt);
+
+        if (!note.getUser().equals(cud.getUser()) && !cud.getAuthorities().contains(GlobalRole.ADMINISTRATOR)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        noteService.deleteNote(noteID);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Page<Reply>> getReplies(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID,
-            @PathVariable Long noteID,
-            Pageable pageable
-    ) {
-        Club club = clubService.requireClubById(clubID);
-        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
-        if (!prompt.getClub().equals(club)) {
-            throw new MalformedDTOException("prompt does not belong to club");
-        }
+    public ResponseEntity<Page<Reply>> getReplies(@PathVariable Long clubID, @PathVariable Long promptID,
+                                                  @PathVariable Long noteID, Pageable pageable) {
+        DiscussionPrompt prompt = validatePromptBelongsToClub(clubID, promptID);
         Note note = noteService.getNoteById(noteID);
-        if (!note.getDiscussionPrompt().equals(prompt)) {
-            throw new MalformedDTOException("note does not belong to prompt");
-        }
-        Page<Reply> replies = replyService.getRepliesForNote(note, pageable);
-        return ResponseEntity.ok(replies);
+        validateNotePromptRelationship(note, prompt);
+        return ResponseEntity.ok(replyService.getRepliesForNote(note, pageable));
     }
 
     @PostMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Reply> createReply(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID,
-            @PathVariable Long noteID,
-            @RequestBody String content,
-            @AuthenticationPrincipal CustomUserDetails cud
-    ) {
-        Club club = clubService.requireClubById(clubID);
-        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
-        if (!prompt.getClub().equals(club)) {
-            throw new MalformedDTOException("prompt does not belong to club");
-        }
+    public ResponseEntity<Reply> createReply(@PathVariable Long clubID, @PathVariable Long promptID,
+                                             @PathVariable Long noteID, @RequestBody String content,
+                                             @AuthenticationPrincipal CustomUserDetails cud) {
+        DiscussionPrompt prompt = validatePromptBelongsToClub(clubID, promptID);
         Note note = noteService.getNoteById(noteID);
-        if (!note.getDiscussionPrompt().equals(prompt)) {
-            throw new MalformedDTOException("note does not belong to prompt");
-        }
-        Reply reply = replyService.createReply(cud.getUser(), note, content);
-        return ResponseEntity.ok(reply);
+        validateNotePromptRelationship(note, prompt);
+        return ResponseEntity.status(HttpStatus.CREATED).body(replyService.createReply(cud.getUser(), note, content));
     }
 
     @PutMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies/{replyID}")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Reply> updateReply(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID,
-            @PathVariable Long noteID,
-            @PathVariable Long replyID,
-            @RequestBody String content,
-            @AuthenticationPrincipal CustomUserDetails cud
-    ) {
-        Club club = clubService.requireClubById(clubID);
-        DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
-        if (!prompt.getClub().equals(club)) {
-            throw new MalformedDTOException("prompt does not belong to club");
-        }
+    public ResponseEntity<Reply> updateReply(@PathVariable Long clubID, @PathVariable Long promptID,
+                                             @PathVariable Long noteID, @PathVariable Long replyID,
+                                             @RequestBody String content, @AuthenticationPrincipal CustomUserDetails cud) {
+        DiscussionPrompt prompt = validatePromptBelongsToClub(clubID, promptID);
         Note note = noteService.getNoteById(noteID);
-        if (!note.getDiscussionPrompt().equals(prompt)) {
-            throw new MalformedDTOException("note does not belong to prompt");
-        }
+        validateNotePromptRelationship(note, prompt);
         Reply reply = replyService.getReplyById(replyID);
-        if (!reply.getParentNote().equals(note)) {
-            throw new MalformedDTOException("reply does not belong to note");
-        }
+        validateReplyNoteRelationship(reply, note);
         return ResponseEntity.ok(replyService.updateReplyContent(replyID, content));
     }
 
     @DeleteMapping("/{clubID}/discussions/{promptID}/notes/{noteID}/replies/{replyID}")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
-    public ResponseEntity<Void> deleteReply(
-            @PathVariable Long clubID,
-            @PathVariable Long promptID,
-            @PathVariable Long noteID,
-            @PathVariable Long replyID,
-            @AuthenticationPrincipal CustomUserDetails cud
-    ) {
+    public ResponseEntity<Void> deleteReply(@PathVariable Long clubID, @PathVariable Long promptID,
+                                            @PathVariable Long noteID, @PathVariable Long replyID,
+                                            @AuthenticationPrincipal CustomUserDetails cud) {
+        DiscussionPrompt prompt = validatePromptBelongsToClub(clubID, promptID);
+        Note note = noteService.getNoteById(noteID);
+        validateNotePromptRelationship(note, prompt);
+        Reply reply = replyService.getReplyById(replyID);
+        validateReplyNoteRelationship(reply, note);
+
+        if (!reply.getUser().equals(cud.getUser()) && !cud.getAuthorities().contains(GlobalRole.ADMINISTRATOR)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        replyService.deleteReply(replyID);
+        return ResponseEntity.noContent().build();
+    }
+
+    private void validateMeetingBelongsToClub(Meeting meeting, Long clubID) {
+        if (!meeting.getClub().getClubID().equals(clubID)) {
+            throw new MalformedDTOException("meeting does not belong to club");
+        }
+    }
+
+    private DiscussionPrompt validatePromptBelongsToClub(Long clubID, Long promptID) {
         Club club = clubService.requireClubById(clubID);
         DiscussionPrompt prompt = discussionPromptService.findPromptById(promptID);
         if (!prompt.getClub().equals(club)) {
             throw new MalformedDTOException("prompt does not belong to club");
         }
-        Note note = noteService.getNoteById(noteID);
+        return prompt;
+    }
+
+    private void validateNoteBelongsToClub(Note note, Long clubID) {
+        if (note.getDiscussionPrompt() != null && !note.getDiscussionPrompt().getClub().getClubID().equals(clubID)) {
+            throw new MalformedDTOException("note does not belong to club");
+        }
+    }
+
+    private void validateNotePromptRelationship(Note note, DiscussionPrompt prompt) {
         if (!note.getDiscussionPrompt().equals(prompt)) {
             throw new MalformedDTOException("note does not belong to prompt");
         }
-        Reply reply = replyService.getReplyById(replyID);
+    }
+
+    private void validateReplyNoteRelationship(Reply reply, Note note) {
         if (!reply.getParentNote().equals(note)) {
             throw new MalformedDTOException("reply does not belong to note");
         }
-        if (!reply.getUser().equals(cud.getUser()) && !cud.getAuthorities().contains(GlobalRole.ADMINISTRATOR)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        replyService.deleteReply(replyID);
-        return ResponseEntity.ok().build();
     }
 }
