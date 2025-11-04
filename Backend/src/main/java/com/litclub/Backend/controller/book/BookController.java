@@ -109,7 +109,7 @@ public class BookController {
             throw new MalformedDTOException("userID mismatch");
         }
         return ResponseEntity.ok(
-                reviewService.updateReview(review, reviewID)
+                reviewService.updateReview(review, reviewID, cud.getUser(), bookService.getBook(bookID))
         );
     }
 
