@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,13 +35,19 @@ public class UserBooksService {
                     newUserBook.setBook(book);
                     newUserBook.setStatus(status);
 
-                    if (status.equals(BookStatus.READING)) {
-                        newUserBook.setDateStarted(LocalDate.now());
+                    LocalDate today = LocalDate.now();
+
+                    switch (status) {
+                        case READING -> newUserBook.setDateStarted(today);
+                        case WANT_TO_READ -> { /* no dates yet */ }
+                        case READ -> newUserBook.setDateFinished(today);
+                        case DNF -> newUserBook.setDateFinished(today);
                     }
 
                     return userBooksRepository.save(newUserBook);
                 });
     }
+
 
     // ====== READ ======
     @Transactional(readOnly = true)
