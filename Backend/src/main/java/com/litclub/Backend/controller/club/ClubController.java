@@ -149,9 +149,9 @@ public class ClubController {
 
     @PostMapping("/{clubID}/join")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ClubMembership> joinClub(@PathVariable Long clubID, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ClubMembership> joinClub(@PathVariable Long clubID, @AuthenticationPrincipal CustomUserDetails cud) {
         boolean isClubOpen = configuration.getClubFlags(clubID).enableRegister();
-        User user = customUserDetails.getUser();
+        User user = cud.getUser();
         Club club = clubService.requireClubById(clubID);
 
         if (!isClubOpen && !user.getGlobalRoles().contains(GlobalRole.ADMINISTRATOR)) {
@@ -163,9 +163,9 @@ public class ClubController {
 
     @PostMapping("/{clubID}/leave")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> leaveClub(@PathVariable Long clubID, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<Void> leaveClub(@PathVariable Long clubID, @AuthenticationPrincipal CustomUserDetails cud) {
         Club club = clubService.requireClubById(clubID);
-        User user = customUserDetails.getUser();
+        User user = cud.getUser();
         ClubMembership clubMembership = clubMembershipService.getMembershipByClubAndUser(club, user);
         clubMembershipService.deRegisterUserFromClub(clubMembership.getClubMembershipID());
         return ResponseEntity.noContent().build();
@@ -200,9 +200,9 @@ public class ClubController {
     @PostMapping("/{clubID}/meetings")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
     public ResponseEntity<Meeting> addMeeting(@PathVariable Long clubID, @RequestBody MeetingCreateRequest createRequest,
-                                              @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+                                              @AuthenticationPrincipal CustomUserDetails cud) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(clubModService.createMeeting(customUserDetails, clubID, createRequest));
+                .body(clubModService.createMeeting(cud, clubID, createRequest));
     }
 
     @GetMapping("/{clubID}/meetings/{meetingID}")
@@ -240,8 +240,8 @@ public class ClubController {
     @PostMapping("/{clubID}/discussions")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
     public ResponseEntity<DiscussionPrompt> addDiscussionPrompt(@PathVariable Long clubID, @RequestBody String prompt,
-                                                                @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        return ResponseEntity.ok(discussionPromptService.createPrompt(prompt, customUserDetails.getUser(),
+                                                                @AuthenticationPrincipal CustomUserDetails cud) {
+        return ResponseEntity.ok(discussionPromptService.createPrompt(prompt, cud.getUser(),
                 clubService.requireClubById(clubID)));
     }
 
