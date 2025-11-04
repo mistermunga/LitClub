@@ -98,7 +98,7 @@ public class LibraryManagementService {
         Book book = bookService.getBook(bookID);
         UserBook libraryItem = userBooksService.getUserBookByUserAndBook(user, book);
 
-        ReviewDTO reviewDTO = new ReviewDTO(book, user, reviewRequest.rating(), reviewRequest.content());
+        ReviewDTO reviewDTO = new ReviewDTO(book.getBookID(), user.getUserID(), reviewRequest.rating(), reviewRequest.content());
         Review review = reviewService.createReview(reviewDTO);
 
         if (review.getRating() != null) userBooksService.changeRating(libraryItem, review.getRating());
