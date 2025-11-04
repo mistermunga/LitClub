@@ -1,10 +1,14 @@
 package com.litclub.Backend.service.low;
 
+import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.construct.review.ReviewDTO;
 import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.Review;
 import com.litclub.Backend.entity.User;
+import com.litclub.Backend.exception.MissingLibraryItemException;
 import com.litclub.Backend.repository.ReviewRepository;
+import com.litclub.Backend.service.middle.BookService;
+import com.litclub.Backend.service.middle.UserService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
@@ -19,16 +23,30 @@ import java.util.Objects;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final UserService userService;
+    private final BookService bookService;
+    private final UserBooksService userBooksService;
 
-    public ReviewService (ReviewRepository reviewRepository) {
+    public ReviewService (ReviewRepository reviewRepository, UserService userService, BookService bookService, UserBooksService userBooksService) {
         this.reviewRepository = reviewRepository;
+        this.userService = userService;
+        this.bookService = bookService;
+        this.userBooksService = userBooksService;
     }
 
     // ====== CREATE ======
     @Transactional
     public Review createReview(ReviewDTO reviewDTO) {
-        if (reviewRepository.existsByUserAndBook(reviewDTO.getUser(), reviewDTO.getBook())) {
+        User user = userService.requireUserById( reviewDTO.getUserID() );
+        Book book = bookService.getBook( reviewDTO.getBookID() );
+        if (reviewRepository.existsByUserAndBook(user,book)) {
             throw new EntityExistsException("Review already exists");
+        }
+        //in case book is not in user library
+        try {
+            userBooksService.getUserBookByUserAndBook(user, book);
+        } catch (MissingLibraryItemException e) {
+            userBooksService.addUserBook(user, book, BookStatus.READ);
         }
         Review review = convertDTOToReview(reviewDTO);
         return reviewRepository.save(review);
@@ -64,6 +82,11 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<Review> getReviews(Book book) {
         return reviewRepository.findByBook(book);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Review> getReviews(Book book, Pageable pageable) {
+        return reviewRepository.findByBook(book, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -142,11 +165,26 @@ public class ReviewService {
     // ====== UPDATE ======
     @Transactional
     public Review updateReview(ReviewDTO reviewDTO) {
-        if (!reviewRepository.existsByUserAndBook(reviewDTO.getUser(), reviewDTO.getBook())) {
+        User user = userService.requireUserById( reviewDTO.getUserID() );
+        Book book = bookService.getBook( reviewDTO.getBookID() );
+        if (!reviewRepository.existsByUserAndBook(user,book)) {
             throw new EntityNotFoundException("Review not found");
         }
 
-        Review review = getReviewByUserAndBook(reviewDTO.getUser(), reviewDTO.getBook());
+        Review review = getReviewByUserAndBook(user, book);
+        review.setRating(reviewDTO.getRating());
+        review.setContent(reviewDTO.getContent());
+        return reviewRepository.save(review);
+    }
+
+    @Transactional
+    public Review updateReview(ReviewDTO reviewDTO, Long reviewID) {
+        User user = userService.requireUserById( reviewDTO.getUserID() );
+        Book book = bookService.getBook( reviewDTO.getBookID() );
+        if (!reviewRepository.existsByReviewID(reviewID)) {
+            throw new EntityNotFoundException("Review not found");
+        }
+        Review review = getReviewByUserAndBook(user, book);
         review.setRating(reviewDTO.getRating());
         review.setContent(reviewDTO.getContent());
         return reviewRepository.save(review);
@@ -173,8 +211,8 @@ public class ReviewService {
     // ------ utility ------
     public Review convertDTOToReview(ReviewDTO reviewDTO) {
         Review review = new Review();
-        review.setUser(reviewDTO.getUser());
-        review.setBook(reviewDTO.getBook());
+        review.setUser(userService.requireUserById( reviewDTO.getUserID()));
+        review.setBook(bookService.getBook( reviewDTO.getBookID() ));
         review.setContent(reviewDTO.getContent());
         review.setRating(reviewDTO.getRating());
 

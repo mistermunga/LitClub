@@ -21,6 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByUser(User user);
     Page<Review> findByUser(User user, Pageable pageable);
     List<Review> findByBook(Book book);
+    Page<Review> findByBook(Book book, Pageable pageable);
     List<Review> findByRatingEquals(int rating);
 
     List<Review> findByUserAndRatingEquals(User user, Integer rating);
@@ -50,4 +51,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByBookAndRatingLessThan(Book book, Integer rating);
     List<Review> findByUserAndRatingLessThan(User user, Integer rating);
 
+    boolean existsByReviewID(Long reviewID);
 }
