@@ -125,7 +125,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserRecord loginWithUsername(UserLoginRecord userLoginRecord) {
-        Optional<User> user = userRepository.findUserByUsername(userLoginRecord.username().toString());
+        Optional<User> user = userRepository.findUserByUsername(userLoginRecord.username().get());
 
         if (user.isEmpty()) {
             throw new BadCredentialsException("Invalid username");
@@ -147,9 +147,10 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserRecord loginWithEmail(UserLoginRecord userLoginRecord) {
-        Optional<User> user = userRepository.findUserByEmail(userLoginRecord.email().toString());
+        Optional<User> user = userRepository.findUserByEmail(userLoginRecord.email().get());
 
         if (user.isEmpty()) {
+            System.out.println("passed in: " + userLoginRecord.email().toString());
             throw new BadCredentialsException("Invalid email");
         }
 
