@@ -86,6 +86,7 @@ public class SecurityConfiguration {
                         authorizeRequests
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMINISTRATOR")
+                                .requestMatchers("/api/ping").permitAll()
                                 .anyRequest().hasRole("USER")
                 )
                 .authenticationProvider(authenticationProvider())
