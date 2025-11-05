@@ -20,6 +20,11 @@ public class BookAlreadyExistsException extends EntityExistsException {
         details.put("isbn", String.valueOf(book.getIsbn()));
     }
 
+    public BookAlreadyExistsException(String message) {
+        super(message);
+        this.details = new HashMap<>();
+    }
+
     public Map<String, String> getDetails() {
         return details;
     }
