@@ -6,6 +6,7 @@ import com.litclub.Backend.construct.library.book.BookSearchRequest;
 import com.litclub.Backend.entity.Book;
 import com.litclub.Backend.entity.User;
 import com.litclub.Backend.entity.UserBook;
+import com.litclub.Backend.exception.BookAlreadyExistsException;
 import com.litclub.Backend.exception.BookNotFoundException;
 import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.BookRepository;
@@ -37,14 +38,47 @@ public class BookService {
     // ====== CREATE ======
     @Transactional
     public Book createBook(BookAddRequest book) {
+        Book newBook = null;
+        boolean alreadySavedByMetadataService = false;
+
         if (book.title() != null && book.author() != null) {
-            return metadataService.enrichAndSaveByTitleAndAuthor(book.title(), book.author())
-                    .orElseThrow(() -> new RuntimeException("failed to create book"));
+
+            var bookOpt = metadataService.enrichAndSaveByTitleAndAuthor(book.title(), book.author());
+
+            if (bookOpt.isPresent()) {
+                newBook = bookOpt.get();
+                alreadySavedByMetadataService = true;
+
+            } else {
+                if (bookRepository.findBookByTitleAndPrimaryAuthor(book.title(), book.author()).isPresent()) {
+                    throw new BookAlreadyExistsException("Book already exists");
+                }
+                newBook = new Book();
+                newBook.setTitle(book.title());
+                newBook.setPrimaryAuthor(book.author());
+
+            }
         } else if (book.isbn() != null) {
-            return metadataService.enrichAndSaveByIsbn(book.isbn())
-                    .orElseThrow(() -> new RuntimeException("failed to create book"));
+            var bookOpt = metadataService.enrichAndSaveByIsbn(book.isbn());
+
+            if (bookOpt.isPresent()) {
+                newBook = bookOpt.get();
+                alreadySavedByMetadataService = true;
+
+            } else {
+                if (bookRepository.findBookByisbn(book.isbn()).isPresent()) {
+                    throw new BookAlreadyExistsException("Book already exists");
+                }
+                newBook = new Book();
+                newBook.setIsbn(book.isbn());
+            }
         } else {
-            throw new MalformedDTOException("book title or isbn is null");
+            throw new MalformedDTOException("Book title/author or ISBN is required.");
+        }
+        if (alreadySavedByMetadataService) {
+            return newBook;
+        } else {
+            return bookRepository.save(newBook);
         }
     }
 
