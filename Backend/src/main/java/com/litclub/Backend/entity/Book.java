@@ -84,7 +84,7 @@ public class Book {
     @Column(name = "publisher")
     private String publisher;
 
-    @Column(name = "year")
+    @Column(name = "published_year")
     private LocalDate year;
 
     @Column(name = "edition")
