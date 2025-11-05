@@ -1,4 +1,6 @@
-package com.litclub.session.construct;
+package com.litclub.construct;
+
+import com.litclub.construct.record.user.UserRecord;
 
 import java.util.Set;
 

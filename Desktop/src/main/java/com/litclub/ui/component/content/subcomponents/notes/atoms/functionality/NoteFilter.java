@@ -1,6 +1,6 @@
 package com.litclub.ui.component.content.subcomponents.notes.atoms.functionality;
 
-import com.litclub.session.construct.Note;
+import com.litclub.construct.Note;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;

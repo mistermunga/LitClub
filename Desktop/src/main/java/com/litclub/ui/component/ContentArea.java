@@ -1,6 +1,6 @@
 package com.litclub.ui.component;
 
-import com.litclub.session.construct.mock.MockDataPopulator;
+import com.litclub.construct.mock.MockDataPopulator;
 import com.litclub.ui.component.content.*;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;

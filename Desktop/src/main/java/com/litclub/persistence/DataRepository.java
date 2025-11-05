@@ -1,7 +1,7 @@
 package com.litclub.persistence;
 
 import com.litclub.session.AppSession;
-import com.litclub.session.construct.*;
+import com.litclub.construct.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

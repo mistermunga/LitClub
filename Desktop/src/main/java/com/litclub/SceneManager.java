@@ -1,8 +1,8 @@
 package com.litclub;
 
 import com.litclub.session.AppSession;
-import com.litclub.session.construct.ClubRecord;
-import com.litclub.session.construct.UserRecord;
+import com.litclub.construct.ClubRecord;
+import com.litclub.construct.record.user.UserRecord;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.*;
 import javafx.scene.Scene;

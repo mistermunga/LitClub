@@ -1,7 +1,7 @@
 package com.litclub.ui.component.content;
 
 import com.litclub.persistence.DataRepository;
-import com.litclub.session.construct.MeetingRecord;
+import com.litclub.construct.MeetingRecord;
 import com.litclub.theme.ThemeManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,7 +13,6 @@ import javafx.scene.layout.VBox;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 public class MeetingsView extends ScrollPane {
 

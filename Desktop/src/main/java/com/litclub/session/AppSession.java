@@ -1,9 +1,11 @@
 package com.litclub.session;
 
-import com.litclub.session.construct.ClubRecord;
-import com.litclub.session.construct.UserRecord;
+import com.litclub.construct.ClubRecord;
+import com.litclub.construct.record.user.UserRecord;
+import com.litclub.construct.simulacra.ClubSimulacra;
 
 import java.net.URL;
+import java.util.Set;
 
 public class AppSession {
 
@@ -36,9 +38,10 @@ public class AppSession {
             String firstname,
             String lastname,
             String username,
-            String email
+            String email,
+            Set<ClubSimulacra> clubs
     ) {
-        this.userRecord = new UserRecord(id, firstname, lastname, username, email);
+        this.userRecord = new UserRecord((long) id, firstname, lastname, username, email, clubs);
     }
 
     public void setClubDetails( ClubRecord clubRecord ) {

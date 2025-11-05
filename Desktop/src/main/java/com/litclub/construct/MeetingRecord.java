@@ -1,4 +1,4 @@
-package com.litclub.session.construct;
+package com.litclub.construct;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

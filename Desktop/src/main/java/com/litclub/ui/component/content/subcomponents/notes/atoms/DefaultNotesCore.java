@@ -1,7 +1,7 @@
 package com.litclub.ui.component.content.subcomponents.notes.atoms;
 
 import com.litclub.persistence.DataRepository;
-import com.litclub.session.construct.Note;
+import com.litclub.construct.Note;
 import com.litclub.theme.ThemeManager;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;

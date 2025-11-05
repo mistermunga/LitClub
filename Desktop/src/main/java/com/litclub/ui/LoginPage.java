@@ -19,7 +19,7 @@ public class LoginPage extends VBox {
 
     private TextField identifierField;
     private PasswordField passwordField;
-    private Label statusLabel;
+    private final Label statusLabel;
 
     public LoginPage() {
         ThemeManager.getInstance().registerComponent(this);

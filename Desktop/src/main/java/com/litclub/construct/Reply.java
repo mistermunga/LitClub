@@ -1,4 +1,4 @@
-package com.litclub.session.construct;
+package com.litclub.construct;
 
 public class Reply extends Note{
 

@@ -1,8 +1,9 @@
-package com.litclub.session.construct.mock;
+package com.litclub.construct.mock;
 
 import com.litclub.persistence.DataRepository;
 import com.litclub.session.AppSession;
-import com.litclub.session.construct.*;
+import com.litclub.construct.*;
+import com.litclub.construct.record.user.UserRecord;
 
 import java.util.HashSet;
 import java.util.Set;

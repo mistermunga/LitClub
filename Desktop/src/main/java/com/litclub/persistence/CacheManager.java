@@ -1,7 +1,7 @@
 package com.litclub.persistence;
 
 import com.google.gson.*;
-import com.litclub.session.construct.*;
+import com.litclub.construct.*;
 
 import java.io.IOException;
 import java.nio.file.Files;

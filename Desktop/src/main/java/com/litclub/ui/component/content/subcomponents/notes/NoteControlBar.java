@@ -1,7 +1,7 @@
 package com.litclub.ui.component.content.subcomponents.notes;
 
 import com.litclub.persistence.DataRepository;
-import com.litclub.session.construct.Note;
+import com.litclub.construct.Note;
 import com.litclub.ui.component.content.subcomponents.notes.atoms.FilteredNotesCore;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
