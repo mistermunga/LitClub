@@ -2,6 +2,7 @@ package com.litclub.Backend.service.middle;
 
 import com.litclub.Backend.construct.club.ClubCreateRequest;
 import com.litclub.Backend.construct.club.ClubRecord;
+import com.litclub.Backend.construct.club.ClubSimulacra;
 import com.litclub.Backend.entity.Club;
 import com.litclub.Backend.entity.ClubMembership;
 import com.litclub.Backend.entity.User;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -243,6 +245,23 @@ public class ClubService {
                 club.getClubName(),
                 getClubOwners(club.getClubID()).stream().map(UserService::convertUserToRecord).toList(),
                 clubMembershipService.getUsersForClub(club).stream().map(UserService::convertUserToRecord).collect(Collectors.toSet())
+        );
+    }
+
+
+    public static Set<ClubSimulacra> convertClubToDTO(Set<Club> clubs) {
+        return clubs.stream()
+                .map(ClubService::convertClubToSimulacrum)
+                .collect(Collectors.toSet());
+    }
+
+    public static ClubSimulacra convertClubToSimulacrum(Club club) {
+        return new ClubSimulacra(
+                club.getClubID(),
+                club.getClubName(),
+                club.getDescription(),
+                UserService.convertUserToRecord(club.getCreator()),
+                club.getCreatedAt()
         );
     }
 }
