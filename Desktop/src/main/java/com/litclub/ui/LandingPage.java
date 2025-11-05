@@ -1,6 +1,7 @@
 package com.litclub.ui;
 
 import com.litclub.SceneManager;
+import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.component.subunits.ThemeToggleBar;
 import javafx.geometry.Insets;
@@ -14,7 +15,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import java.io.InputStream;
+import java.net.*;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class LandingPage extends VBox {
 
@@ -103,5 +107,54 @@ public class LandingPage extends VBox {
         container.getChildren().addAll(urlLabel, inputRow, toggleContainer);
 
         return container;
+    }
+
+    private URL getInstanceURL(String link) throws MalformedURLException {
+        try {
+            String normalized = link.trim().replaceAll("/+$", "");
+
+            URI uri = new URI(normalized);
+
+            String scheme = uri.getScheme();
+            if (scheme == null || (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https"))) {
+                throw new MalformedURLException("Invalid or missing scheme (must be http or https): " + link);
+            }
+
+            return uri.toURL();
+        } catch (URISyntaxException e) {
+            throw new MalformedURLException("Invalid URL syntax: " + link);
+        }
+    }
+
+    private boolean pingServer(URL baseUrl) {
+        try {
+
+            URI baseUri = baseUrl.toURI();
+            URI pingUri = baseUri.resolve("/api/ping");
+            URL pingUrl = pingUri.toURL();
+
+            HttpURLConnection connection = (HttpURLConnection) pingUrl.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != 200) {
+                return false;
+            }
+
+            try (InputStream inputStream = connection.getInputStream();
+                 Scanner scanner = new Scanner(inputStream).useDelimiter("\\A")) {
+                String response = scanner.hasNext() ? scanner.next() : "";
+                if (response.contains("\"serverType\":\"LitClub\"")) {
+                    AppSession.getInstance().setINSTANCE_URL(pingUrl);
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            System.err.println("Ping failed: " + e.getMessage());
+            return false;
+        }
     }
 }
