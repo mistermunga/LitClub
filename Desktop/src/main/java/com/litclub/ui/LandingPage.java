@@ -22,6 +22,8 @@ import java.util.Scanner;
 
 public class LandingPage extends VBox {
 
+    private final Label statusLabel;
+
     public LandingPage() {
 
         ThemeManager.getInstance().registerComponent(this);
@@ -34,9 +36,11 @@ public class LandingPage extends VBox {
         // Components
         ImageView logo = createLogoHeader();
         VBox instanceSelector = createInstanceSelector();
-
+        statusLabel = new Label();
         // Main layout
-        this.getChildren().addAll(logo, instanceSelector);
+        this.getChildren().addAll(logo, instanceSelector, statusLabel);
+
+
     }
 
     private ImageView createLogoHeader() {
@@ -73,7 +77,6 @@ public class LandingPage extends VBox {
         return logo;
     }
 
-    // TODO API logic will come here
     private VBox createInstanceSelector() {
         VBox container = new VBox();
         container.setAlignment(Pos.CENTER);
@@ -89,16 +92,16 @@ public class LandingPage extends VBox {
         inputRow.setAlignment(Pos.CENTER);
         inputRow.setSpacing(10);
 
-        TextField instanceURL = new TextField();
-        instanceURL.setPromptText("abulafia.litclub.com");
+        TextField instanceURL = new TextField("http://localhost:8080");
+        instanceURL.setPromptText("https://example.litclub.com");
         instanceURL.getStyleClass().add("text-input");
         HBox.setHgrow(instanceURL, Priority.ALWAYS);
-        instanceURL.setOnAction(e -> SceneManager.getInstance().showLogin());
+        instanceURL.setOnAction(e -> resolvePing(instanceURL.getText()));
 
         Button goButton = new Button("Go");
         goButton.getStyleClass().add("button-primary");
         goButton.setDefaultButton(true);
-        goButton.setOnAction(e -> SceneManager.getInstance().showLogin());
+        goButton.setOnAction(e -> resolvePing(instanceURL.getText()));
 
         inputRow.getChildren().addAll(instanceURL, goButton);
 
@@ -126,7 +129,7 @@ public class LandingPage extends VBox {
         }
     }
 
-    private boolean pingServer(URL baseUrl) {
+    private void pingServer(URL baseUrl) {
         try {
 
             URI baseUri = baseUrl.toURI();
@@ -140,7 +143,7 @@ public class LandingPage extends VBox {
 
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
-                return false;
+                return;
             }
 
             try (InputStream inputStream = connection.getInputStream();
@@ -148,13 +151,25 @@ public class LandingPage extends VBox {
                 String response = scanner.hasNext() ? scanner.next() : "";
                 if (response.contains("\"serverType\":\"LitClub\"")) {
                     AppSession.getInstance().setINSTANCE_URL(pingUrl);
-                    return true;
                 }
             }
-            return false;
         } catch (Exception e) {
             System.err.println("Ping failed: " + e.getMessage());
-            return false;
+        }
+    }
+
+    private void showAccessDeniedError() {
+        statusLabel.setText("Failed ping. Confirm URL is correct.");
+        statusLabel.setVisible(true);
+        statusLabel.getStyleClass().add("error-label");
+    }
+
+    private void resolvePing(String inputText) {
+        try {
+            pingServer(getInstanceURL(inputText));
+            SceneManager.getInstance().showLogin();
+        } catch (Exception e) {
+            showAccessDeniedError();
         }
     }
 }
