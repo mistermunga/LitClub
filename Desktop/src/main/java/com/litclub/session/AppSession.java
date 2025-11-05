@@ -3,12 +3,16 @@ package com.litclub.session;
 import com.litclub.session.construct.ClubRecord;
 import com.litclub.session.construct.UserRecord;
 
+import java.net.URI;
+
 public class AppSession {
 
     private static AppSession instance;
     private UserRecord userRecord;
     private ClubRecord clubRecord;
     private boolean brightMode = true;
+
+    private URI INSTANCE_URL;
 
     private AppSession() {}
 
@@ -47,5 +51,13 @@ public class AppSession {
 
     public ClubRecord getClubRecord() {
         return clubRecord;
+    }
+
+    public void setINSTANCE_URL(URI INSTANCE_URL) {
+        this.INSTANCE_URL = INSTANCE_URL;
+    }
+
+    public URI getINSTANCE_URL() {
+        return INSTANCE_URL;
     }
 }
