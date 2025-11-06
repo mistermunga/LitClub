@@ -990,9 +990,7 @@ public class UserService {
                 user.getSecondName(),
                 user.getUsername(),
                 user.getEmail(),
-                getClubsForUser(user).isEmpty()
-                        ? new HashSet<>()
-                        : ClubService.convertClubToDTO(getClubsForUser(user))
+                getClubsForUser(user)
         );
     }
 
