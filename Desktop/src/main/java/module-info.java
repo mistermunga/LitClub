@@ -7,6 +7,7 @@ module com.litclub {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires java.net.http;
+    requires com.fasterxml.jackson.annotation;
 
     opens com.litclub to javafx.fxml, com.google.gson, com.fasterxml.jackson.databind;
     opens com.litclub.client.api to com.fasterxml.jackson.databind, com.google.gson, javafx.fxml, com.fasterxml.jackson.datatype.jsr310;

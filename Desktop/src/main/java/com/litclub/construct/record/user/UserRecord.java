@@ -1,6 +1,6 @@
 package com.litclub.construct.record.user;
 
-import com.litclub.construct.simulacra.ClubSimulacra;
+import com.litclub.construct.simulacra.Club;
 
 import java.util.Set;
 
@@ -10,5 +10,5 @@ public record UserRecord (
         String surname,
         String username,
         String email,
-        Set<ClubSimulacra> clubs
+        Set<Club> clubs
 ) {}
