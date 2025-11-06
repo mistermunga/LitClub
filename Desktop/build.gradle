@@ -22,8 +22,13 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
+dependencies {
+    implementation('com.google.code.gson:gson:2.8.9')
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
+    implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1')
+}
+
 application {
-    // main bio of your app goes here
     mainClass = 'com.litclub.Launcher'
     applicationDefaultJvmArgs = [
         '--enable-native-access=javafx.graphics,javafx.web,javafx.media'
