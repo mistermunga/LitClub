@@ -26,6 +26,7 @@ dependencies {
     implementation('com.google.code.gson:gson:2.8.9')
     implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
     implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1')
+    implementation('org.json:json:20250517')
 }
 
 application {
