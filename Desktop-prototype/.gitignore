@@ -1,0 +1,64 @@
+# =========================
+# Gradle
+# =========================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# =========================
+# IntelliJ IDEA / JetBrains IDEs
+# =========================
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# =========================
+# Java / JVM
+# =========================
+*.class
+*.log
+*.ctxt
+*.hprof
+hs_err_pid*
+replay_pid*
+
+# =========================
+# OS-specific files
+# =========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# =========================
+# Temporary / Misc
+# =========================
+*.tmp
+*.bak
+*.swp
+*.swo
+*.old
+*.orig
+*.lock
+*.txt
+
+# =========================
+# JavaFX / Packaging
+# =========================
+# Ignore output from jlink/jpackage builds
+dist/
+runtime/
