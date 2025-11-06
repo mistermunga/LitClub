@@ -54,7 +54,6 @@ $RECYCLE.BIN/
 *.old
 *.orig
 *.lock
-*.txt
 
 # =========================
 # JavaFX / Packaging
