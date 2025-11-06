@@ -1,5 +1,6 @@
 package com.litclub.Backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.litclub.Backend.entity.compositeKey.ClubMembershipID;
 import com.litclub.Backend.security.roles.ClubRole;
 import jakarta.persistence.*;
@@ -55,11 +56,13 @@ public class ClubMembership {
     @ManyToOne
     @MapsId("memberID")
     @JoinColumn(name = "member_id", nullable = false)
+    @JsonIgnore
     private User member;
 
     @ManyToOne
     @MapsId("clubID")
     @JoinColumn(name = "club_id", nullable = false)
+    @JsonIgnore
     private Club club;
 
     @ElementCollection(targetClass = ClubRole.class, fetch = FetchType.EAGER)

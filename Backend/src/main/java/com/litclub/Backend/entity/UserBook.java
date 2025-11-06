@@ -1,5 +1,6 @@
 package com.litclub.Backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.litclub.Backend.construct.library.book.BookStatus;
 import com.litclub.Backend.entity.compositeKey.UserBookID;
 import jakarta.persistence.*;
@@ -62,11 +63,13 @@ public class UserBook {
     @MapsId("userID")
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @MapsId("bookID")
     @ManyToOne
     @JoinColumn(name = "book_id")
+    @JsonIgnore
     private Book book;
 
     /**

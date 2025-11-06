@@ -1,5 +1,6 @@
 package com.litclub.Backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.litclub.Backend.security.roles.GlobalRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -73,6 +74,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @JsonIgnore
     @Column
     private String passwordHash;
 
@@ -98,6 +100,7 @@ public class User {
     )
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ClubMembership> memberships = new HashSet<>();
 
