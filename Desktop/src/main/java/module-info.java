@@ -8,6 +8,7 @@ module com.litclub {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires java.net.http;
     requires com.fasterxml.jackson.annotation;
+    requires org.json;
 
     opens com.litclub to javafx.fxml;
 
