@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated
 public class MockEntityGenerator {
 
     private static int bookIdCounter = 1000;

@@ -1,5 +1,6 @@
 package com.litclub.construct;
 
+@Deprecated
 public class Reply extends Note{
 
     private int noteID;

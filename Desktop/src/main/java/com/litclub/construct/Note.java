@@ -4,7 +4,7 @@ import com.litclub.persistence.DataRepository;
 
 import java.time.LocalDateTime;
 
-
+@Deprecated
 public class Note {
 
     private int noteID;

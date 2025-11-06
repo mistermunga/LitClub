@@ -2,6 +2,7 @@ package com.litclub.construct;
 
 import java.time.LocalDateTime;
 
+@Deprecated
 public class Review {
 
     private int reviewID;

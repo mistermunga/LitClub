@@ -2,6 +2,7 @@ package com.litclub.construct;
 
 import java.util.Objects;
 
+@Deprecated
 public class Book {
 
     private int bookID;

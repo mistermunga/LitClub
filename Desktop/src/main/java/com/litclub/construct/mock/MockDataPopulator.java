@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 design to be called once per club, immediately after
 the CrossRoads page
  */
+@Deprecated
 public class MockDataPopulator {
 
     private MockEntityGenerator mockEntityGenerator = new MockEntityGenerator();
