@@ -168,7 +168,7 @@ public class LandingPage extends VBox {
         try {
             pingServer(getInstanceURL(inputText));
             ApiClient.initialize(inputText);
-            SceneManager.getInstance().showLanding();
+            SceneManager.getInstance().showLogin();
         } catch (Exception e) {
             showAccessDeniedError();
         }
