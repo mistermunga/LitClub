@@ -49,7 +49,7 @@ public class LibraryRepository {
     private final ObservableList<Review> userReviews;
     private final ObservableList<Note> personalNotes;
 
-    // Current user context
+    // Current userRecord context
     private UserRecord currentUser;
 
     private LibraryRepository() {
@@ -75,45 +75,45 @@ public class LibraryRepository {
     // ==================== AUTHENTICATION ====================
 
     /**
-     * Registers a new user account.
+     * Registers a new userRecord account.
      *
-     * @param registrationRecord user registration details
-     * @return CompletableFuture with AuthResponse containing token and user data
+     * @param registrationRecord userRecord registration details
+     * @return CompletableFuture with AuthResponse containing token and userRecord data
      */
     public CompletableFuture<AuthResponse> register(UserRegistrationRecord registrationRecord) {
         return apiClient.post("/api/auth/register", registrationRecord, AuthResponse.class)
                 .thenApply(authResponse -> {
                     // Set authentication token
-                    apiClient.setAuthToken(authResponse.token(), authResponse.user().userID());
+                    apiClient.setAuthToken(authResponse.token(), authResponse.userRecord().userID());
 
-                    // Store current user
-                    this.currentUser = authResponse.user();
+                    // Store current userRecord
+                    this.currentUser = authResponse.userRecord();
 
                     return authResponse;
                 });
     }
 
     /**
-     * Logs in an existing user.
+     * Logs in an existing userRecord.
      *
      * @param loginRecord login credentials (username/email and password)
-     * @return CompletableFuture with AuthResponse containing token and user data
+     * @return CompletableFuture with AuthResponse containing token and userRecord data
      */
     public CompletableFuture<AuthResponse> login(UserLoginRecord loginRecord) {
         return apiClient.post("/api/auth/login", loginRecord, AuthResponse.class)
                 .thenApply(authResponse -> {
                     // Set authentication token
-                    apiClient.setAuthToken(authResponse.token(), authResponse.user().userID());
+                    apiClient.setAuthToken(authResponse.token(), authResponse.userRecord().userID());
 
-                    // Store current user
-                    this.currentUser = authResponse.user();
+                    // Store current userRecord
+                    this.currentUser = authResponse.userRecord();
 
                     return authResponse;
                 });
     }
 
     /**
-     * Logs out the current user and clears all data.
+     * Logs out the current userRecord and clears all data.
      */
     public void logout() {
         apiClient.clearAuthToken();
@@ -124,9 +124,9 @@ public class LibraryRepository {
     // ==================== USER LIBRARY ====================
 
     /**
-     * Fetches the current user's library from the API and populates observable lists.
+     * Fetches the current userRecord's library from the API and populates observable lists.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @return CompletableFuture that completes when library is loaded
      */
     public CompletableFuture<Void> fetchUserLibrary(Long userID) {
@@ -162,9 +162,9 @@ public class LibraryRepository {
     }
 
     /**
-     * Adds a book to the user's library.
+     * Adds a book to the userRecord's library.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param bookAddRequest book details and initial status
      * @return CompletableFuture with the added book
      */
@@ -195,9 +195,9 @@ public class LibraryRepository {
     }
 
     /**
-     * Updates a book's status in the user's library.
+     * Updates a book's status in the userRecord's library.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param bookID the book's ID
      * @param newStatus the new reading status
      * @return CompletableFuture with updated book
@@ -229,9 +229,9 @@ public class LibraryRepository {
     }
 
     /**
-     * Removes a book from the user's library.
+     * Removes a book from the userRecord's library.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param bookID the book's ID
      * @return CompletableFuture that completes when book is removed
      */
@@ -335,9 +335,9 @@ public class LibraryRepository {
     // ==================== REVIEWS ====================
 
     /**
-     * Fetches reviews for the current user (fetching multiple pages).
+     * Fetches reviews for the current userRecord (fetching multiple pages).
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @return CompletableFuture that completes when reviews are loaded
      */
     public CompletableFuture<Void> fetchUserReviews(Long userID) {
@@ -353,7 +353,7 @@ public class LibraryRepository {
     }
 
     /**
-     * Recursively fetches all pages of user reviews.
+     * Recursively fetches all pages of userRecord reviews.
      */
     private CompletableFuture<List<Review>> fetchUserReviewsRecursive(Long userID, int page, List<Review> accumulator) {
         TypeReference<PageResponse<Review>> typeRef = new TypeReference<>() {};
@@ -373,7 +373,7 @@ public class LibraryRepository {
     /**
      * Creates or updates a review for a book.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param bookID the book's ID
      * @param reviewRequest review content and rating
      * @return CompletableFuture with the created/updated review
@@ -397,7 +397,7 @@ public class LibraryRepository {
     /**
      * Deletes a review.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param bookID the book's ID
      * @return CompletableFuture that completes when review is deleted
      */
@@ -415,9 +415,9 @@ public class LibraryRepository {
     // ==================== PERSONAL NOTES ====================
 
     /**
-     * Fetches personal notes for the current user.
+     * Fetches personal notes for the current userRecord.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @return CompletableFuture that completes when notes are loaded
      */
     public CompletableFuture<Void> fetchPersonalNotes(Long userID) {
@@ -437,7 +437,7 @@ public class LibraryRepository {
     /**
      * Creates a personal note.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param noteRequest note content and metadata
      * @return CompletableFuture with the created note
      */
@@ -457,7 +457,7 @@ public class LibraryRepository {
     /**
      * Updates a personal note.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param noteID the note's ID
      * @param content new note content
      * @return CompletableFuture with the updated note
@@ -480,7 +480,7 @@ public class LibraryRepository {
     /**
      * Deletes a personal note.
      *
-     * @param userID the user's ID
+     * @param userID the userRecord's ID
      * @param noteID the note's ID
      * @return CompletableFuture that completes when note is deleted
      */
