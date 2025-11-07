@@ -1,5 +1,6 @@
 package com.litclub.client.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.json.JSONObject;
@@ -147,7 +148,7 @@ public class ApiClient {
     // ====== HTTP METHODS ======
 
     /**
-     * Performs a GET request.
+     * Performs a GET request with Class-based deserialization.
      *
      * @param endpoint API endpoint path (e.g., "/api/books")
      * @param responseType class of the expected response
@@ -159,6 +160,21 @@ public class ApiClient {
                 .build();
 
         return sendRequest(request, responseType);
+    }
+
+    /**
+     * Performs a GET request with TypeReference-based deserialization for generic types.
+     *
+     * @param endpoint API endpoint path
+     * @param typeReference TypeReference for generic types (e.g., List&lt;Book&gt;)
+     * @return CompletableFuture with deserialized response
+     */
+    public <T> CompletableFuture<T> get(String endpoint, TypeReference<T> typeReference) {
+        HttpRequest request = buildRequest(endpoint)
+                .GET()
+                .build();
+
+        return sendRequest(request, typeReference);
     }
 
     /**
@@ -178,6 +194,30 @@ public class ApiClient {
                     .build();
 
             return sendRequest(request, responseType);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(
+                    new ApiException("Failed to serialize request body", e)
+            );
+        }
+    }
+
+    /**
+     * Performs a POST request with a request body and TypeReference response.
+     *
+     * @param endpoint API endpoint path
+     * @param body request body object (will be serialized to JSON)
+     * @param typeReference TypeReference for generic types
+     * @return CompletableFuture with deserialized response
+     */
+    public <T> CompletableFuture<T> post(String endpoint, Object body, TypeReference<T> typeReference) {
+        try {
+            String jsonBody = objectMapper.writeValueAsString(body);
+
+            HttpRequest request = buildRequest(endpoint)
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            return sendRequest(request, typeReference);
         } catch (Exception e) {
             return CompletableFuture.failedFuture(
                     new ApiException("Failed to serialize request body", e)
@@ -217,6 +257,30 @@ public class ApiClient {
                     .build();
 
             return sendRequest(request, responseType);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(
+                    new ApiException("Failed to serialize request body", e)
+            );
+        }
+    }
+
+    /**
+     * Performs a PUT request with a request body and TypeReference response.
+     *
+     * @param endpoint API endpoint path
+     * @param body request body object (will be serialized to JSON)
+     * @param typeReference TypeReference for generic types
+     * @return CompletableFuture with deserialized response
+     */
+    public <T> CompletableFuture<T> put(String endpoint, Object body, TypeReference<T> typeReference) {
+        try {
+            String jsonBody = objectMapper.writeValueAsString(body);
+
+            HttpRequest request = buildRequest(endpoint)
+                    .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            return sendRequest(request, typeReference);
         } catch (Exception e) {
             return CompletableFuture.failedFuture(
                     new ApiException("Failed to serialize request body", e)
@@ -268,34 +332,55 @@ public class ApiClient {
     }
 
     /**
-     * Sends the request and deserializes the response.
+     * Sends the request and deserializes the response using Class.
      */
     private <T> CompletableFuture<T> sendRequest(HttpRequest request, Class<T> responseType) {
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(response -> {
-                    // Handle HTTP errors
-                    if (response.statusCode() >= 400) {
-                        throw new ApiException(
-                                "Request failed with status " + response.statusCode(),
-                                response.body()
-                        );
-                    }
+                .thenApply(response -> deserializeResponse(response,
+                        body -> objectMapper.readValue(body, responseType)));
+    }
 
-                    // Handle empty responses (204 No Content)
-                    if (response.statusCode() == 204 || response.body().isEmpty()) {
-                        return null;
-                    }
+    /**
+     * Sends the request and deserializes the response using TypeReference.
+     */
+    private <T> CompletableFuture<T> sendRequest(HttpRequest request, TypeReference<T> typeReference) {
+        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> deserializeResponse(response,
+                        body -> objectMapper.readValue(body, typeReference)));
+    }
 
-                    // Deserialize response
-                    try {
-                        return objectMapper.readValue(response.body(), responseType);
-                    } catch (Exception e) {
-                        throw new ApiException(
-                                "Failed to deserialize response",
-                                e
-                        );
-                    }
-                });
+    /**
+     * Common deserialization logic using functional interface for flexibility.
+     */
+    private <T> T deserializeResponse(HttpResponse<String> response,
+                                      DeserializationFunction<T> deserializer) {
+        // Handle HTTP errors
+        if (response.statusCode() >= 400) {
+            throw new ApiException(
+                    "Request failed with status " + response.statusCode(),
+                    response.body()
+            );
+        }
+
+        // Handle empty responses (204 No Content)
+        if (response.statusCode() == 204 || response.body().isEmpty()) {
+            return null;
+        }
+
+        // Deserialize response
+        try {
+            return deserializer.deserialize(response.body());
+        } catch (Exception e) {
+            throw new ApiException("Failed to deserialize response", e);
+        }
+    }
+
+    /**
+     * Functional interface for deserialization abstraction.
+     */
+    @FunctionalInterface
+    private interface DeserializationFunction<T> {
+        T deserialize(String body) throws Exception;
     }
 
     // ====== EXCEPTION CLASS ======
