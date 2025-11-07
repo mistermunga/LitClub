@@ -159,6 +159,7 @@ public class ApiClient {
                 .GET()
                 .build();
 
+        logRequest("GET", endpoint);
         return sendRequest(request, responseType);
     }
 
@@ -174,6 +175,7 @@ public class ApiClient {
                 .GET()
                 .build();
 
+        logRequest("GET", endpoint);
         return sendRequest(request, typeReference);
     }
 
@@ -193,6 +195,7 @@ public class ApiClient {
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
+            logRequest("POST", endpoint);
             return sendRequest(request, responseType);
         } catch (Exception e) {
             return CompletableFuture.failedFuture(
@@ -217,6 +220,7 @@ public class ApiClient {
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
+            logRequest("POST", endpoint);
             return sendRequest(request, typeReference);
         } catch (Exception e) {
             return CompletableFuture.failedFuture(
@@ -237,6 +241,7 @@ public class ApiClient {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
 
+        logRequest("POST", endpoint);
         return sendRequest(request, responseType);
     }
 
@@ -256,6 +261,7 @@ public class ApiClient {
                     .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
+            logRequest("PUT", endpoint);
             return sendRequest(request, responseType);
         } catch (Exception e) {
             return CompletableFuture.failedFuture(
@@ -280,6 +286,7 @@ public class ApiClient {
                     .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .build();
 
+            logRequest("PUT", endpoint);
             return sendRequest(request, typeReference);
         } catch (Exception e) {
             return CompletableFuture.failedFuture(
@@ -299,6 +306,7 @@ public class ApiClient {
                 .DELETE()
                 .build();
 
+        logRequest("DELETE", endpoint);
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {
                     if (response.statusCode() >= 400) {
@@ -329,6 +337,13 @@ public class ApiClient {
         }
 
         return builder;
+    }
+
+    /**
+     * Logs HTTP request details to console.
+     */
+    private void logRequest(String method, String endpoint) {
+        System.out.println("[API] " + method + " " + baseUrl + endpoint);
     }
 
     /**
@@ -364,8 +379,13 @@ public class ApiClient {
 
         // Handle empty responses (204 No Content)
         if (response.statusCode() == 204 || response.body().isEmpty()) {
+            System.out.println("[API Response] Status: " + response.statusCode() + " (No Content)");
             return null;
         }
+
+        // Log response body
+        System.out.println("[API Response] Status: " + response.statusCode());
+        System.out.println(response.body());
 
         // Deserialize response
         try {
