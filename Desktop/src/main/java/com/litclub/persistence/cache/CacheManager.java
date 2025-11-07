@@ -1,4 +1,4 @@
-package com.litclub.persistence;
+package com.litclub.persistence.cache;
 
 import com.google.gson.*;
 import com.litclub.construct.*;
