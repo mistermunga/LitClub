@@ -3,6 +3,7 @@ package com.litclub;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.LandingPage;
+import com.litclub.ui.authentication.LoginPage;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -38,6 +39,17 @@ public class SceneManager {
         stage.setHeight(600);
         stage.setWidth(550);
 
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void showLogin() {
+        themeManager.clearRegisteredComponents();
+        Stage stage = application.getPrimaryStage();
+        LoginPage loginPage = new LoginPage();
+        Scene scene = new Scene(loginPage);
+
+        stage.setTitle("LitClub Desktop - Login");
         stage.setScene(scene);
         stage.show();
     }
