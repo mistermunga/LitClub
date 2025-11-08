@@ -1,6 +1,7 @@
 package com.litclub.ui.authentication.service;
 
 import com.litclub.client.api.ApiClient;
+import com.litclub.client.api.ApiErrorHandler;
 import com.litclub.construct.interfaces.auth.AuthResponse;
 import com.litclub.construct.interfaces.user.UserLoginRecord;
 import com.litclub.persistence.repository.LibraryRepository;
@@ -11,7 +12,7 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 /**
- * Service layer for handling userRecord authentication (login/register).
+ * Service layer for handling user authentication (login/register).
  *
  * <p>This service handles async operations and provides callbacks for UI updates.
  * All callbacks are automatically executed on the JavaFX Application Thread.</p>
@@ -49,7 +50,7 @@ public class LoginService {
      * happens asynchronously in the background.</p>
      *
      * @param onSuccess callback when login succeeds (receives AuthResponse)
-     * @param onError callback when login fails (receives userRecord-friendly error message)
+     * @param onError callback when login fails (receives user-friendly error message)
      */
     public void login(Consumer<AuthResponse> onSuccess, Consumer<String> onError) {
         LibraryRepository.getInstance().login(userLoginRecord)
@@ -61,12 +62,12 @@ public class LoginService {
                     });
                 })
                 .exceptionally(throwable -> {
-                    // Login failed
+                    // Login failed - use ApiErrorHandler for consistent error messages
                     Platform.runLater(() -> {
-                        String errorMessage = parseErrorMessage(throwable);
+                        String errorMessage = ApiErrorHandler.parseError(throwable);
                         onError.accept(errorMessage);
                     });
-                    return null; // Required by exceptionally
+                    return null;
                 });
     }
 
@@ -79,58 +80,6 @@ public class LoginService {
                 authResponse -> onSuccess.run(),
                 onError
         );
-    }
-
-    /**
-     * Parses throwables from the API client into userRecord-friendly error messages.
-     *
-     * @param throwable the exception thrown during login
-     * @return userRecord-friendly error message
-     */
-    private String parseErrorMessage(Throwable throwable) {
-        Throwable actualError = throwable;
-        while (actualError.getCause() != null &&
-                actualError.getClass().getName().contains("CompletionException")) {
-            actualError = actualError.getCause();
-        }
-
-        String message = actualError.getMessage();
-
-        // Check if it's an ApiException
-        if (actualError instanceof ApiClient.ApiException apiException) {
-            String responseBody = apiException.getResponseBody();
-
-            // Parse response body for more specific errors if available
-            if (responseBody != null && !responseBody.isEmpty()) {
-                // You might want to parse JSON here for specific error messages
-                // For now, we'll use the status code from the message
-            }
-        }
-
-        // Handle specific HTTP status codes
-        if (message != null) {
-            if (message.contains("401")) {
-                return "Invalid username/email or password. Please try again.";
-            } else if (message.contains("403")) {
-                return "Access denied. Your account may be locked.";
-            } else if (message.contains("404")) {
-                return "User not found. Please check your credentials.";
-            } else if (message.contains("500")) {
-                return "Server error. Please try again later.";
-            } else if (message.contains("timeout") || message.contains("timed out")) {
-                return "Connection timeout. Please check your internet connection.";
-            } else if (message.contains("Connection refused") ||
-                    message.contains("Unable to connect")) {
-                return "Unable to connect to server. Please check your network.";
-            } else if (message.contains("Failed to serialize")) {
-                return "Invalid request format. Please try again.";
-            } else if (message.contains("Failed to deserialize")) {
-                return "Invalid response from server. Please contact support.";
-            }
-        }
-
-        // Generic fallback message
-        return "Login failed: " + (message != null ? message : "Unknown error");
     }
 
     /**
