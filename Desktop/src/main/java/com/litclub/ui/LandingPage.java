@@ -129,7 +129,7 @@ public class LandingPage extends VBox {
         }
     }
 
-    private void pingServer(URL baseUrl) {
+    private boolean pingServer(URL baseUrl) {
         try {
 
             URI baseUri = baseUrl.toURI();
@@ -143,7 +143,7 @@ public class LandingPage extends VBox {
 
             int responseCode = connection.getResponseCode();
             if (responseCode != 200) {
-                return;
+                return false;
             }
 
             try (InputStream inputStream = connection.getInputStream();
@@ -153,8 +153,10 @@ public class LandingPage extends VBox {
                     AppSession.getInstance().setINSTANCE_URL(pingUrl);
                 }
             }
+            return true;
         } catch (Exception e) {
             System.err.println("Ping failed: " + e.getMessage());
+            return false;
         }
     }
 
@@ -166,7 +168,7 @@ public class LandingPage extends VBox {
 
     private void resolvePing(String inputText) {
         try {
-            pingServer(getInstanceURL(inputText));
+            if (!pingServer(getInstanceURL(inputText))) throw new Exception("Failed Ping");
             ApiClient.initialize(inputText);
             SceneManager.getInstance().showLogin();
         } catch (Exception e) {
