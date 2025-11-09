@@ -6,6 +6,7 @@ import com.litclub.theme.ThemeManager;
 import com.litclub.ui.CrossRoadsPage;
 import com.litclub.ui.LandingPage;
 import com.litclub.ui.authentication.LoginPage;
+import com.litclub.ui.authentication.RegistrationPage;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -61,7 +62,7 @@ public class SceneManager {
     public void showRegistration() {
         themeManager.clearRegisteredComponents();
         Stage stage = application.getPrimaryStage();
-        LoginPage registrationPage = new LoginPage();
+        RegistrationPage registrationPage = new RegistrationPage();
         Scene scene = new Scene(registrationPage);
 
         stage.setTitle("LitClub Desktop - Registration");
