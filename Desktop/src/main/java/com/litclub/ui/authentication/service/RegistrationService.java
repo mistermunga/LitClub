@@ -4,6 +4,7 @@ import com.litclub.client.api.ApiErrorHandler;
 import com.litclub.construct.interfaces.auth.AuthResponse;
 import com.litclub.construct.interfaces.user.UserRegistrationRecord;
 import com.litclub.persistence.repository.LibraryRepository;
+import com.litclub.session.AppSession;
 import javafx.application.Platform;
 
 import java.util.function.Consumer;
@@ -131,6 +132,7 @@ public class RegistrationService {
         LibraryRepository.getInstance().register(userRegistrationRecord)
                 .thenAccept(authResponse -> {
                     // Registration successful
+                    AppSession.getInstance().setUserRecord(authResponse.userRecord());
                     Platform.runLater(() -> {
                         onSuccess.accept(authResponse);
                     });

@@ -1,10 +1,10 @@
 package com.litclub.ui.authentication.service;
 
-import com.litclub.client.api.ApiClient;
 import com.litclub.client.api.ApiErrorHandler;
 import com.litclub.construct.interfaces.auth.AuthResponse;
 import com.litclub.construct.interfaces.user.UserLoginRecord;
 import com.litclub.persistence.repository.LibraryRepository;
+import com.litclub.session.AppSession;
 import javafx.application.Platform;
 
 import java.util.Optional;
@@ -56,6 +56,7 @@ public class LoginService {
         LibraryRepository.getInstance().login(userLoginRecord)
                 .thenAccept(authResponse -> {
                     // Login successful
+                    AppSession.getInstance().setUserRecord(authResponse.userRecord());
                     // Ensure UI updates happen on JavaFX Application Thread
                     Platform.runLater(() -> {
                         onSuccess.accept(authResponse);
