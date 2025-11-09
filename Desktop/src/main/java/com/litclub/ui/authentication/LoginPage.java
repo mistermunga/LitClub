@@ -96,7 +96,7 @@ public class LoginPage extends VBox {
         registerButton.getStyleClass().add("secondary-button");
         HBox.setHgrow(registerButton, Priority.ALWAYS);
         registerButton.setMaxWidth(Double.MAX_VALUE);
-        // TODO: registerButton.setOnAction(e -> SceneManager.getInstance().showRegister());
+        registerButton.setOnAction(e -> SceneManager.getInstance().showRegistration());
 
         Button backButton = new Button("Back");
         backButton.getStyleClass().add("secondary-button");
