@@ -22,24 +22,19 @@ public class AppSession {
         return instance;
     }
 
-
-    public static void setInstance(AppSession instance) {
-        AppSession.instance = instance;
-    }
-
-    public static UserRecord getUserRecord() {
+    public UserRecord getUserRecord() {
         return userRecord;
     }
 
-    public static void setUserRecord(UserRecord userRecord) {
+    public void setUserRecord(UserRecord userRecord) {
         AppSession.userRecord = userRecord;
     }
 
-    public static ClubRecord getClubRecord() {
+    public ClubRecord getClubRecord() {
         return clubRecord;
     }
 
-    public static void setClubRecord(ClubRecord clubRecord) {
+    public void setClubRecord(ClubRecord clubRecord) {
         AppSession.clubRecord = clubRecord;
     }
 
