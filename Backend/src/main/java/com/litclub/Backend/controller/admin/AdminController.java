@@ -34,4 +34,9 @@ public class AdminController {
         return ResponseEntity.ok(adminService.updateInstanceSettings(instanceSettings));
     }
 
+    @GetMapping("/settings")
+    public ResponseEntity<ConfigurationManager.InstanceSettings> getInstanceSettings() {
+        return ResponseEntity.ok(adminService.getInstanceSettings());
+    }
+
 }
