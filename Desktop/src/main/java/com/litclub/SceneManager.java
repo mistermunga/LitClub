@@ -1,5 +1,6 @@
 package com.litclub;
 
+import com.litclub.construct.Club;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.CrossRoadsPage;
@@ -7,6 +8,8 @@ import com.litclub.ui.LandingPage;
 import com.litclub.ui.authentication.LoginPage;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.util.Set;
 
 public class SceneManager {
 
@@ -69,11 +72,14 @@ public class SceneManager {
     public void showCrossRoads() {
         themeManager.clearRegisteredComponents();
         Stage stage = application.getPrimaryStage();
-        CrossRoadsPage crossRoadsPage = new CrossRoadsPage();
+        Set<Club> clubs = AppSession.getInstance().getUserRecord().clubs();
+        CrossRoadsPage crossRoadsPage = new CrossRoadsPage(clubs);
         Scene scene = new Scene(crossRoadsPage);
 
         stage.setTitle("LitClub Desktop - Crossroads");
         stage.setScene(scene);
         stage.show();
     }
+
+    public void showClubPage(String clubName) {}
 }
