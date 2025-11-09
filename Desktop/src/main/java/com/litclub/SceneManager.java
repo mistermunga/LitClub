@@ -2,6 +2,7 @@ package com.litclub;
 
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.CrossRoadsPage;
 import com.litclub.ui.LandingPage;
 import com.litclub.ui.authentication.LoginPage;
 import javafx.scene.Scene;
@@ -50,6 +51,28 @@ public class SceneManager {
         Scene scene = new Scene(loginPage);
 
         stage.setTitle("LitClub Desktop - Login");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void showRegistration() {
+        themeManager.clearRegisteredComponents();
+        Stage stage = application.getPrimaryStage();
+        LoginPage registrationPage = new LoginPage();
+        Scene scene = new Scene(registrationPage);
+
+        stage.setTitle("LitClub Desktop - Registration");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void showCrossRoads() {
+        themeManager.clearRegisteredComponents();
+        Stage stage = application.getPrimaryStage();
+        CrossRoadsPage crossRoadsPage = new CrossRoadsPage();
+        Scene scene = new Scene(crossRoadsPage);
+
+        stage.setTitle("LitClub Desktop - Crossroads");
         stage.setScene(scene);
         stage.show();
     }
