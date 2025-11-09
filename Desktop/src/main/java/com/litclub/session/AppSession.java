@@ -15,7 +15,7 @@ public class AppSession {
 
     private AppSession() {}
 
-    public static AppSession getInstance() {
+    public static synchronized AppSession getInstance() {
         if (instance == null) {
             instance = new AppSession();
         }
