@@ -4,6 +4,13 @@ import java.util.Map;
 
 public class ConfigurationManager {
 
+    public record InstanceSettings(
+            InstanceRegistrationMode registrationMode,
+            ClubCreationMode clubCreationMode,
+            int maxClubsPerUser,
+            int maxMembersPerClub
+    ) {}
+
     private static class InstanceConfiguration {
         public InstanceData instance;
         public Map<String, ClubFlagsData> clubs;
