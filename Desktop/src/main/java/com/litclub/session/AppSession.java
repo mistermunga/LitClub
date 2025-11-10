@@ -12,6 +12,7 @@ public class AppSession {
     private static ClubRecord clubRecord;
     private boolean brightMode = true;
     private URL INSTANCE_URL;
+    private boolean isAdmin;
 
     private AppSession() {}
 
@@ -52,5 +53,13 @@ public class AppSession {
 
     public void setINSTANCE_URL(URL INSTANCE_URL) {
         this.INSTANCE_URL = INSTANCE_URL;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }
