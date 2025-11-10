@@ -105,6 +105,11 @@
     -fx-padding: 10 0 0 0;
 }
 
+.success-label {
+    -fx-text-fill: #3b8132;
+    -fx-font-weight: 600;
+}
+
 .error-label {
     -fx-text-fill: #E57368;
     -fx-font-weight: 600;
