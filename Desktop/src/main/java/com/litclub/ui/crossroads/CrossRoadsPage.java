@@ -1,4 +1,4 @@
-package com.litclub.ui;
+package com.litclub.ui.crossroads;
 
 import com.litclub.SceneManager;
 import com.litclub.construct.Club;

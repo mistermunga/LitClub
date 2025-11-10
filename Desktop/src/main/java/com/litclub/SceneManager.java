@@ -3,7 +3,7 @@ package com.litclub;
 import com.litclub.construct.Club;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
-import com.litclub.ui.CrossRoadsPage;
+import com.litclub.ui.crossroads.CrossRoadsPage;
 import com.litclub.ui.LandingPage;
 import com.litclub.ui.authentication.LoginPage;
 import com.litclub.ui.authentication.RegistrationPage;
