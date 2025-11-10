@@ -11,7 +11,6 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admins")
-@PreAuthorize("hasRole('ADMINISTRATOR')")
 public class AdminController {
 
     private final AdminService adminService;
@@ -21,6 +20,7 @@ public class AdminController {
     }
 
     @PostMapping("/elevate")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<UserRecord> elevateToAdministrator(
             @RequestBody Long userID
     ) {
@@ -28,6 +28,7 @@ public class AdminController {
     }
 
     @PutMapping("/settings")
+    @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<ConfigurationManager.InstanceSettings> updateInstanceSettings(
             @RequestBody ConfigurationManager.InstanceSettings instanceSettings
     ) throws IOException {
@@ -35,6 +36,7 @@ public class AdminController {
     }
 
     @GetMapping("/settings")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ConfigurationManager.InstanceSettings> getInstanceSettings() {
         return ResponseEntity.ok(adminService.getInstanceSettings());
     }
