@@ -3,6 +3,7 @@ package com.litclub.Backend.controller.meeting;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.Meeting;
 import com.litclub.Backend.entity.User;
+import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.MeetingService;
 import com.litclub.Backend.service.middle.UserService;
 import org.springframework.data.domain.Page;
@@ -21,9 +22,13 @@ import java.util.List;
 public class MeetingController {
 
     private final MeetingService meetingService;
+    private final ClubService clubService;
+    private final UserService userService;
 
-    public MeetingController(MeetingService meetingService) {
+    public MeetingController(MeetingService meetingService, ClubService clubService, UserService userService) {
         this.meetingService = meetingService;
+        this.clubService = clubService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -39,6 +44,31 @@ public class MeetingController {
         List<User> users = meetingService.getAttendeesForMeeting(meeting);
         return ResponseEntity.ok(
                 users.stream().map(UserService::convertUserToRecord).toList()
+        );
+    }
+
+    @GetMapping("/{clubID}")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMINISTRATOR')")
+    public ResponseEntity<Page<Meeting>> getMeetingsByClubID(
+            @PathVariable Long clubID,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                meetingService.getMeetings(clubService.requireClubById(clubID), pageable)
+        );
+    }
+
+    @GetMapping("/{userID}")
+    @PreAuthorize("userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public ResponseEntity<Page<Meeting>> getMeetingsByUserID(
+            @PathVariable Long userID,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                meetingService.getMeetings(
+                        userService.requireUserById(userID),
+                        pageable
+                )
         );
     }
 }
