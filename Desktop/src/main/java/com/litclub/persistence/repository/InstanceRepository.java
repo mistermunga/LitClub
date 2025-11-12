@@ -2,7 +2,9 @@ package com.litclub.persistence.repository;
 
 import com.litclub.client.api.ApiClient;
 import com.litclub.construct.interfaces.config.ConfigurationManager;
+import com.litclub.construct.interfaces.config.LoadedInstanceSettings;
 import com.litclub.construct.interfaces.user.UserRecord;
+import com.litclub.session.AppSession;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -48,11 +50,12 @@ public class InstanceRepository {
      *
      * @return CompletableFuture with instance settings
      */
-    public CompletableFuture<ConfigurationManager.InstanceSettings> fetchInstanceSettings() {
-        return apiClient.get("/api/admins/settings", ConfigurationManager.InstanceSettings.class)
+    public CompletableFuture<LoadedInstanceSettings> fetchInstanceSettings() {
+        return apiClient.get("/api/admins/settings", LoadedInstanceSettings.class)
                 .thenApply(settings -> {
                     Platform.runLater(() -> {
-                        instanceSettings.set(settings);
+                        instanceSettings.set(settings.instanceSettings());
+                        AppSession.getInstance().setAdmin(settings.isAdmin());
                     });
                     return settings;
                 });
@@ -116,3 +119,4 @@ public class InstanceRepository {
         });
     }
 }
+
