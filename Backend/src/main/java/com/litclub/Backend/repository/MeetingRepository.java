@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -307,5 +308,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
         ORDER BY meetingCount DESC\s
         LIMIT :limit
        \s""")
-    List<Object[]> findMostActiveClusByMeetingCount(@Param("limit") int limit);
+    List<Object[]> findMostActiveClubsByMeetingCount(@Param("limit") int limit);
+
+    Page<Meeting> findMeetingsByClub(Club club, Pageable pageable);
+
+    Page<Meeting> findAllByClubIn(Collection<Club> clubs, Pageable pageable);
 }
