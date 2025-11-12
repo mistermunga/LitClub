@@ -26,4 +26,6 @@ module com.litclub {
     opens com.litclub.construct.interfaces.discussion to com.fasterxml.jackson.databind, com.google.gson;
 
     exports com.litclub;
+    exports com.litclub.construct;
+    exports com.litclub.construct.interfaces.user;
 }
