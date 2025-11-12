@@ -7,6 +7,8 @@ import com.litclub.ui.crossroads.CrossRoadsPage;
 import com.litclub.ui.LandingPage;
 import com.litclub.ui.authentication.LoginPage;
 import com.litclub.ui.authentication.RegistrationPage;
+import com.litclub.ui.main.club.MainClubPage;
+import com.litclub.ui.main.personal.MainPersonalPage;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -73,8 +75,7 @@ public class SceneManager {
     public void showCrossRoads() {
         themeManager.clearRegisteredComponents();
         Stage stage = application.getPrimaryStage();
-        Set<Club> clubs = AppSession.getInstance().getUserRecord().clubs();
-        CrossRoadsPage crossRoadsPage = new CrossRoadsPage(clubs);
+        CrossRoadsPage crossRoadsPage = new CrossRoadsPage();
         Scene scene = new Scene(crossRoadsPage);
 
         stage.setTitle("LitClub Desktop - Crossroads");
@@ -82,5 +83,25 @@ public class SceneManager {
         stage.show();
     }
 
-    public void showClubPage(String clubName) {}
+    public void showClubPage(Club club) {
+        themeManager.clearRegisteredComponents();
+        Stage stage = application.getPrimaryStage();
+        MainClubPage clubPage = new MainClubPage(club);
+        Scene scene = new Scene(clubPage);
+
+        stage.setTitle("LitClub Desktop - " + club.getClubName());
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void showPersonalPage() {
+        themeManager.clearRegisteredComponents();
+        Stage stage = application.getPrimaryStage();
+        MainPersonalPage personalPage = new MainPersonalPage(AppSession.getInstance().isAdmin());
+        Scene scene = new Scene(personalPage);
+
+        stage.setTitle("LitClub Desktop - " + AppSession.getInstance().getUserRecord().username());
+        stage.setScene(scene);
+        stage.show();
+    }
 }
