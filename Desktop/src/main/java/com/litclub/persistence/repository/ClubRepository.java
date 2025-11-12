@@ -43,6 +43,8 @@ public class ClubRepository {
     private final ObservableList<Note> clubNotes;
     private final ObservableList<Reply> replies;
 
+    private final ObservableList<Meeting> userMeetings;
+
     private ClubRepository() {
         this.apiClient = ApiClient.getInstance();
         this.cacheManager = CacheManager.getInstance();
@@ -50,6 +52,7 @@ public class ClubRepository {
         // Initialize observable lists
         this.userClubs = FXCollections.observableArrayList();
         this.meetings = FXCollections.observableArrayList();
+        this.userMeetings = FXCollections.observableArrayList();
         this.discussions = FXCollections.observableArrayList();
         this.clubNotes = FXCollections.observableArrayList();
         this.replies = FXCollections.observableArrayList();
@@ -229,6 +232,25 @@ public class ClubRepository {
                     });
 
                     cacheManager.saveMeetings(allMeetings);
+                });
+    }
+
+    /**
+     * Fetches meetings for a user across all their clubs.
+     *
+     * @param userID the user's ID
+     * @return CompletableFuture that completes when meetings are loaded
+     */
+    public CompletableFuture<Void> fetchUserMeetings(Long userID) {
+        return apiClient.get("/api/meetings/user/" + userID + "?page=0&size=100",
+                        new TypeReference<PageResponse<Meeting>>() {})
+                .thenAccept(pageResponse -> {
+                    Platform.runLater(() -> {
+                        userMeetings.clear();
+                        userMeetings.addAll(pageResponse.getContent());
+                    });
+
+                    cacheManager.saveMeetings(new ArrayList<>(userMeetings));
                 });
     }
 
@@ -660,6 +682,10 @@ public class ClubRepository {
 
     public ObservableList<Meeting> getMeetings() {
         return FXCollections.unmodifiableObservableList(meetings);
+    }
+
+    public ObservableList<Meeting> getUserMeetings() {
+        return FXCollections.unmodifiableObservableList(userMeetings);
     }
 
     public ObservableList<DiscussionPrompt> getDiscussions() {
