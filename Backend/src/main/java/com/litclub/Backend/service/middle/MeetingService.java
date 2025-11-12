@@ -1,6 +1,7 @@
 package com.litclub.Backend.service.middle;
 
 import com.litclub.Backend.construct.meeting.RsvpStatus;
+import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.*;
 import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.MeetingRepository;
@@ -13,8 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -254,7 +257,19 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public java.util.Optional<Meeting> getNextMeeting(Club club) {
         List<Meeting> upcoming = getUpcomingMeetings(club);
-        return upcoming.isEmpty() ? java.util.Optional.empty() : java.util.Optional.of(upcoming.get(0));
+        return upcoming.isEmpty() ? java.util.Optional.empty() : java.util.Optional.of(upcoming.getFirst());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Meeting> getMeetings(Club club, Pageable pageable) {
+        return meetingRepository.findAllByClub(club, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Meeting> getMeetings(User user, Pageable pageable) {
+        UserRecord ur = UserService.convertUserToRecord(user);
+        if (ur.clubs().isEmpty()) return Page.empty(pageable);
+        return meetingRepository.findAllByClubIn(ur.clubs(), pageable);
     }
 
     /**
