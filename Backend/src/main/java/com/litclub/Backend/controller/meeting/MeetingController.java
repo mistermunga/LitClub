@@ -47,7 +47,7 @@ public class MeetingController {
         );
     }
 
-    @GetMapping("/{clubID}")
+    @GetMapping("/club/{clubID}")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMINISTRATOR')")
     public ResponseEntity<Page<Meeting>> getMeetingsByClubID(
             @PathVariable Long clubID,
@@ -58,8 +58,8 @@ public class MeetingController {
         );
     }
 
-    @GetMapping("/{userID}")
-    @PreAuthorize("userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    @GetMapping("/user/{userID}")
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
     public ResponseEntity<Page<Meeting>> getMeetingsByUserID(
             @PathVariable Long userID,
             Pageable pageable
