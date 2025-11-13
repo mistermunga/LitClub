@@ -51,7 +51,7 @@ import java.util.Set;
 public class ClubMembership {
 
     @EmbeddedId
-    private ClubMembershipID clubMembershipID;
+    private ClubMembershipID clubMembershipID = new ClubMembershipID();
 
     @ManyToOne
     @MapsId("memberID")

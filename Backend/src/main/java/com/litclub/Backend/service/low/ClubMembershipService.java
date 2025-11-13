@@ -58,10 +58,9 @@ public class ClubMembershipService {
             clubRoles.add(ClubRole.OWNER);
         }
 
-        ClubMembershipID clubMembershipID = new ClubMembershipID(club.getClubID(), user.getUserID());
         ClubMembership membership = new ClubMembership();
-
-        membership.setClubMembershipID(clubMembershipID);
+        membership.setClub(club);
+        membership.setMember(user);
         membership.setRoles(clubRoles);
 
         return clubMembershipRepository.save(membership);
