@@ -12,6 +12,7 @@ import com.litclub.Backend.construct.note.NoteCreateRequest;
 import com.litclub.Backend.construct.user.UserRecord;
 import com.litclub.Backend.entity.*;
 import com.litclub.Backend.exception.MalformedDTOException;
+import com.litclub.Backend.security.roles.ClubRole;
 import com.litclub.Backend.security.roles.GlobalRole;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
 import com.litclub.Backend.service.low.ClubMembershipService;
@@ -37,6 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/clubs")
@@ -91,6 +93,24 @@ public class ClubController {
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMINISTRATOR')")
     public ResponseEntity<Club> getClub(@PathVariable Long clubID) {
         return ResponseEntity.ok(clubService.requireClubById(clubID));
+    }
+
+    @GetMapping("/{clubID}/role")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
+    public ResponseEntity<ClubRole> getClubRole(
+            @PathVariable Long clubID,
+            @AuthenticationPrincipal CustomUserDetails cud
+    ) {
+        Club club = clubService.requireClubById(clubID);
+        User user = cud.getUser();
+
+        Set<ClubRole> roles = clubMembershipService.getRolesForUserInClub(user, club);
+
+        ClubRole highestRole = roles.contains(ClubRole.OWNER) ? ClubRole.OWNER
+                : roles.contains(ClubRole.MODERATOR) ? ClubRole.MODERATOR
+                : ClubRole.MEMBER;
+
+        return ResponseEntity.ok(highestRole);
     }
 
     @PostMapping
