@@ -16,6 +16,7 @@ import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
 import com.litclub.Backend.service.top.facilitator.LibraryManagementService;
 import com.litclub.Backend.service.top.facilitator.UserActivityService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -104,10 +106,19 @@ public class UserController {
 
     @GetMapping("/{userID}/clubs")
     @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
-    public ResponseEntity<List<Club>> getClubs(@PathVariable("userID") Long userID){
-        return ResponseEntity.ok(
-                userActivityService.getClubsForUser(userID)
-        );
+    public ResponseEntity<Page<Club>> getClubs(@PathVariable("userID") Long userID, Pageable pageable) {
+        List<Club> clubs = userActivityService.getClubsForUser(userID);
+        if (clubs == null) {
+            clubs = Collections.emptyList();
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), clubs.size());
+
+        List<Club> pageContent = (start >= clubs.size()) ? Collections.emptyList() : clubs.subList(start, end);
+        Page<Club> page = new PageImpl<>(pageContent, pageable, clubs.size());
+
+        return ResponseEntity.ok(page);
     }
 
 
