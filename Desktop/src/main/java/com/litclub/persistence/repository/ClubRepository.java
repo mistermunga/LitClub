@@ -68,17 +68,19 @@ public class ClubRepository {
     // ==================== CLUBS ====================
 
     /**
-     * Fetches all clubs the user is a member of.
+     * Fetches all clubs for a user using the user endpoint.
      *
      * @param userID the user's ID
      * @return CompletableFuture that completes when clubs are loaded
      */
     public CompletableFuture<Void> fetchUserClubs(Long userID) {
-        return apiClient.get("/api/users/" + userID + "/clubs", new TypeReference<List<Club>>() {})
-                .thenAccept(clubs -> {
+        return apiClient.get("/api/users/" + userID + "/clubs?page=0&size=100",
+                        new TypeReference<PageResponse<Club>>() {})
+                .thenAccept(pageResponse -> {
                     Platform.runLater(() -> {
                         userClubs.clear();
-                        userClubs.addAll(clubs);
+                        userClubs.addAll(pageResponse.getContent());
+                        System.out.println("Loaded " + pageResponse.getContent().size() + " clubs for user " + userID);
                     });
                 });
     }
