@@ -139,6 +139,12 @@ public class ClubMembershipService {
         return users;
     }
 
+    @Transactional(readOnly = true)
+    public Set<ClubRole> getRolesForUserInClub(User user, Club club) {
+        ClubMembership membership = getMembershipByClubAndUser(club, user);
+        return membership.getRoles();
+    }
+
     // ====== UPDATE ======
     @Transactional
     public ClubMembership modifyClubRole(Set<ClubRole> clubRoles, User user, Club club) {
