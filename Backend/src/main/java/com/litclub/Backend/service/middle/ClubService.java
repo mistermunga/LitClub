@@ -70,7 +70,9 @@ public class ClubService {
     @Transactional
     public Club registerClub(Club club, User creator) {
         club.setCreator(creator);
-        return clubRepository.save(club);
+        Club createdClub = clubRepository.save(club);
+        clubMembershipService.enrollUserToClub(createdClub, creator);
+        return createdClub;
     }
 
     // ===== RETRIEVAL =====
