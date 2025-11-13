@@ -2,7 +2,6 @@ package com.litclub.ui.crossroads;
 
 import com.litclub.SceneManager;
 import com.litclub.construct.Club;
-import com.litclub.construct.Meeting;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.crossroads.service.CrossRoadsService;
@@ -127,6 +126,8 @@ public class CrossRoadsPage extends BorderPane {
     }
 
     private void onDataLoaded() {
+        System.out.println("onDataLoaded called. Clubs available: " + service.getClubs().size());
+
         contentContainer.getChildren().clear();
 
         // Build content sections
@@ -303,6 +304,8 @@ public class CrossRoadsPage extends BorderPane {
     }
 
     private void refreshClubCards() {
+        System.out.println("Refreshing club cards. Total clubs: " + service.getClubs().size());
+
         clubsGrid.getChildren().clear();
 
         // Re-add "Me" card
@@ -310,6 +313,7 @@ public class CrossRoadsPage extends BorderPane {
 
         // Re-add club cards
         for (Club club : service.getClubs()) {
+            System.out.println("Adding club card: " + club.getClubName());
             clubsGrid.getChildren().add(createClubCard(club));
         }
     }

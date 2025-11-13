@@ -56,10 +56,16 @@ public class CrossRoadsService {
 
         // Wait for all to complete
         CompletableFuture.allOf(clubsFuture, meetingsFuture, settingsFuture)
-                .thenRun(() -> Platform.runLater(onSuccess))
+                .thenRun(() -> {
+                    Platform.runLater(() -> {
+                        System.out.println("All data loaded. Clubs count: " + clubRepository.getUserClubs().size());
+                        onSuccess.run();
+                    });
+                })
                 .exceptionally(throwable -> {
                     Platform.runLater(() -> {
                         String errorMessage = ApiErrorHandler.parseError(throwable);
+                        System.err.println("Failed to load data: " + errorMessage);
                         onError.accept("Failed to load data: " + errorMessage);
                     });
                     return null;
