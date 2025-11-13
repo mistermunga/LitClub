@@ -16,6 +16,7 @@ import com.litclub.construct.interfaces.user.UserRegistrationRecord;
 import com.litclub.construct.interfaces.user.UserLoginRecord;
 import com.litclub.construct.interfaces.auth.AuthResponse;
 import com.litclub.persistence.cache.CacheManager;
+import com.litclub.session.AppSession;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -119,6 +120,23 @@ public class LibraryRepository {
         apiClient.clearAuthToken();
         this.currentUser = null;
         clearAllData();
+    }
+
+    /**
+     * Fetches the current user's updated profile.
+     * Useful for refreshing session data after changes.
+     *
+     * @return CompletableFuture with updated user record
+     */
+    public CompletableFuture<UserRecord> fetchCurrentUser() {
+        return apiClient.get("/api/users/me", UserRecord.class)
+                .thenApply(userRecord -> {
+                    Platform.runLater(() -> {
+                        // Update session
+                        AppSession.getInstance().setUserRecord(userRecord);
+                    });
+                    return userRecord;
+                });
     }
 
     // ==================== USER LIBRARY ====================
