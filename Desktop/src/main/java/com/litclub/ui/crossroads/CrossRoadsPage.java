@@ -424,7 +424,7 @@ public class CrossRoadsPage extends BorderPane {
                     // Navigate to new club after brief delay
                     javafx.animation.PauseTransition pause =
                             new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
-                    pause.setOnFinished(e -> SceneManager.getInstance().showClubPage(club));
+                    pause.setOnFinished(e -> SceneManager.getInstance().showMainPage(false));
                     pause.play();
                 },
                 error -> {
