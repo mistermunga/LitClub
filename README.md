@@ -50,7 +50,7 @@ The architecture separates the backend API from frontend clients, allowing for:
 
 🚧 **In Active Development** 🚧
 
-LitClub is being developed as part of SWE 3090 (Fall 2025) at [University]. Core features are being implemented following the Waterfall SDLC methodology.
+LitClub is being developed as part of SWE 3090 (Fall 2025) at USIU. Core features are being implemented following the Waterfall SDLC methodology.
 
 **What's Working:**
 - User authentication and authorization
@@ -59,12 +59,12 @@ LitClub is being developed as part of SWE 3090 (Fall 2025) at [University]. Core
 - Meeting scheduling
 - Notes system (private and shared)
 - Theme system (light/dark mode)
+- Discussion prompts and replies
+- Enhanced book metadata handling
 
 **What's Coming:**
-- Discussion prompts and replies
 - Recommendation system
 - Member management tools
-- Enhanced book metadata handling
 - Web client interface
 
 ## Philosophy
