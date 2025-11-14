@@ -2,6 +2,7 @@ package com.litclub;
 
 import javafx.application.Application;
 import javafx.scene.image.Image;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.util.Objects;
@@ -20,6 +21,12 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         instance = this;
+
+        Font.loadFont(
+                getClass().getResourceAsStream("/com/litclub/ui/perpetua.ttf"),
+                16
+        );
+
         this.primaryStage = primaryStage;
 
         primaryStage.getIcons().add(
