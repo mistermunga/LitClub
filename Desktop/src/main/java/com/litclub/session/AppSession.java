@@ -1,6 +1,7 @@
 package com.litclub.session;
 
-import com.litclub.construct.interfaces.club.ClubRecord;
+import com.litclub.construct.Club;
+import com.litclub.construct.enums.ClubRole;
 import com.litclub.construct.interfaces.user.UserRecord;
 
 import java.net.URL;
@@ -9,7 +10,8 @@ public class AppSession {
 
     private static AppSession instance;
     private static UserRecord userRecord;
-    private static ClubRecord clubRecord;
+    private static Club currentClub;
+    private ClubRole highestRole;
     private boolean brightMode = true;
     private URL INSTANCE_URL;
     private boolean isAdmin;
@@ -31,13 +33,13 @@ public class AppSession {
         AppSession.userRecord = userRecord;
     }
 
-    public ClubRecord getClubRecord() {
-        return clubRecord;
-    }
+    public Club getCurrentClub() {return currentClub;}
 
-    public void setClubRecord(ClubRecord clubRecord) {
-        AppSession.clubRecord = clubRecord;
-    }
+    public void setCurrentClub(Club currentClub) {AppSession.currentClub = currentClub;}
+
+    public ClubRole getHighestRole() {return highestRole;}
+
+    public void setHighestRole(ClubRole highestRole) {this.highestRole = highestRole;}
 
     public boolean isBrightMode() {
         return brightMode;
@@ -61,5 +63,10 @@ public class AppSession {
 
     public void setAdmin(boolean admin) {
         isAdmin = admin;
+    }
+
+    public void clearClubContext() {
+        setHighestRole(null);
+        setCurrentClub(null);
     }
 }
