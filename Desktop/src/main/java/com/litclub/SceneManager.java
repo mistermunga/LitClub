@@ -1,18 +1,14 @@
 package com.litclub;
 
-import com.litclub.construct.Club;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.crossroads.CrossRoadsPage;
 import com.litclub.ui.LandingPage;
 import com.litclub.ui.authentication.LoginPage;
 import com.litclub.ui.authentication.RegistrationPage;
-import com.litclub.ui.main.club.MainClubPage;
-import com.litclub.ui.main.personal.MainPersonalPage;
+import com.litclub.ui.main.MainPage;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.util.Set;
 
 public class SceneManager {
 
@@ -79,28 +75,25 @@ public class SceneManager {
         Scene scene = new Scene(crossRoadsPage);
 
         stage.setTitle("LitClub Desktop - Crossroads");
+        stage.setMaximized(true);
+        stage.setResizable(true);
         stage.setScene(scene);
         stage.show();
     }
 
-    public void showClubPage(Club club) {
+    public void showMainPage(boolean isPersonal) {
         themeManager.clearRegisteredComponents();
         Stage stage = application.getPrimaryStage();
-        MainClubPage clubPage = new MainClubPage(club);
-        Scene scene = new Scene(clubPage);
+        MainPage mainPage = new MainPage(isPersonal);
+        Scene scene = new Scene(mainPage);
 
-        stage.setTitle("LitClub Desktop - " + club.getClubName());
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    public void showPersonalPage() {
-        themeManager.clearRegisteredComponents();
-        Stage stage = application.getPrimaryStage();
-        MainPersonalPage personalPage = new MainPersonalPage(AppSession.getInstance().isAdmin());
-        Scene scene = new Scene(personalPage);
-
-        stage.setTitle("LitClub Desktop - " + AppSession.getInstance().getUserRecord().username());
+        if (isPersonal) {
+            stage.setTitle("LitClub Desktop - " + AppSession.getInstance().getUserRecord().username());
+        } else {
+            stage.setTitle("LitClub Desktop - " + AppSession.getInstance().getCurrentClub().getClubName());
+        }
+        stage.setMaximized(true);
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
