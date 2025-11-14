@@ -1,4 +1,4 @@
-package com.litclub.ui.crossroads.subcomponents;
+package com.litclub.ui.crossroads.components.subcomponents;
 
 import com.litclub.construct.Meeting;
 import com.litclub.theme.ThemeManager;
@@ -136,6 +136,10 @@ public class MeetingsIsland extends VBox {
     private void refreshMeetings() {
         this.getChildren().clear();
         showMeetings();
+    }
+
+    public void refresh() {
+        refreshMeetings();
     }
 
     /**

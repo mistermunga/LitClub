@@ -5,7 +5,7 @@ import com.litclub.construct.Club;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.crossroads.service.CrossRoadsService;
-import com.litclub.ui.crossroads.subcomponents.MeetingsIsland;
+import com.litclub.ui.crossroads.components.subcomponents.MeetingsIsland;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
