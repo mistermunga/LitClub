@@ -1,5 +1,6 @@
 package com.litclub.ui.main.shared.subcomponents;
 
+import com.litclub.SceneManager;
 import com.litclub.session.AppSession;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -17,6 +18,11 @@ public class UserMessage extends HBox {
 
         Button userButton = new Button(AppSession.getInstance().getUserRecord().username());
         userButton.getStyleClass().add("user-button");
+
+        userButton.setOnAction(e -> {
+            AppSession.getInstance().clearClubContext();
+            SceneManager.getInstance().showMainPage(true);
+        });
 
         this.getChildren().addAll(greeting, userButton);
     }
