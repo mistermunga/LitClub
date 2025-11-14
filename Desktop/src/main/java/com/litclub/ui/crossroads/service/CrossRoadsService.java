@@ -120,6 +120,48 @@ public class CrossRoadsService {
                 });
     }
 
+    /**
+     * Fetches the user's role in a specific club and sets it in AppSession.
+     *
+     * @param clubID the club's ID
+     * @param onSuccess callback when role is fetched
+     * @param onError callback if fetch fails
+     */
+    public void fetchAndSetClubRole(Long clubID, Runnable onSuccess, Consumer<String> onError) {
+        clubRepository.fetchClubPermission(clubID)
+                .thenRun(() -> Platform.runLater(onSuccess))
+                .exceptionally(throwable -> {
+                    Platform.runLater(() -> {
+                        String errorMessage = ApiErrorHandler.parseError(throwable);
+                        onError.accept("Failed to fetch club role: " + errorMessage);
+                    });
+                    return null;
+                });
+    }
+
+    /**
+     * Prepares club context by setting the club and fetching the user's role.
+     * This should be called before navigating to a club page.
+     *
+     * @param club the club to enter
+     * @param onSuccess callback when context is ready
+     * @param onError callback if preparation fails
+     */
+    public void prepareClubContext(Club club, Runnable onSuccess, Consumer<String> onError) {
+        // Set the club in session
+        session.setCurrentClub(club);
+
+        // Fetch the user's role in this club
+        fetchAndSetClubRole(club.getClubID(), onSuccess, onError);
+    }
+
+    /**
+     * Prepares personal context by clearing club data from session.
+     */
+    public void preparePersonalContext() {
+        session.clearClubContext();
+    }
+
     // ==================== CLUB OPERATIONS ====================
 
     /**
