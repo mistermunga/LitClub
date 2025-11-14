@@ -1,6 +1,7 @@
 package com.litclub.ui.main.shared;
 
 import com.litclub.SceneManager;
+import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.subcomponents.MiniLogo;
 import com.litclub.ui.main.shared.subcomponents.UserMessage;
@@ -31,6 +32,7 @@ public class HeaderBar extends HBox {
 
         MiniLogo miniLogo = new MiniLogo();
         miniLogo.setOnMouseClicked(e -> {
+            AppSession.getInstance().clearClubContext();
             SceneManager.getInstance().showCrossRoads();
         });
 
