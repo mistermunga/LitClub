@@ -230,8 +230,8 @@ public class CrossRoadsPage extends BorderPane {
 
         card.getChildren().addAll(icon, title, subtitle, stats);
 
-        // Click handler
-        card.setOnMouseClicked(e -> SceneManager.getInstance().showPersonalPage());
+        // Click handler - Navigate to personal page
+        card.setOnMouseClicked(e -> handleNavigateToPersonal());
 
         // Hover effects
         card.setOnMouseEntered(e -> card.setStyle("-fx-scale-x: 1.03; -fx-scale-y: 1.03;"));
@@ -275,14 +275,6 @@ public class CrossRoadsPage extends BorderPane {
         HBox stats = new HBox(10);
         stats.setAlignment(Pos.CENTER_LEFT);
 
-        // Member count (if available)
-//        if (club.getMembers() != null) {
-//            Label memberCount = new Label(club.getMembers().size() + " members");
-//            memberCount.getStyleClass().add("text-muted");
-//            memberCount.setStyle("-fx-font-size: 12px;");
-//            stats.getChildren().add(memberCount);
-//        }
-
         // Created date
         if (club.getCreatedAt() != null) {
             Label createdDate = new Label("Created " + formatDate(club.getCreatedAt()));
@@ -293,8 +285,8 @@ public class CrossRoadsPage extends BorderPane {
 
         card.getChildren().addAll(icon, name, description, stats);
 
-        // Click handler
-        card.setOnMouseClicked(e -> SceneManager.getInstance().showClubPage(club));
+        // Click handler - Navigate to club page
+        card.setOnMouseClicked(e -> handleNavigateToClub(club));
 
         // Hover effects
         card.setOnMouseEntered(e -> card.setStyle("-fx-scale-x: 1.03; -fx-scale-y: 1.03;"));
@@ -454,12 +446,48 @@ public class CrossRoadsPage extends BorderPane {
             if (response == ButtonType.OK) {
                 // Clear session
                 AppSession.getInstance().setUserRecord(null);
-                AppSession.getInstance().setClubRecord(null);
+                AppSession.getInstance().clearClubContext();
 
                 // Navigate to login
                 SceneManager.getInstance().showLogin();
             }
         });
+    }
+
+    /**
+     * Handles navigation to personal page.
+     * Clears club context and navigates immediately.
+     */
+    private void handleNavigateToPersonal() {
+        // Prepare personal context (clears club data)
+        service.preparePersonalContext();
+
+        // Navigate to personal page
+        SceneManager.getInstance().showMainPage(true);
+    }
+
+    /**
+     * Handles navigation to club page.
+     * Fetches user's role in the club before navigating.
+     */
+    private void handleNavigateToClub(Club club) {
+        // Show loading state
+        setLoading(true);
+
+        // Prepare club context (sets club and fetches role)
+        service.prepareClubContext(
+                club,
+                // On success - navigate to club page
+                () -> {
+                    setLoading(false);
+                    SceneManager.getInstance().showMainPage(false);
+                },
+                // On error - show error and stay on crossroads
+                error -> {
+                    setLoading(false);
+                    showError("Failed to enter club: " + error);
+                }
+        );
     }
 
     // ==================== UI STATE MANAGEMENT ====================
