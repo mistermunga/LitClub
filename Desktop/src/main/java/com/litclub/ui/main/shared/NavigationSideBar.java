@@ -43,18 +43,18 @@ public class NavigationSideBar extends VBox {
             items.put("✨", "Recommendations");
 
             if (session.isAdmin()) {
-                items.put("🛠️", "Admin Actions");
+                items.put("🛠", "Admin Actions");
             }
         } else {
             items.put("🏠", "Club Home");
-            items.put("🗣️", "Discussion");
+            items.put("🗣", "Discussion");
             items.put("📝", "Notes");
             items.put("📅", "Meetings");
 
             ClubRole role = session.getHighestRole();
             switch (role) {
-                case MODERATOR -> items.put("🛠️", "Moderator Actions");
-                case OWNER -> items.put("🛞", "Owner Actions");
+                case MODERATOR -> items.put("🛠︎", "Moderator Actions");
+                case OWNER    -> items.put("⚙", "Owner Actions");
             }
         }
 
