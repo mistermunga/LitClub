@@ -205,7 +205,10 @@ public class CrossRoadsService {
         );
 
         clubRepository.createClub(request)
-                .thenAccept(club -> Platform.runLater(() -> onSuccess.accept(club)))
+                .thenAccept(club -> Platform.runLater(() -> {
+                    session.setCurrentClub(club);
+                    onSuccess.accept(club);
+                }))
                 .exceptionally(throwable -> {
                     Platform.runLater(() -> {
                         String errorMessage = ApiErrorHandler.parseError(throwable);
