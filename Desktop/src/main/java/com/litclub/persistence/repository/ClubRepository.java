@@ -3,6 +3,7 @@ package com.litclub.persistence.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.litclub.client.api.ApiClient;
 import com.litclub.construct.*;
+import com.litclub.construct.enums.ClubRole;
 import com.litclub.construct.interfaces.PageResponse;
 import com.litclub.construct.interfaces.club.ClubCreateRequest;
 import com.litclub.construct.interfaces.discussion.DiscussionThread;
@@ -11,6 +12,7 @@ import com.litclub.construct.interfaces.meeting.MeetingUpdateRequest;
 import com.litclub.construct.interfaces.note.NoteCreateRequest;
 import com.litclub.construct.interfaces.user.UserRecord;
 import com.litclub.persistence.cache.CacheManager;
+import com.litclub.session.AppSession;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -82,6 +84,22 @@ public class ClubRepository {
                         userClubs.addAll(pageResponse.getContent());
                         System.out.println("Loaded " + pageResponse.getContent().size() + " clubs for user " + userID);
                     });
+                });
+    }
+
+    /**
+     * Fetches the user's permission in the selected club.
+     *
+     * @param clubID the selected club
+     * @return CompletavleFuture that completes when the permission is fetched.
+     */
+    public CompletableFuture<ClubRole> fetchClubPermission(Long clubID) {
+        return apiClient.get("/api/clubs/" + clubID + "/role", ClubRole.class)
+                .thenApply(role -> {
+                    Platform.runLater(() -> {
+                        AppSession.getInstance().setHighestRole(role);
+                    });
+                    return role;
                 });
     }
 
