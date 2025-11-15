@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
@@ -163,5 +164,18 @@ public class Book {
 
     public void setAddedBy(User addedBy) {
         this.addedBy = addedBy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(bookID, book.bookID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(bookID);
     }
 }
