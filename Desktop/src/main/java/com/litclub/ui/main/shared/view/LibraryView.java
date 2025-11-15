@@ -7,19 +7,31 @@ import javafx.scene.layout.BorderPane;
 
 public class LibraryView extends BorderPane {
 
+    private final LibraryCore libraryCore;
+    private final LibraryControlBar controlBar;
+
     public LibraryView(boolean isPersonal) {
         ThemeManager.getInstance().registerComponent(this);
-        showControlBar();
-        showLibraryCore();
-    }
 
-    public void showControlBar() {
-        LibraryControlBar libraryControlBar = new LibraryControlBar();
-        this.setTop(libraryControlBar);
-    }
+        // Create core first
+        libraryCore = new LibraryCore();
 
-    public void showLibraryCore() {
-        LibraryCore libraryCore = new LibraryCore();
+        // Create control bar with callbacks to core
+        controlBar = new LibraryControlBar(
+                libraryCore.getLibraryService(),
+                libraryCore::applyFilter,  // Filter callback
+                libraryCore::applySort     // Sort callback
+        );
+
+        this.setTop(controlBar);
         this.setCenter(libraryCore);
+    }
+
+    /**
+     * Refresh the library view.
+     */
+    public void refresh() {
+        libraryCore.refresh();
+        controlBar.refreshStats();
     }
 }
