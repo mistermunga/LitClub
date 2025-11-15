@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,10 +40,11 @@ public class CacheManager {
 
         Files.createDirectories(cacheDir);
 
-        // Configure Gson with LocalDateTime support
+        // Configure Gson with LocalDateTime and LocalDate support
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                 .create();
     }
 
@@ -63,6 +65,7 @@ public class CacheManager {
         try {
             String json = gson.toJson(books);
             Files.writeString(cacheDir.resolve(BOOKS_FILE), json);
+            System.out.println("Successfully cached " + books.size() + " books");
         } catch (IOException e) {
             System.err.println("Failed to save books: " + e.getMessage());
         }
@@ -214,9 +217,14 @@ public class CacheManager {
             return new ArrayList<>();
         }
 
-        String json = gson.toJson(repliesFile);
-        Reply[] repliesArray = gson.fromJson(json, Reply[].class);
-        return repliesArray != null ? new ArrayList<>(List.of(repliesArray)) : new ArrayList<>();
+        try {
+            String json = Files.readString(repliesFile);
+            Reply[] repliesArray = gson.fromJson(json, Reply[].class);
+            return repliesArray != null ? new ArrayList<>(List.of(repliesArray)) : new ArrayList<>();
+        } catch (IOException e) {
+            System.err.println("Failed to load replies: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     // ==================== UTILITY ====================
@@ -273,6 +281,24 @@ public class CacheManager {
         @Override
         public LocalDateTime deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             return LocalDateTime.parse(json.getAsString(), FORMATTER);
+        }
+    }
+
+    /**
+     * Custom Gson adapter for LocalDate serialization/deserialization.
+     * CRITICAL: This prevents Java module system errors when serializing LocalDate.
+     */
+    private static class LocalDateAdapter implements JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
+        private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
+
+        @Override
+        public JsonElement serialize(LocalDate src, java.lang.reflect.Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.format(FORMATTER));
+        }
+
+        @Override
+        public LocalDate deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return LocalDate.parse(json.getAsString(), FORMATTER);
         }
     }
 }
