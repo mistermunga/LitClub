@@ -12,6 +12,9 @@ module com.litclub {
     requires org.json;
 
     opens com.litclub to javafx.fxml;
+    opens com.litclub.client.api to com.fasterxml.jackson.databind, com.google.gson;
+    opens com.litclub.persistence.cache to com.fasterxml.jackson.databind, com.google.gson;
+    opens com.litclub.persistence.repository to com.fasterxml.jackson.databind, com.google.gson;
     opens com.litclub.construct to com.fasterxml.jackson.databind, com.google.gson;
     opens com.litclub.construct.interfaces to com.fasterxml.jackson.databind, com.google.gson;
     opens com.litclub.construct.enums to com.fasterxml.jackson.databind, com.google.gson;
