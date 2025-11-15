@@ -23,7 +23,11 @@ public class MainApplication extends Application {
         instance = this;
 
         Font.loadFont(
-                getClass().getResourceAsStream("/com/litclub/ui/perpetua.ttf"),
+                getClass().getResourceAsStream("/com/litclub/ui/Lora-Italic-VariableFont_wght.ttf"),
+                16
+        );
+        Font.loadFont(
+                getClass().getResourceAsStream("/com/litclub/ui/Lora-VariableFont_wght.ttf"),
                 16
         );
 

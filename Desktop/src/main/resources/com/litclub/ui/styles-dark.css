@@ -8,8 +8,7 @@
 .root,
 .page-root {
     -fx-background-color: linear-gradient(to bottom, #0D0E10 0%, #1A1B1E 100%);
-    -fx-font-family: "Perpetua";
-    -fx-font-size: 18;
+    -fx-font-family: "Lora Regular";
     -fx-text-fill: #E8E9EA;
     -fx-accent: #4A9EFF;
 }
