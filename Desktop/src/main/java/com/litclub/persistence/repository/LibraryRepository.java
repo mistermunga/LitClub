@@ -156,6 +156,11 @@ public class LibraryRepository {
                         wantToRead.clear();
                         finishedReading.clear();
 
+                        System.out.println("Received library data:");
+                        System.out.println("  Currently Reading: " + library.currentlyReading().size());
+                        System.out.println("  Want to Read: " + library.wantToRead().size());
+                        System.out.println("  Read: " + library.read().size());
+
                         // Populate categorized lists
                         currentlyReading.addAll(library.currentlyReading().stream()
                                 .map(BookWithStatus::book)
@@ -172,17 +177,25 @@ public class LibraryRepository {
                         allBooks.addAll(currentlyReading);
                         allBooks.addAll(wantToRead);
                         allBooks.addAll(finishedReading);
+
+                        System.out.println("Library loaded. Total books: " + allBooks.size());
                     });
 
                     // Cache books
                     cacheManager.saveBooks(new ArrayList<>(allBooks));
+                })
+                .exceptionally(throwable -> {
+                    // Detailed error logging
+                    System.err.println("Failed to fetch user library:");
+                    throwable.printStackTrace();
+                    return null;
                 });
     }
 
     /**
-     * Adds a book to the userRecord's library.
+     * Adds a book to the user's library.
      *
-     * @param userID the userRecord's ID
+     * @param userID the user's ID
      * @param bookAddRequest book details and initial status
      * @return CompletableFuture with the added book
      */
@@ -192,23 +205,56 @@ public class LibraryRepository {
                     Platform.runLater(() -> {
                         Book book = bookWithStatus.book();
 
+                        System.out.println("Adding book to observable list: " + book.getTitle() + " with status: " + bookWithStatus.status());
+
                         // Add to appropriate list based on status
                         switch (bookWithStatus.status()) {
-                            case READING -> currentlyReading.add(book);
-                            case WANT_TO_READ -> wantToRead.add(book);
-                            case READ -> finishedReading.add(book);
+                            case READING -> {
+                                if (!currentlyReading.contains(book)) {
+                                    currentlyReading.add(book);
+                                    System.out.println("Added to Currently Reading");
+                                }
+                            }
+                            case WANT_TO_READ -> {
+                                if (!wantToRead.contains(book)) {
+                                    wantToRead.add(book);
+                                    System.out.println("Added to Want to Read");
+                                }
+                            }
+                            case READ -> {
+                                if (!finishedReading.contains(book)) {
+                                    finishedReading.add(book);
+                                    System.out.println("Added to Finished Reading");
+                                }
+                            }
+                            case DNF -> {
+                                // TODO: Handle DNF list when implemented
+                                System.out.println("DNF status - not yet implemented");
+                            }
                         }
 
                         // Add to all books
                         if (!allBooks.contains(book)) {
                             allBooks.add(book);
+                            System.out.println("Added to all books. Total: " + allBooks.size());
                         }
                     });
 
-                    // Update cache
-                    cacheManager.saveBooks(new ArrayList<>(allBooks));
+                    // Update cache - wrap in try-catch to prevent cache errors from breaking the flow
+                    try {
+                        cacheManager.saveBooks(new ArrayList<>(allBooks));
+                        System.out.println("Cache updated successfully");
+                    } catch (Exception e) {
+                        System.err.println("Failed to update cache (non-fatal): " + e.getMessage());
+                        // Don't rethrow - cache failure shouldn't break the add operation
+                    }
 
                     return bookWithStatus;
+                })
+                .exceptionally(throwable -> {
+                    System.err.println("Error in addBookToLibrary:");
+                    throwable.printStackTrace();
+                    throw new RuntimeException(throwable);
                 });
     }
 
@@ -516,27 +562,27 @@ public class LibraryRepository {
     // ==================== GETTERS FOR OBSERVABLE LISTS ====================
 
     public ObservableList<Book> getAllBooks() {
-        return FXCollections.unmodifiableObservableList(allBooks);
+        return allBooks;
     }
 
     public ObservableList<Book> getCurrentlyReading() {
-        return FXCollections.unmodifiableObservableList(currentlyReading);
+        return currentlyReading;
     }
 
     public ObservableList<Book> getWantToRead() {
-        return FXCollections.unmodifiableObservableList(wantToRead);
+        return wantToRead;
     }
 
     public ObservableList<Book> getFinishedReading() {
-        return FXCollections.unmodifiableObservableList(finishedReading);
+        return finishedReading;
     }
 
     public ObservableList<Review> getUserReviews() {
-        return FXCollections.unmodifiableObservableList(userReviews);
+        return userReviews;
     }
 
     public ObservableList<Note> getPersonalNotes() {
-        return FXCollections.unmodifiableObservableList(personalNotes);
+        return personalNotes;
     }
 
     public UserRecord getCurrentUser() {
