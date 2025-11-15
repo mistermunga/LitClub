@@ -1,5 +1,8 @@
 package com.litclub.ui.main.shared.view.subcomponent.library;
 
+import com.litclub.construct.Book;
+import com.litclub.ui.main.shared.view.service.LibraryService;
+import com.litclub.ui.main.shared.view.subcomponent.library.dialog.AddBookDialog;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -7,10 +10,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class LibraryControlBar extends HBox {
 
+    private final LibraryService libraryService;
+    private final Consumer<Predicate<Book>> onFilterChange;
+    private final Consumer<Comparator<Book>> onSortChange;
+
+    private Label statsLabel;
     private MenuButton optionsMenu;
     private Button addBookButton;
 
@@ -18,7 +29,20 @@ public class LibraryControlBar extends HBox {
     private String currentFilter = "All books";
     private String currentSort = "Recently added";
 
-    public LibraryControlBar() {
+    /**
+     * Creates a library control bar with filtering and sorting capabilities.
+     *
+     * @param libraryService the service for library operations
+     * @param onFilterChange callback when filter changes (provides predicate)
+     * @param onSortChange callback when sort changes (provides comparator)
+     */
+    public LibraryControlBar(LibraryService libraryService,
+                             Consumer<Predicate<Book>> onFilterChange,
+                             Consumer<Comparator<Book>> onSortChange) {
+        this.libraryService = libraryService;
+        this.onFilterChange = onFilterChange;
+        this.onSortChange = onSortChange;
+
         this.getStyleClass().add("library-control-bar");
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(15, 20, 15, 20));
@@ -27,25 +51,52 @@ public class LibraryControlBar extends HBox {
         addStats();
         addSpacer();
         addButtons();
+
+        // Listen for changes to update stats
+        setupStatsListeners();
     }
 
-    //TODO Implement API calls here; hardcoded data for now
     private void addStats() {
-        Label stats = new Label();
-        int bookCount = 150;
-        int booksForCurrentYear = 8;
-        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
+        statsLabel = new Label();
+        statsLabel.getStyleClass().add("stats-label");
+        updateStats();
+        this.getChildren().add(statsLabel);
+    }
+
+    private void setupStatsListeners() {
+        // Update stats whenever any book list changes
+        libraryService.getAllBooks().addListener(
+                (javafx.collections.ListChangeListener.Change<? extends Book> c) -> {
+                    updateStats();
+                }
+        );
+    }
+
+    private void updateStats() {
+        int totalBooks = libraryService.getTotalBookCount();
+        int booksThisYear = countBooksReadThisYear();
 
         // Calculate books per month average
-        float rate = month > 0 ? (float) booksForCurrentYear / month : 0;
+        int currentMonth = LocalDate.now().getMonthValue();
+        float rate = currentMonth > 0 ? (float) booksThisYear / currentMonth : 0;
         String formattedRate = String.format("%.1f", rate);
 
-        stats.setText("📚 " + bookCount + " books  |  " +
-                booksForCurrentYear + " this year  |  " +
+        statsLabel.setText("📚 " + totalBooks + " books  |  " +
+                booksThisYear + " this year  |  " +
                 formattedRate + " books/month");
-        stats.getStyleClass().add("stats-label");
+    }
 
-        this.getChildren().add(stats);
+    private int countBooksReadThisYear() {
+        // Count books in "Read" category from this year
+        // This is a simplification - you might want to track dateFinished in BookWithStatus
+        int currentYear = LocalDate.now().getYear();
+        return (int) libraryService.getFinishedReading().stream()
+                .filter(book -> {
+                    // If book has year info, check if it was read this year
+                    LocalDate bookYear = book.getYear();
+                    return bookYear != null && bookYear.getYear() == currentYear;
+                })
+                .count();
     }
 
     private void addSpacer() {
@@ -62,7 +113,7 @@ public class LibraryControlBar extends HBox {
         optionsMenu = new MenuButton("⚙ Options");
         optionsMenu.getStyleClass().add("options-menu");
 
-        // Search item (custom with text field)
+        // Search item
         CustomMenuItem searchItem = createSearchItem();
         optionsMenu.getItems().add(searchItem);
         optionsMenu.getItems().add(new SeparatorMenuItem());
@@ -84,7 +135,7 @@ public class LibraryControlBar extends HBox {
 
         // Add Book Button
         addBookButton = new Button("+ Add Book");
-        addBookButton.getStyleClass().addAll("button-primary");
+        addBookButton.getStyleClass().addAll("button-primary", "add-book-button");
         addBookButton.setOnAction(e -> handleAddBook());
 
         buttonGroup.getChildren().addAll(optionsMenu, addBookButton);
@@ -102,23 +153,20 @@ public class LibraryControlBar extends HBox {
         });
 
         CustomMenuItem searchItem = new CustomMenuItem(searchField);
-        searchItem.setHideOnClick(false); // Keep menu open while typing
+        searchItem.setHideOnClick(false);
 
         return searchItem;
     }
 
     private Menu createFilterMenu() {
         Menu filterMenu = new Menu("Filter by");
-
-        // Create radio menu items for exclusive selection
         ToggleGroup filterGroup = new ToggleGroup();
 
         String[] filters = {
                 "All books",
-                "Genre",
-                "Author",
-                "Club",
-                "Year"
+                "Currently Reading",
+                "Want to Read",
+                "Finished"
         };
 
         for (String filter : filters) {
@@ -138,15 +186,15 @@ public class LibraryControlBar extends HBox {
 
     private Menu createSortMenu() {
         Menu sortMenu = new Menu("Sort by");
-
         ToggleGroup sortGroup = new ToggleGroup();
 
         String[] sortOptions = {
                 "Recently added",
                 "Title (A-Z)",
-                "Author",
-                "Date read",
-                "Rating"
+                "Title (Z-A)",
+                "Author (A-Z)",
+                "Year (Newest)",
+                "Year (Oldest)"
         };
 
         for (String option : sortOptions) {
@@ -164,25 +212,63 @@ public class LibraryControlBar extends HBox {
         return sortMenu;
     }
 
-    // Event Handlers
+    // ==================== EVENT HANDLERS ====================
+
     private void handleSearch(String query) {
-        System.out.println("Searching for: " + query);
-        // TODO: Implement search functionality
-        // This should filter the book display based on the query
+        if (query == null || query.trim().isEmpty()) {
+            // Clear filter
+            onFilterChange.accept(book -> true);
+            return;
+        }
+
+        String lowerQuery = query.toLowerCase().trim();
+
+        // Filter by title or author
+        Predicate<Book> searchPredicate = book -> {
+            String title = book.getTitle() != null ? book.getTitle().toLowerCase() : "";
+            String author = book.getPrimaryAuthor() != null ? book.getPrimaryAuthor().toLowerCase() : "";
+
+            return title.contains(lowerQuery) || author.contains(lowerQuery);
+        };
+
+        onFilterChange.accept(searchPredicate);
     }
 
     private void handleFilter(String filter) {
         currentFilter = filter;
-        System.out.println("Filter changed to: " + filter);
-        // TODO: Implement filter logic
-        // May need to show additional UI for genre/author/club/year selection
+
+        Predicate<Book> filterPredicate = switch (filter) {
+            case "Currently Reading" -> book ->
+                    libraryService.getCurrentlyReading().contains(book);
+            case "Want to Read" -> book ->
+                    libraryService.getWantToRead().contains(book);
+            case "Finished" -> book ->
+                    libraryService.getFinishedReading().contains(book);
+            default -> book -> true; // "All books"
+        };
+
+        onFilterChange.accept(filterPredicate);
     }
 
     private void handleSort(String sortOption) {
         currentSort = sortOption;
-        System.out.println("Sort changed to: " + sortOption);
-        // TODO: Implement sort logic
-        // This should re-order the displayed books
+
+        Comparator<Book> sortComparator = switch (sortOption) {
+            case "Title (A-Z)" ->
+                    Comparator.comparing(book -> book.getTitle() != null ? book.getTitle() : "");
+            case "Title (Z-A)" ->
+                    Comparator.comparing((Book book) -> book.getTitle() != null ? book.getTitle() : "").reversed();
+            case "Author (A-Z)" ->
+                    Comparator.comparing(Book::getPrimaryAuthor);
+            case "Year (Newest)" ->
+                    Comparator.comparing((Book book) -> book.getYear() != null ? book.getYear() : LocalDate.MIN).reversed();
+            case "Year (Oldest)" ->
+                    Comparator.comparing((Book book) -> book.getYear() != null ? book.getYear() : LocalDate.MAX);
+            default -> // "Recently added" - keep current order (based on bookID)
+                    Comparator.comparing((Book book) -> book.getBookID() != null ? book.getBookID() : 0L).reversed();
+        };
+
+        onSortChange.accept(sortComparator);
     }
 
     private void handleViewToggle(MenuItem item) {
@@ -198,21 +284,40 @@ public class LibraryControlBar extends HBox {
     }
 
     private void handleAddBook() {
-        System.out.println("Add Book button clicked");
-        // TODO: Open the book management scene/dialog
-        // SceneManager.getInstance().showBookManagement();
+        AddBookDialog dialog = new AddBookDialog(libraryService);
+        dialog.showAndWait().ifPresent(bookData -> {
+            // Dialog returns book data, service handles the rest
+            System.out.println("Book added via dialog: " + bookData.title());
+        });
     }
 
-    // Public methods to trigger actions from parent components
-    public void refreshStats(int totalBooks, int thisYear, float rate) {
-        // Update stats label dynamically
+    // ==================== PUBLIC METHODS ====================
+
+    /**
+     * Manually refresh stats (useful after external operations).
+     */
+    public void refreshStats() {
+        updateStats();
     }
 
+    /**
+     * Get current filter setting.
+     */
     public String getCurrentFilter() {
         return currentFilter;
     }
 
+    /**
+     * Get current sort setting.
+     */
     public String getCurrentSort() {
         return currentSort;
+    }
+
+    /**
+     * Enable/disable the add book button (e.g., during loading).
+     */
+    public void setAddBookButtonEnabled(boolean enabled) {
+        addBookButton.setDisable(!enabled);
     }
 }
