@@ -58,7 +58,7 @@ import java.time.LocalDateTime;
 public class UserBook {
 
     @EmbeddedId
-    private UserBookID userBookID;
+    private UserBookID userBookID = new UserBookID();
 
     @MapsId("userID")
     @ManyToOne
