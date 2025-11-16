@@ -1,6 +1,7 @@
 package com.litclub.ui.main.shared.view.subcomponent.notes.dialog;
 
 import com.litclub.construct.Book;
+import com.litclub.construct.DiscussionPrompt;
 import com.litclub.construct.interfaces.note.NoteCreateRequest;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.LibraryService;
@@ -19,6 +20,7 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
     private final AppSession session = AppSession.getInstance();
 
     private final boolean isPersonal;
+    private DiscussionPrompt prompt;
     private ComboBox<String> booksComboBox;
     private TextArea noteTextArea;
     private Label statusLabel;
@@ -49,6 +51,53 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         } else {
             setTitle("Add " + session.getCurrentClub().getClubName() + " Club Note.");
         }
+
+        setResizable(true);
+
+        // Dialog buttons
+        ButtonType addButtonType = new ButtonType("Add Book", ButtonBar.ButtonData.OK_DONE);
+        getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
+
+        VBox content = createContent();
+        getDialogPane().setContent(content);
+
+        // Button references
+        addButton = (Button) getDialogPane().lookupButton(addButtonType);
+        cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
+
+        addButton.setDisable(true);
+
+        // Enable button only when the note text is not empty
+        noteTextArea.textProperty().addListener((obs, old, val) ->
+                addButton.setDisable(val.trim().isEmpty() || isSubmitting)
+        );
+
+        // Prevent dialog from closing on Add click
+        addButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            if (!isSubmitting) {
+                event.consume(); // Prevent default close behavior
+                handleSubmit();
+            }
+        });
+    }
+
+    public AddNoteDialog(LibraryService libraryService,
+                         NoteService noteService,
+                         DiscussionPrompt prompt) {
+
+        this.libraryService = libraryService;
+        this.noteService = noteService;
+        this.isPersonal = false;
+        this.prompt = prompt;
+
+        booksComboBox = new ComboBox<>();
+        booksComboBox.getItems().addAll(
+                libraryService.getCurrentlyReading().stream()
+                        .map(Book::getTitle)
+                        .toList()
+        );
+
+        setTitle(prompt.getPrompt());
 
         setResizable(true);
 
@@ -201,6 +250,49 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         if (isPersonal) {
             noteService.createPersonalNote(
                     session.getUserRecord().userID(),
+                    createRequest,
+                    note -> Platform.runLater(() -> {
+                        showSuccess();
+
+                        PauseTransition pause = new PauseTransition(javafx.util.Duration.seconds(1));
+                        pause.setOnFinished(event -> {
+                            setResult(createRequest);
+                            close();
+                        });
+                        pause.play();
+                    }),
+                    errorMessage -> Platform.runLater(() -> {
+                        System.err.println("Failed to add note: " + errorMessage);
+                        loadingIndicator.setVisible(false);
+                        resetSubmittingState();
+                        showError(errorMessage);
+                    })
+            );
+        } else if (prompt != null) {
+            noteService.createPromptNote(
+                    session.getCurrentClub().getClubID(),
+                    prompt.getPromptID(),
+                    createRequest,
+                    note -> Platform.runLater(() -> {
+                        showSuccess();
+
+                        PauseTransition pause = new PauseTransition(javafx.util.Duration.seconds(1));
+                        pause.setOnFinished(event -> {
+                            setResult(createRequest);
+                            close();
+                        });
+                        pause.play();
+                    }),
+                    errorMessage -> Platform.runLater(() -> {
+                        System.err.println("Failed to add note: " + errorMessage);
+                        loadingIndicator.setVisible(false);
+                        resetSubmittingState();
+                        showError(errorMessage);
+                    })
+            );
+        } else {
+            noteService.createClubNote(
+                    session.getCurrentClub().getClubID(),
                     createRequest,
                     note -> Platform.runLater(() -> {
                         showSuccess();
