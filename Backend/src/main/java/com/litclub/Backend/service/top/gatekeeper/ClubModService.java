@@ -11,6 +11,7 @@ import com.litclub.Backend.service.low.DiscussionPromptService;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.MeetingService;
 import com.litclub.Backend.service.middle.UserService;
+import com.litclub.Backend.service.top.facilitator.util.ClubInviteGenerator;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,19 +26,21 @@ public class ClubModService {
     private final ClubService clubService;
     private final UserService userService;
     private final ClubMembershipService membershipService;
+    private final ClubInviteGenerator clubInviteGenerator;
 
     public ClubModService(
             MeetingService meetingService,
             DiscussionPromptService discussionPromptService,
             ClubService clubService,
             UserService userService,
-            ClubMembershipService membershipService
-    ) {
+            ClubMembershipService membershipService,
+            ClubInviteGenerator clubInviteGenerator) {
         this.meetingService = meetingService;
         this.discussionPromptService = discussionPromptService;
         this.clubService = clubService;
         this.userService = userService;
         this.membershipService = membershipService;
+        this.clubInviteGenerator = clubInviteGenerator;
     }
 
     // ====== MEETING MANAGEMENT ======
@@ -113,6 +116,14 @@ public class ClubModService {
         User user = userService.requireUserById(userID);
 
         membershipService.modifyClubRole(Set.of(role), user, club);
+    }
+
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public String generateInvite(Long clubID, Long userID) {
+        Club club = clubService.requireClubById(clubID);
+        User user = userService.requireUserById(userID);
+
+        return clubInviteGenerator.generateInvite(user, club);
     }
 
     // ====== DISCUSSION ======
