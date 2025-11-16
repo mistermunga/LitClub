@@ -60,7 +60,6 @@ import java.util.stream.Collectors;
  * @see com.litclub.Backend.entity.Club
  */
 @Service
-@PreAuthorize("@userSecurity.isAdmin(authentication)")
 public class AdminService {
 
     private final UserService userService;
@@ -109,6 +108,7 @@ public class AdminService {
      * @see UserService#updateUser(com.litclub.Backend.entity.User)
      */
     @Transactional
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public UserRecord promoteAdmin(Long userID) {
         User user = userService.requireUserById(userID);
         Set<GlobalRole> roles = user.getGlobalRoles();
@@ -133,6 +133,7 @@ public class AdminService {
      * @see ConfigurationManager#updateInstanceSettings(ConfigurationManager.InstanceSettings)
      */
     @Transactional
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public void changeRegistrationPolicy(ConfigurationManager.InstanceRegistrationMode mode) throws IOException {
         ConfigurationManager.InstanceSettings old = configuration.getInstanceSettings();
 
@@ -158,6 +159,7 @@ public class AdminService {
      * @see UserService#registerUser(UserRegistrationRecord)
      */
     @Transactional
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public UserRecord createUser(UserRegistrationRecord userRegistrationRecord) {
         return userService.registerUser(userRegistrationRecord);
     }
@@ -172,6 +174,7 @@ public class AdminService {
      * @see UserService#deleteUser(Long)
      */
     @Transactional
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public void deleteUser(Long userID) {
         userService.deleteUser(userID);
     }
@@ -194,6 +197,7 @@ public class AdminService {
      * @see UserService#convertUserToRecord(User)
      */
     @Transactional
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public List<UserRecord> getAllUsers() {
         List<User> users = userService.getAllUsers();
         return users.stream()
@@ -213,6 +217,7 @@ public class AdminService {
      * @see ClubService#deleteClub(Long)
      */
     @Transactional
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public void deleteClub(Long clubID) {
         clubService.deleteClub(clubID);
     }
@@ -227,6 +232,7 @@ public class AdminService {
      * @see ClubService#getClubs(Pageable)
      */
     @Transactional
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public Page<Club> getAllClubs(Pageable pageable) {
         return clubService.getClubs(pageable);
     }
@@ -255,6 +261,7 @@ public class AdminService {
      * @throws java.io.IOException if persisting the configuration fails.
      * @see ConfigurationManager#updateInstanceSettings(ConfigurationManager.InstanceSettings)
      */
+    @PreAuthorize("@userSecurity.isAdmin(authentication)")
     public ConfigurationManager.InstanceSettings updateInstanceSettings(ConfigurationManager.InstanceSettings newInstanceSettings) throws IOException {
         configuration.updateInstanceSettings(newInstanceSettings);
         return getInstanceSettings();
