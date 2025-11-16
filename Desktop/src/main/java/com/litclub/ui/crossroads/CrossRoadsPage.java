@@ -4,6 +4,7 @@ import com.litclub.SceneManager;
 import com.litclub.construct.Club;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
+import com.litclub.theme.ThemeToggleBar;
 import com.litclub.ui.crossroads.components.*;
 import com.litclub.ui.crossroads.components.subcomponents.*;
 import com.litclub.ui.crossroads.service.CrossRoadsService;
@@ -196,7 +197,9 @@ class HeaderBar extends HBox {
         logoutButton.getStyleClass().add("user-button");
         logoutButton.setOnAction(e -> onLogout.run());
 
-        getChildren().addAll(appName, spacer, greeting, logoutButton);
+        ThemeToggleBar toggleBar = new ThemeToggleBar();
+
+        getChildren().addAll(appName, toggleBar, spacer, greeting, logoutButton);
     }
 }
 
