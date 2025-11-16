@@ -21,6 +21,7 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
 
     private final boolean isPersonal;
     private DiscussionPrompt prompt;
+
     private ComboBox<String> booksComboBox;
     private TextArea noteTextArea;
     private Label statusLabel;
@@ -31,6 +32,10 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
 
     private boolean isSubmitting = false;
 
+    // -----------------------
+    // Constructors
+    // -----------------------
+
     public AddNoteDialog(LibraryService libraryService,
                          NoteService noteService,
                          boolean isPersonal) {
@@ -39,46 +44,18 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         this.noteService = noteService;
         this.isPersonal = isPersonal;
 
-        booksComboBox = new ComboBox<>();
-        booksComboBox.getItems().addAll(
-                libraryService.getCurrentlyReading().stream()
-                        .map(Book::getTitle)
-                        .toList()
-        );
+        initializeBooksDropdown();
+        initializeDialogTitle(isPersonal ?
+                "Add personal Note." :
+                "Add " + session.getCurrentClub().getClubName() + " Club Note.");
 
-        if (isPersonal) {
-            setTitle("Add personal Note.");
-        } else {
-            setTitle("Add " + session.getCurrentClub().getClubName() + " Club Note.");
-        }
-
-        setResizable(true);
-
-        // Dialog buttons
-        ButtonType addButtonType = new ButtonType("Add Book", ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
-
-        VBox content = createContent();
-        getDialogPane().setContent(content);
+        setupDialogLayout();
 
         // Button references
-        addButton = (Button) getDialogPane().lookupButton(addButtonType);
-        cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
+        addButton = getDialogButton(ButtonBar.ButtonData.OK_DONE);
+        cancelButton = getDialogButton(ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        addButton.setDisable(true);
-
-        // Enable button only when the note text is not empty
-        noteTextArea.textProperty().addListener((obs, old, val) ->
-                addButton.setDisable(val.trim().isEmpty() || isSubmitting)
-        );
-
-        // Prevent dialog from closing on Add click
-        addButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            if (!isSubmitting) {
-                event.consume(); // Prevent default close behavior
-                handleSubmit();
-            }
-        });
+        setupAddButtonBehavior();
     }
 
     public AddNoteDialog(LibraryService libraryService,
@@ -90,43 +67,73 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         this.isPersonal = false;
         this.prompt = prompt;
 
+        initializeBooksDropdown();
+        initializeDialogTitle(prompt.getPrompt());
+
+        setupDialogLayout();
+
+        // Button references
+        addButton = getDialogButton(ButtonBar.ButtonData.OK_DONE);
+        cancelButton = getDialogButton(ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        setupAddButtonBehavior();
+    }
+
+    // -----------------------
+    // Initialization helpers
+    // -----------------------
+
+    private void initializeBooksDropdown() {
         booksComboBox = new ComboBox<>();
         booksComboBox.getItems().addAll(
                 libraryService.getCurrentlyReading().stream()
                         .map(Book::getTitle)
                         .toList()
         );
+    }
 
-        setTitle(prompt.getPrompt());
-
+    private void initializeDialogTitle(String title) {
+        setTitle(title);
         setResizable(true);
+    }
 
-        // Dialog buttons
+    private void setupDialogLayout() {
         ButtonType addButtonType = new ButtonType("Add Book", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
 
         VBox content = createContent();
         getDialogPane().setContent(content);
+    }
 
-        // Button references
-        addButton = (Button) getDialogPane().lookupButton(addButtonType);
-        cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
+    private Button getDialogButton(ButtonBar.ButtonData type) {
+        return (Button) getDialogPane().lookupButton(
+                getDialogPane().getButtonTypes().stream()
+                        .filter(bt -> bt.getButtonData() == type)
+                        .findFirst()
+                        .orElseThrow()
+        );
+    }
 
+    private void setupAddButtonBehavior() {
         addButton.setDisable(true);
 
-        // Enable button only when the note text is not empty
+        // Enable button only when note is non-empty
         noteTextArea.textProperty().addListener((obs, old, val) ->
                 addButton.setDisable(val.trim().isEmpty() || isSubmitting)
         );
 
-        // Prevent dialog from closing on Add click
+        // Prevent dialog from closing automatically
         addButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             if (!isSubmitting) {
-                event.consume(); // Prevent default close behavior
+                event.consume();
                 handleSubmit();
             }
         });
     }
+
+    // -----------------------
+    // UI creation
+    // -----------------------
 
     private VBox createContent() {
         VBox container = new VBox(15);
@@ -173,7 +180,7 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         grid.add(noteLabel, 0, row);
         grid.add(noteTextArea, 1, row);
 
-        // Status label
+        // Status message
         statusLabel = new Label();
         statusLabel.getStyleClass().add("status-label");
         statusLabel.setVisible(false);
@@ -191,23 +198,23 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         return container;
     }
 
+    // -----------------------
+    // Submission logic
+    // -----------------------
+
     private void handleSubmit() {
         if (isSubmitting) return;
 
         String selectedTitle = booksComboBox.getValue();
         String note = noteTextArea.getText().trim();
 
-        // Validate ComboBox
         if (selectedTitle == null) {
-            statusLabel.setText("Please select a book.");
-            statusLabel.setVisible(true);
+            showError("Please select a book.");
             return;
         }
 
-        // Validate Note
         if (note.isEmpty()) {
-            statusLabel.setText("Note cannot be empty.");
-            statusLabel.setVisible(true);
+            showError("Note cannot be empty.");
             return;
         }
 
@@ -217,20 +224,17 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         loadingIndicator.setVisible(true);
         statusLabel.setVisible(false);
 
-        // Find book by title
         Book selectedBook = libraryService.getAllBooks().stream()
                 .filter(b -> b.getTitle().equals(selectedTitle))
                 .findFirst()
                 .orElse(null);
 
         if (selectedBook == null) {
-            statusLabel.setText("Could not find selected book.");
-            statusLabel.setVisible(true);
+            showError("Could not find selected book.");
             resetSubmittingState();
             return;
         }
 
-        // Build request
         NoteCreateRequest createRequest = new NoteCreateRequest(
                 selectedBook.getBookID(),
                 isPersonal ? null : session.getCurrentClub().getClubID(),
@@ -247,72 +251,54 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
 
         System.out.println("Submitting note...");
 
+        Runnable onSuccess = () -> Platform.runLater(() -> {
+            showSuccess();
+
+            PauseTransition pause =
+                    new PauseTransition(javafx.util.Duration.seconds(1));
+
+            pause.setOnFinished(event -> {
+                setResult(createRequest);
+                close();
+            });
+            pause.play();
+        });
+
+        java.util.function.Consumer<String> onError = errorMessage -> Platform.runLater(() -> {
+            System.err.println("Failed to add note: " + errorMessage);
+            loadingIndicator.setVisible(false);
+            resetSubmittingState();
+            showError(errorMessage);
+        });
+
         if (isPersonal) {
             noteService.createPersonalNote(
                     session.getUserRecord().userID(),
                     createRequest,
-                    note -> Platform.runLater(() -> {
-                        showSuccess();
-
-                        PauseTransition pause = new PauseTransition(javafx.util.Duration.seconds(1));
-                        pause.setOnFinished(event -> {
-                            setResult(createRequest);
-                            close();
-                        });
-                        pause.play();
-                    }),
-                    errorMessage -> Platform.runLater(() -> {
-                        System.err.println("Failed to add note: " + errorMessage);
-                        loadingIndicator.setVisible(false);
-                        resetSubmittingState();
-                        showError(errorMessage);
-                    })
+                    note -> onSuccess.run(),
+                    onError
             );
         } else if (prompt != null) {
             noteService.createPromptNote(
                     session.getCurrentClub().getClubID(),
                     prompt.getPromptID(),
                     createRequest,
-                    note -> Platform.runLater(() -> {
-                        showSuccess();
-
-                        PauseTransition pause = new PauseTransition(javafx.util.Duration.seconds(1));
-                        pause.setOnFinished(event -> {
-                            setResult(createRequest);
-                            close();
-                        });
-                        pause.play();
-                    }),
-                    errorMessage -> Platform.runLater(() -> {
-                        System.err.println("Failed to add note: " + errorMessage);
-                        loadingIndicator.setVisible(false);
-                        resetSubmittingState();
-                        showError(errorMessage);
-                    })
+                    note -> onSuccess.run(),
+                    onError
             );
         } else {
             noteService.createClubNote(
                     session.getCurrentClub().getClubID(),
                     createRequest,
-                    note -> Platform.runLater(() -> {
-                        showSuccess();
-
-                        PauseTransition pause = new PauseTransition(javafx.util.Duration.seconds(1));
-                        pause.setOnFinished(event -> {
-                            setResult(createRequest);
-                            close();
-                        });
-                        pause.play();
-                    }),
-                    errorMessage -> Platform.runLater(() -> {
-                        System.err.println("Failed to add note: " + errorMessage);
-                        loadingIndicator.setVisible(false);
-                        resetSubmittingState();
-                        showError(errorMessage);
-                    })
+                    note -> onSuccess.run(),
+                    onError
             );
         }
     }
+
+    // -----------------------
+    // UI Helpers
+    // -----------------------
 
     private void showSuccess() {
         statusLabel.setText("Note added successfully!");
