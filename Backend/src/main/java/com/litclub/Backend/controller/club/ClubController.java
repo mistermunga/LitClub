@@ -24,6 +24,7 @@ import com.litclub.Backend.service.middle.ReplyService;
 import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.ClubActivityService;
 import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
+import com.litclub.Backend.service.top.facilitator.util.ClubInviteGenerator;
 import com.litclub.Backend.service.top.gatekeeper.AdminService;
 import com.litclub.Backend.service.top.gatekeeper.ClubModService;
 import jakarta.validation.Valid;
@@ -56,6 +57,7 @@ public class ClubController {
     private final DiscussionManagementService discussionManagementService;
     private final NoteService noteService;
     private final ReplyService replyService;
+    private final ClubInviteGenerator clubInviteGenerator;
 
     public ClubController(ClubService clubService,
                           AdminService adminService,
@@ -68,7 +70,7 @@ public class ClubController {
                           DiscussionPromptService discussionPromptService,
                           DiscussionManagementService discussionManagementService,
                           NoteService noteService,
-                          ReplyService replyService) {
+                          ReplyService replyService, ClubInviteGenerator clubInviteGenerator) {
         this.clubService = clubService;
         this.adminService = adminService;
         this.userService = userService;
@@ -81,6 +83,7 @@ public class ClubController {
         this.discussionManagementService = discussionManagementService;
         this.noteService = noteService;
         this.replyService = replyService;
+        this.clubInviteGenerator = clubInviteGenerator;
     }
 
     @GetMapping
@@ -179,6 +182,29 @@ public class ClubController {
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(clubMembershipService.enrollUserToClub(club, user));
+    }
+
+    @GetMapping("/{clubID}/invite")
+    @PreAuthorize("clubSecurity.isModerator(authentication, #clubID)")
+    public ResponseEntity<String> generateInvite(
+            @PathVariable Long clubID,
+            @AuthenticationPrincipal CustomUserDetails cud
+    ) {
+        return ResponseEntity.ok(clubModService.generateInvite(clubID, cud.getUserID()));
+    }
+
+    @PostMapping("/join")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ClubMembership> redeemInvite(
+            @RequestBody String invite,
+            @AuthenticationPrincipal CustomUserDetails cud) {
+        ClubInviteGenerator.DecodedInvite decodedInvite = clubInviteGenerator.decodeInvite(invite);
+        Club club = clubService.requireClubById(decodedInvite.clubID());
+        User user = cud.getUser();
+        return ResponseEntity
+                .status(HttpStatus.CREATED).body(
+                        clubMembershipService.enrollUserToClub(club, user)
+                );
     }
 
     @PostMapping("/{clubID}/leave")
