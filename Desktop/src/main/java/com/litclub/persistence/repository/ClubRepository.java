@@ -697,27 +697,27 @@ public class ClubRepository {
     // ==================== GETTERS FOR OBSERVABLE LISTS ====================
 
     public ObservableList<Club> getUserClubs() {
-        return FXCollections.unmodifiableObservableList(userClubs);
+        return userClubs;
     }
 
     public ObservableList<Meeting> getMeetings() {
-        return FXCollections.unmodifiableObservableList(meetings);
+        return meetings;
     }
 
     public ObservableList<Meeting> getUserMeetings() {
-        return FXCollections.unmodifiableObservableList(userMeetings);
+        return userMeetings;
     }
 
     public ObservableList<DiscussionPrompt> getDiscussions() {
-        return FXCollections.unmodifiableObservableList(discussions);
+        return discussions;
     }
 
     public ObservableList<Note> getClubNotes() {
-        return FXCollections.unmodifiableObservableList(clubNotes);
+        return clubNotes;
     }
 
     public ObservableList<Reply> getReplies() {
-        return FXCollections.unmodifiableObservableList(replies);
+        return replies;
     }
 
     // ==================== UTILITY ====================
