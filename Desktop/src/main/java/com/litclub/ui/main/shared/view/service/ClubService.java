@@ -1,5 +1,6 @@
 package com.litclub.ui.main.shared.view.service;
 
+import com.litclub.construct.interfaces.club.Invite;
 import com.litclub.persistence.repository.ClubRepository;
 import com.litclub.session.AppSession;
 
@@ -13,7 +14,7 @@ public class ClubService {
         this.session = AppSession.getInstance();
     }
 
-    public String generateInvite() {
+    public Invite generateInvite() {
         return clubRepository.generateInvite(session.getCurrentClub().getClubID()).join();
     }
 }

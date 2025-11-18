@@ -6,6 +6,7 @@ import com.litclub.construct.*;
 import com.litclub.construct.enums.ClubRole;
 import com.litclub.construct.interfaces.PageResponse;
 import com.litclub.construct.interfaces.club.ClubCreateRequest;
+import com.litclub.construct.interfaces.club.Invite;
 import com.litclub.construct.interfaces.discussion.DiscussionThread;
 import com.litclub.construct.interfaces.meeting.MeetingCreateRequest;
 import com.litclub.construct.interfaces.meeting.MeetingUpdateRequest;
@@ -143,8 +144,8 @@ public class ClubRepository {
      * @param clubID the clubID
      * @return CompletableFuture with the invite String
      */
-    public CompletableFuture<String> generateInvite(Long clubID) {
-        return apiClient.get("/api/clubs/" + clubID + "/invite", String.class);
+    public CompletableFuture<Invite> generateInvite(Long clubID) {
+        return apiClient.get("/api/clubs/" + clubID + "/invite", Invite.class);
     }
 
     /**
@@ -154,10 +155,11 @@ public class ClubRepository {
      * @return CompletableFuture void
      */
     public CompletableFuture<Club> redeemInvite(String invite) {
-        return apiClient.post("/api/clubs/join", invite, ClubMembership.class)
+        return apiClient.post("/api/clubs/join", new Invite(invite), ClubMembership.class)
                 .thenApply(membership -> {
                     Platform.runLater(() -> {
                         userClubs.add(membership.getClub());
+                        AppSession.getInstance().setCurrentClub(membership.getClub());
                     });
                     return membership.getClub();
                 });

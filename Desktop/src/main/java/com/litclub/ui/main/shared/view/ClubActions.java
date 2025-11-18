@@ -40,7 +40,7 @@ public class ClubActions extends VBox {
         Label codeLabel = new Label();
 
         getInviteButton.setOnAction(e -> {
-            String code = clubService.generateInvite();
+            String code = clubService.generateInvite().invite();
             codeLabel.setText(code);
             System.out.println("Generated Invite: " + code);
         });
