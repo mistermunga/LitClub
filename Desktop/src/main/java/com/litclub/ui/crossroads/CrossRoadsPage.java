@@ -67,8 +67,12 @@ public class CrossRoadsPage extends BorderPane {
         scrollPane.setContent(contentContainer);
         setCenter(scrollPane);
 
+        VBox bottom = new VBox(10);
+        ThemeToggleBar toggleBar = new ThemeToggleBar();
+        bottom.getChildren().addAll(toggleBar, statusBar);
+
         // Status bar at bottom
-        setBottom(statusBar);
+        setBottom(bottom);
     }
 
     private void loadData() {
@@ -203,9 +207,7 @@ class HeaderBar extends HBox {
         logoutButton.getStyleClass().add("user-button");
         logoutButton.setOnAction(e -> onLogout.run());
 
-        ThemeToggleBar toggleBar = new ThemeToggleBar();
-
-        getChildren().addAll(appName, toggleBar, spacer, greeting, logoutButton);
+        getChildren().addAll(appName, spacer, greeting, logoutButton);
     }
 }
 
