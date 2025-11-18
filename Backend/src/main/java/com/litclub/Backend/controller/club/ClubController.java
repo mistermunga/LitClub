@@ -185,7 +185,7 @@ public class ClubController {
     }
 
     @GetMapping("/{clubID}/invite")
-    @PreAuthorize("clubSecurity.isModerator(authentication, #clubID)")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
     public ResponseEntity<String> generateInvite(
             @PathVariable Long clubID,
             @AuthenticationPrincipal CustomUserDetails cud
