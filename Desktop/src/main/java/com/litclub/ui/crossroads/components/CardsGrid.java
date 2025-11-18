@@ -64,6 +64,7 @@ public class CardsGrid extends VBox {
 
         // Add club cards
         for (Club club : service.getClubs()) {
+            if (club == null) continue;
             ClubCard clubCard = new ClubCard(club, onNavigateToClub);
             grid.getChildren().add(clubCard);
         }
