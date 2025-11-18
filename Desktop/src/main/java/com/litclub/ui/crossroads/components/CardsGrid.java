@@ -2,6 +2,7 @@ package com.litclub.ui.crossroads.components;
 
 import com.litclub.construct.Club;
 import com.litclub.ui.crossroads.components.subcomponents.ClubCard;
+import com.litclub.ui.crossroads.components.subcomponents.InviteCard;
 import com.litclub.ui.crossroads.components.subcomponents.MeCard;
 import com.litclub.ui.crossroads.service.CrossRoadsService;
 import javafx.geometry.Pos;
@@ -20,14 +21,17 @@ public class CardsGrid extends VBox {
     private final FlowPane grid;
     private final Runnable onNavigateToPersonal;
     private final Consumer<Club> onNavigateToClub;
+    private final Runnable redeemInvite;
 
     public CardsGrid(CrossRoadsService service,
                      Runnable onNavigateToPersonal,
-                     Consumer<Club> onNavigateToClub) {
+                     Consumer<Club> onNavigateToClub,
+                     Runnable redeemInvite) {
         super(20);
         this.service = service;
         this.onNavigateToPersonal = onNavigateToPersonal;
         this.onNavigateToClub = onNavigateToClub;
+        this.redeemInvite = redeemInvite;
 
         setAlignment(Pos.TOP_CENTER);
         setMaxWidth(1200);
@@ -63,5 +67,9 @@ public class CardsGrid extends VBox {
             ClubCard clubCard = new ClubCard(club, onNavigateToClub);
             grid.getChildren().add(clubCard);
         }
+
+        // Add Invite Card last
+        InviteCard inviteCard = new InviteCard(redeemInvite);
+        grid.getChildren().add(inviteCard);
     }
 }
