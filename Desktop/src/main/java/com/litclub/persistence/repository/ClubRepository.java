@@ -138,6 +138,32 @@ public class ClubRepository {
     }
 
     /**
+     * Creates a single use invite to a club.
+     *
+     * @param clubID the clubID
+     * @return CompletableFuture with the invite String
+     */
+    public CompletableFuture<String> generateInvite(Long clubID) {
+        return apiClient.get("/api/clubs/" + clubID + "/invite", String.class);
+    }
+
+    /**
+     * Redeems an invitation
+     *
+     * @param invite the invite itself
+     * @return CompletableFuture void
+     */
+    public CompletableFuture<Club> redeemInvite(String invite) {
+        return apiClient.post("/api/clubs/join", invite, ClubMembership.class)
+                .thenApply(membership -> {
+                    Platform.runLater(() -> {
+                        userClubs.add(membership.getClub());
+                    });
+                    return membership.getClub();
+                });
+    }
+
+    /**
      * Updates an existing club.
      *
      * @param clubID the club's ID

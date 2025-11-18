@@ -256,6 +256,25 @@ public class CrossRoadsService {
                 });
     }
 
+    public CompletableFuture<Club> redeemInvite(
+            String invite,
+            Consumer<Club> onSuccess,
+            Consumer<String> onError
+    ) {
+        return clubRepository.redeemInvite(invite)
+                .thenApply(club -> {
+                    Platform.runLater(() -> onSuccess.accept(club));
+                    return club;
+                })
+                .exceptionally(throwable -> {
+                    Platform.runLater(() -> {
+                        String message = ApiErrorHandler.parseError(throwable);
+                        onError.accept("failed to redeem invite: " + message);
+                    });
+                    return null;
+                });
+    }
+
     // ==================== OBSERVABLE DATA ACCESS ====================
 
     /**
