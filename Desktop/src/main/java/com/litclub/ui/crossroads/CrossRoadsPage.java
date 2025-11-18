@@ -88,7 +88,8 @@ public class CrossRoadsPage extends BorderPane {
         CardsGrid = new CardsGrid(
                 service,
                 this::handleNavigateToPersonal,
-                this::handleNavigateToClub
+                this::handleNavigateToClub,
+                this::redeemInvite
         );
 
         // Create club section
@@ -167,6 +168,11 @@ public class CrossRoadsPage extends BorderPane {
                     statusBar.showError("Failed to enter club: " + error);
                 }
         );
+    }
+
+    private void redeemInvite() {
+        RedeemInviteDialog inviteDialog = new RedeemInviteDialog(service);
+        inviteDialog.showAndWait().ifPresent(code -> System.out.println("Redeemed invitation: " + code));
     }
 }
 
