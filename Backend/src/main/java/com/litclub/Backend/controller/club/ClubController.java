@@ -186,19 +186,19 @@ public class ClubController {
 
     @GetMapping("/{clubID}/invite")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
-    public ResponseEntity<String> generateInvite(
+    public ResponseEntity<Invite> generateInvite(
             @PathVariable Long clubID,
             @AuthenticationPrincipal CustomUserDetails cud
     ) {
-        return ResponseEntity.ok(clubModService.generateInvite(clubID, cud.getUserID()));
+        return ResponseEntity.ok(new Invite(clubModService.generateInvite(clubID, cud.getUserID())));
     }
 
     @PostMapping("/join")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ClubMembership> redeemInvite(
-            @RequestBody String invite,
+            @RequestBody Invite invite,
             @AuthenticationPrincipal CustomUserDetails cud) {
-        ClubInviteGenerator.DecodedInvite decodedInvite = clubInviteGenerator.decodeInvite(invite);
+        ClubInviteGenerator.DecodedInvite decodedInvite = clubInviteGenerator.decodeInvite(invite.invite());
         Club club = clubService.requireClubById(decodedInvite.clubID());
         User user = cud.getUser();
         return ResponseEntity
@@ -474,4 +474,6 @@ public class ClubController {
             throw new MalformedDTOException("reply does not belong to note");
         }
     }
+
+    public record Invite(String invite) {}
 }
