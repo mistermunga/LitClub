@@ -37,7 +37,7 @@ public class ContentArea extends StackPane {
             addView("Notes", new NotesView(false));
             addView("Meetings", new MeetingsView());
             addView("Members", new MembersView());
-            addView("Club Actions", new ClubActions());
+            addView("Actions", new ClubActions());
         }
 
         // Put all views on the StackPane

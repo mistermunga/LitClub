@@ -53,8 +53,8 @@ public class NavigationSideBar extends VBox {
 
             ClubRole role = session.getHighestRole();
             switch (role) {
-                case MODERATOR -> items.put("🛠︎", "Moderator Actions");
-                case OWNER    -> items.put("⚙", "Owner Actions");
+                case MODERATOR -> items.put("🛠︎", "Actions");
+                case OWNER    -> items.put("⚙", "Actions");
             }
         }
 
