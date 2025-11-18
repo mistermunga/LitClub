@@ -732,3 +732,49 @@
     -fx-font-style: italic;
     -fx-padding: 30 0 0 0;
 }
+
+/* -----------------------------------------------
+   Invite Card
+   ----------------------------------------------- */
+
+/* Base Invite Card */
+.invite-card {
+    -fx-pref-width: 280;
+    -fx-min-height: 200;
+
+    -fx-alignment: center;
+    -fx-padding: 20;
+
+    -fx-background-color: transparent;
+
+    /* Thick dotted border */
+    -fx-border-color: #888;
+    -fx-border-width: 4;
+    -fx-border-style: dotted;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+
+    -fx-cursor: hand;
+    -fx-transition: 0.2s;
+}
+
+/* Hover effect */
+.invite-card:hover {
+    -fx-border-color: #666;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+/* + icon */
+.invite-plus {
+    -fx-font-size: 64px;
+    -fx-font-weight: bold;
+}
+
+/* Title text */
+.invite-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-text-alignment: center;
+}
+
