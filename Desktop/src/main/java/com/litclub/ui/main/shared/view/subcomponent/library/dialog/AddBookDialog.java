@@ -3,19 +3,22 @@ package com.litclub.ui.main.shared.view.subcomponent.library.dialog;
 import com.litclub.construct.enums.BookStatus;
 import com.litclub.construct.interfaces.library.BookAddRequest;
 import com.litclub.session.AppSession;
+import com.litclub.ui.dialog.BaseAsyncDialog;
 import com.litclub.ui.main.shared.view.service.LibraryService;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 
 /**
  * Dialog for adding a new book to the library.
- * Collects book details and initial reading status.
+ *
+ * <p>Collects book details (title, author, ISBN) and initial reading status.
+ * Notes field is optional for personal annotations.
  */
-public class AddBookDialog extends Dialog<BookData> {
+public class AddBookDialog extends BaseAsyncDialog<BookData> {
 
     private final LibraryService libraryService;
 
@@ -24,59 +27,15 @@ public class AddBookDialog extends Dialog<BookData> {
     private TextField isbnField;
     private ComboBox<BookStatus> statusComboBox;
     private TextArea notesArea;
-    private Label statusLabel;
-    private ProgressIndicator loadingIndicator;
-
-    private Button addButton;
-    private Button cancelButton;
-    private boolean isSubmitting = false;
 
     public AddBookDialog(LibraryService libraryService) {
+        super("Add Book to Library", "Add Book");
         this.libraryService = libraryService;
-
-        setTitle("Add Book to Library");
-        setHeaderText("Enter book details");
-        setResizable(true);
-
-        // Dialog buttons
-        ButtonType addButtonType = new ButtonType("Add Book", ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
-
-        // Build UI
-        VBox content = createContent();
-        getDialogPane().setContent(content);
-
-        // Get references to buttons
-        addButton = (Button) getDialogPane().lookupButton(addButtonType);
-        cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
-        addButton.setDisable(true);
-
-        // Enable Add button only when required fields are filled
-        titleField.textProperty().addListener((obs, old, val) ->
-                addButton.setDisable(val.trim().isEmpty() || isSubmitting)
-        );
-
-        // Prevent dialog from closing on button click
-        addButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            if (!isSubmitting) {
-                event.consume(); // Prevent default close behavior
-                handleSubmit();
-            }
-        });
-
-        // Don't use result converter - handle submission manually
-        setResultConverter(buttonType -> {
-            // Only return result if explicitly closed (after success)
-            return null;
-        });
+        setHeaderText("Enter Book Details");
     }
 
-    private VBox createContent() {
-        VBox container = new VBox(15);
-        container.setPadding(new Insets(20));
-        container.setMinWidth(500);
-
-        // Form grid
+    @Override
+    protected Node createFormContent() {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(15);
@@ -140,29 +99,38 @@ public class AddBookDialog extends Dialog<BookData> {
         grid.add(notesLabel, 0, row);
         grid.add(notesArea, 1, row);
 
-        // Status message
-        statusLabel = new Label();
-        statusLabel.getStyleClass().add("status-label");
-        statusLabel.setVisible(false);
-        statusLabel.setWrapText(true);
-        statusLabel.setMaxWidth(450);
-
-        // Loading indicator
-        loadingIndicator = new ProgressIndicator();
-        loadingIndicator.setMaxSize(30, 30);
-        loadingIndicator.setVisible(false);
-
-        container.getChildren().addAll(grid, statusLabel, loadingIndicator);
-        return container;
+        return grid;
     }
 
-    private void handleSubmit() {
-        if (isSubmitting) return;
+    @Override
+    protected void setupFormValidation() {
+        // Enable submit button only when required fields are filled
+        titleField.textProperty().addListener((obs, old, val) ->
+                updateSubmitButtonState()
+        );
+    }
 
-        isSubmitting = true;
-        addButton.setDisable(true);
-        cancelButton.setDisable(true);
+    @Override
+    protected boolean isFormValid() {
+        return titleField != null &&
+                !titleField.getText().trim().isEmpty();
+    }
 
+    @Override
+    protected boolean validateForm() {
+        if (titleField.getText().trim().isEmpty()) {
+            showError("Title is required");
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void handleAsyncSubmit() {
+        Long userID = AppSession.getInstance().getUserRecord().userID();
+
+        // Create BookData record
         BookData bookData = new BookData(
                 titleField.getText().trim(),
                 authorField.getText().trim(),
@@ -171,17 +139,7 @@ public class AddBookDialog extends Dialog<BookData> {
                 notesArea.getText().trim()
         );
 
-        submitBook(bookData);
-    }
-
-    private void submitBook(BookData bookData) {
-        // Show loading state
-        loadingIndicator.setVisible(true);
-        statusLabel.setVisible(false);
-
-        Long userID = AppSession.getInstance().getUserRecord().userID();
-
-        // Create request
+        // Create API request
         BookAddRequest request = new BookAddRequest(
                 bookData.title(),
                 bookData.author(),
@@ -194,48 +152,20 @@ public class AddBookDialog extends Dialog<BookData> {
         libraryService.addBook(
                 userID,
                 request,
-                // Success
-                bookWithStatus -> {
-                    System.out.println("Book successfully added to library: " + bookWithStatus.book().getTitle());
-                    Platform.runLater(() -> {
-                        loadingIndicator.setVisible(false);
-                        showSuccess("Book added successfully!");
-
-                        // Close dialog after short delay
-                        javafx.animation.PauseTransition pause =
-                                new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1));
-                        pause.setOnFinished(e -> {
-                            setResult(bookData); // Set result before closing
-                            close();
-                        });
-                        pause.play();
-                    });
-                },
+                // Success - return BookData to dialog result
+                bookWithStatus -> onSubmitSuccess(bookData),
                 // Error
-                errorMessage -> {
-                    System.err.println("Failed to add book: " + errorMessage);
-                    Platform.runLater(() -> {
-                        loadingIndicator.setVisible(false);
-                        isSubmitting = false;
-                        addButton.setDisable(false);
-                        cancelButton.setDisable(false);
-                        showError(errorMessage);
-                    });
-                }
+                this::onSubmitError
         );
     }
 
-    private void showSuccess(String message) {
-        statusLabel.setText(message);
-        statusLabel.getStyleClass().removeAll("error-label");
-        statusLabel.getStyleClass().add("success-label");
-        statusLabel.setVisible(true);
+    @Override
+    protected String getSuccessMessage(BookData result) {
+        return "Book added successfully!";
     }
 
-    private void showError(String message) {
-        statusLabel.setText(message);
-        statusLabel.getStyleClass().removeAll("success-label");
-        statusLabel.getStyleClass().add("error-label");
-        statusLabel.setVisible(true);
+    @Override
+    protected double getSuccessCloseDelay() {
+        return 1.0;
     }
 }
