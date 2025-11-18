@@ -154,14 +154,13 @@ public class ClubRepository {
      * @param invite the invite itself
      * @return CompletableFuture void
      */
-    public CompletableFuture<Club> redeemInvite(String invite) {
+    public CompletableFuture<ClubMembership> redeemInvite(String invite) {
         return apiClient.post("/api/clubs/join", new Invite(invite), ClubMembership.class)
                 .thenApply(membership -> {
                     Platform.runLater(() -> {
                         userClubs.add(membership.getClub());
-                        AppSession.getInstance().setCurrentClub(membership.getClub());
                     });
-                    return membership.getClub();
+                    return membership;
                 });
     }
 
