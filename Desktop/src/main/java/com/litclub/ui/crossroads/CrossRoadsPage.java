@@ -172,7 +172,7 @@ public class CrossRoadsPage extends BorderPane {
 
     private void redeemInvite() {
         RedeemInviteDialog inviteDialog = new RedeemInviteDialog(service);
-        inviteDialog.showAndWait().ifPresent(code -> System.out.println("Redeemed invitation: " + code));
+        inviteDialog.showAndWait();
     }
 }
 

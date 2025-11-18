@@ -256,24 +256,53 @@ public class CrossRoadsService {
                 });
     }
 
-    public CompletableFuture<Club> redeemInvite(
+    public CompletableFuture<Void> redeemInvite(
             String invite,
-            Consumer<Club> onSuccess,
+            Runnable onSuccess,
             Consumer<String> onError
     ) {
+        UserRecord user = session.getUserRecord();
+        if (user == null) {
+            Platform.runLater(() -> onError.accept("User session not found"));
+            return CompletableFuture.completedFuture(null);
+        }
+
         return clubRepository.redeemInvite(invite)
-                .thenApply(club -> {
-                    Platform.runLater(() -> onSuccess.accept(club));
-                    return club;
+                .thenCompose(membership -> {
+
+                    // Extract the club ID from the membership
+                    Long clubID = membership.getClubMembershipID().getClubID();
+
+                    // Refresh user's clubs
+                    return clubRepository.fetchUserClubs(user.userID())
+                            .thenApply(v -> clubID); // pass clubID along
                 })
-                .exceptionally(throwable -> {
+                .thenAccept(clubID -> {
                     Platform.runLater(() -> {
-                        String message = ApiErrorHandler.parseError(throwable);
-                        onError.accept("failed to redeem invite: " + message);
+                        // Set the current club using existing cached list
+                        var club = getClubs().stream()
+                                .filter(c -> c.getClubID().equals(clubID))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (club != null) {
+                            session.setCurrentClub(club);
+                            onSuccess.run();
+                        } else {
+                            onError.accept("Invite redeemed but club not found after refresh.");
+                        }
+                    });
+                })
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        String message = ApiErrorHandler.parseError(ex);
+                        onError.accept("Failed to redeem invite: " + message);
                     });
                     return null;
                 });
     }
+
+
 
     // ==================== OBSERVABLE DATA ACCESS ====================
 
