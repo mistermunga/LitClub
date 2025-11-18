@@ -1,72 +1,34 @@
 package com.litclub.ui.crossroads.components.subcomponents;
 
-import com.litclub.SceneManager;
-import com.litclub.session.AppSession;
 import com.litclub.ui.crossroads.service.CrossRoadsService;
-import javafx.animation.PauseTransition;
+import com.litclub.ui.dialog.BaseAsyncDialog;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
-public class RedeemInviteDialog extends Dialog<String> {
-
-    private Button redeemButton;
-    private Button cancelButton;
-    private TextField inviteField;
-    private Label statusLabel;
-    private ProgressIndicator loadingIndicator;
+/**
+ * Dialog for redeeming club invitation codes.
+ */
+public class RedeemInviteDialog extends BaseAsyncDialog<Void> {
 
     private final CrossRoadsService crossRoadsService;
-    private boolean isSubmitting;
+    private TextField inviteField;
 
     public RedeemInviteDialog(CrossRoadsService crossRoadsService) {
+        super("Redeem Invite", "Redeem");
         this.crossRoadsService = crossRoadsService;
-
-        setTitle("Redeem Invite");
-        setHeaderText("Enter invitation code");
-        setResizable(true);
-
-        ButtonType redeemButtonType = new ButtonType("Redeem", ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().addAll(redeemButtonType, ButtonType.CANCEL);
-
-        // Build UI
-        VBox content = createContent();
-        getDialogPane().setContent(content);
-
-        // Get references to buttons
-        redeemButton = (Button) getDialogPane().lookupButton(redeemButtonType);
-        cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
-        redeemButton.setDisable(true);
-
-        // Enable redeem button only when invite field has text
-        inviteField.textProperty().addListener((obs, old, val) ->
-                redeemButton.setDisable(val.trim().isEmpty() || isSubmitting)
-        );
-
-        // Prevent dialog from closing on button click
-        redeemButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            if (!isSubmitting) {
-                event.consume(); // Prevent default close behavior
-                handleSubmit();
-            }
-        });
-
-        // Don't use result converter - handle submission manually
-        setResultConverter(buttonType -> null);
+        setHeaderText("Enter your invitation code to join a club");
     }
 
-    private VBox createContent() {
-        VBox container = new VBox(15);
-        container.setPadding(new Insets(20));
-        container.setMinWidth(500);
-        container.getStyleClass().add("container");
-
+    @Override
+    protected Node createFormContent() {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(15);
+        grid.setPadding(new Insets(10, 0, 0, 0));
 
         Label titleLabel = new Label("Invite Code:");
         titleLabel.getStyleClass().add("label");
@@ -78,89 +40,53 @@ public class RedeemInviteDialog extends Dialog<String> {
         grid.add(titleLabel, 0, 0);
         grid.add(inviteField, 1, 0);
 
-        // Status message
-        statusLabel = new Label();
-        statusLabel.getStyleClass().add("status-label");
-        statusLabel.setVisible(false);
-        statusLabel.setWrapText(true);
-        statusLabel.setMaxWidth(450);
-
-        // Loading indicator
-        loadingIndicator = new ProgressIndicator();
-        loadingIndicator.setMaxSize(30, 30);
-        loadingIndicator.setVisible(false);
-
-        container.getChildren().addAll(grid, statusLabel, loadingIndicator);
-        return container;
+        return grid;
     }
 
-    private void handleSubmit() {
-        if (isSubmitting) return;
+    @Override
+    protected void setupFormValidation() {
+        inviteField.textProperty().addListener((obs, old, val) -> updateSubmitButtonState());
+    }
 
-        String inviteCode = inviteField.getText().trim();
+    @Override
+    protected boolean isFormValid() {
+        return inviteField != null && !inviteField.getText().trim().isEmpty();
+    }
 
-        // Basic validation
-        if (inviteCode.isEmpty()) {
+    @Override
+    protected boolean validateForm() {
+        String code = inviteField.getText().trim();
+        if (code.isEmpty()) {
             showError("Please enter an invite code");
-            return;
+            return false;
         }
-
-        isSubmitting = true;
-        redeemButton.setDisable(true);
-        cancelButton.setDisable(true);
-
-        submitCode(inviteCode);
+        return true;
     }
 
-    private void submitCode(String code) {
-        loadingIndicator.setVisible(true);
-        statusLabel.setVisible(false);
-
+    @Override
+    protected void handleAsyncSubmit() {
+        String code = inviteField.getText().trim();
         System.out.println("Redeeming invite: " + code);
 
         crossRoadsService.redeemInvite(
                 code,
-                // Success callback
-                club -> Platform.runLater(() -> {
-                    loadingIndicator.setVisible(false);
-                    showSuccess("Successfully joined " + club.getClubName() + "!");
-
-                    // Close dialog after delay
-                    PauseTransition pause = new PauseTransition(Duration.seconds(1.5));
-                    pause.setOnFinished(e -> {
-                        setResult(code);
-                        AppSession.getInstance().setCurrentClub(club);
-                        SceneManager.getInstance().showMainPage(false);
-                        close();
-                    });
-                    pause.play();
-                }),
-                // Error callback
-                errorMessage -> Platform.runLater(() -> {
-                    loadingIndicator.setVisible(false);
-                    resetSubmittingState();
-                    showError(errorMessage);
-                })
+                // Success: explicitly call onSubmitSuccess and then close dialog on FX thread
+                (() -> Platform.runLater(() -> {
+                    onSubmitSuccess(null);
+                    close();
+                })),
+                // Error
+                this::onSubmitError
         );
     }
 
-    private void showSuccess(String message) {
-        statusLabel.setText(message);
-        statusLabel.getStyleClass().removeAll("error-label");
-        statusLabel.getStyleClass().add("success-label");
-        statusLabel.setVisible(true);
+    @Override
+    protected String getSuccessMessage(Void result) {
+        return "Invite redeemed!";
     }
 
-    private void showError(String message) {
-        statusLabel.setText(message);
-        statusLabel.getStyleClass().removeAll("success-label");
-        statusLabel.getStyleClass().add("error-label");
-        statusLabel.setVisible(true);
-    }
-
-    private void resetSubmittingState() {
-        isSubmitting = false;
-        redeemButton.setDisable(false);
-        cancelButton.setDisable(false);
+    @Override
+    protected double getSuccessCloseDelay() {
+        return 1.5;
     }
 }
