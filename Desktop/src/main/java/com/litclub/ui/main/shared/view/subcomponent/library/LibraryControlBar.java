@@ -74,29 +74,16 @@ public class LibraryControlBar extends HBox {
 
     private void updateStats() {
         int totalBooks = libraryService.getTotalBookCount();
-        int booksThisYear = countBooksReadThisYear();
+        int booksThisYear = libraryService.getBooksReadThisYear();
 
         // Calculate books per month average
         int currentMonth = LocalDate.now().getMonthValue();
-        float rate = currentMonth > 0 ? (float) booksThisYear / currentMonth : 0;
+        float rate = (float) booksThisYear / currentMonth;
         String formattedRate = String.format("%.1f", rate);
 
         statsLabel.setText("📚 " + totalBooks + " books  |  " +
                 booksThisYear + " this year  |  " +
                 formattedRate + " books/month");
-    }
-
-    private int countBooksReadThisYear() {
-        // Count books in "Read" category from this year
-        // This is a simplification - you might want to track dateFinished in BookWithStatus
-        int currentYear = LocalDate.now().getYear();
-        return (int) libraryService.getFinishedReading().stream()
-                .filter(book -> {
-                    // If book has year info, check if it was read this year
-                    LocalDate bookYear = book.getYear();
-                    return bookYear != null && bookYear.getYear() == currentYear;
-                })
-                .count();
     }
 
     private void addSpacer() {
