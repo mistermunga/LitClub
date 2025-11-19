@@ -1,5 +1,6 @@
 package com.litclub.ui.dialog;
 
+import com.litclub.theme.ThemeManager;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -116,6 +117,12 @@ public abstract class BaseAsyncDialog<T> extends Dialog<T> {
 
         // Result converter (returns null by default, result set via onSubmitSuccess)
         setResultConverter(buttonType -> dialogResult);
+
+        ThemeManager.getInstance().registerComponent(this.getDialogPane());
+        getDialogPane().getStyleClass().add("root");
+
+        submitButton.getStyleClass().add("button-primary");
+        cancelButton.getStyleClass().add("secondary-button");
     }
 
     // ==================== ABSTRACT METHODS (must be implemented by subclasses) ====================
