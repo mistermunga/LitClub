@@ -5,6 +5,7 @@ import com.litclub.construct.Book;
 import com.litclub.construct.enums.BookStatus;
 import com.litclub.construct.interfaces.library.BookAddRequest;
 import com.litclub.construct.interfaces.library.BookWithStatus;
+import com.litclub.construct.interfaces.library.UserLibrary;
 import com.litclub.construct.interfaces.library.book.BookSearchRequest;
 import com.litclub.persistence.repository.LibraryRepository;
 import com.litclub.session.AppSession;
@@ -295,5 +296,10 @@ public class LibraryService {
      */
     public int getTotalBookCount() {
         return getAllBooks().size();
+    }
+
+    public int getBooksReadThisYear() {
+        UserLibrary userLibrary = libraryRepository.getUserLibrary();
+        return userLibrary.read().size();
     }
 }
