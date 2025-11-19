@@ -5,6 +5,8 @@ import com.litclub.construct.Review;
 import com.litclub.construct.enums.BookStatus;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.view.service.LibraryService;
+import com.litclub.ui.main.shared.view.service.ReviewService;
+import com.litclub.ui.main.shared.view.subcomponent.library.dialog.AddReviewDialog;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -19,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 public class BookFocus extends ScrollPane {
 
     private final LibraryService libraryService;
+    private final ReviewService reviewService;
     private final Runnable onBack;
     private final VBox container;
     private final HBox bookHeader;
@@ -27,8 +30,9 @@ public class BookFocus extends ScrollPane {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM, yyyy");
 
-    public BookFocus(LibraryService libraryService, Runnable onBack) {
+    public BookFocus(LibraryService libraryService, Runnable onBack, ReviewService reviewService) {
         this.libraryService = libraryService;
+        this.reviewService = reviewService;
         this.onBack = onBack;
 
         ThemeManager.getInstance().registerComponent(this);
@@ -204,7 +208,12 @@ public class BookFocus extends ScrollPane {
 
     private void handleAddReview() {
         System.out.println("Add review for: " + currentBook.getTitle());
-        // TODO: Open add review dialog
+        AddReviewDialog reviewDialog = new AddReviewDialog(
+                currentBook.getBookID(),
+                currentBook.getTitle(),
+                reviewService
+        );
+        reviewDialog.showAndWait();
     }
 
     private void handleRemoveBook() {
