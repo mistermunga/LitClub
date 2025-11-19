@@ -3,10 +3,13 @@ package com.litclub.ui.main.shared.view.subcomponent.library.subview;
 import com.litclub.construct.Book;
 import com.litclub.construct.Review;
 import com.litclub.construct.enums.BookStatus;
+import com.litclub.construct.interfaces.review.LoadedReview;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.library.dialog.AddReviewDialog;
+import com.litclub.ui.main.shared.view.subcomponent.library.dialog.subcomponent.StarRater;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -25,6 +28,7 @@ public class BookFocus extends ScrollPane {
     private final Runnable onBack;
     private final VBox container;
     private final HBox bookHeader;
+    private VBox reviewsSection;
 
     private Book currentBook;
 
@@ -75,7 +79,7 @@ public class BookFocus extends ScrollPane {
     public void loadBook(Book book) {
         this.currentBook = book;
         buildBookHeader();
-        addReviewsSection();
+        loadReviewsSection();
     }
 
     private void buildBookHeader() {
@@ -177,26 +181,119 @@ public class BookFocus extends ScrollPane {
         return actionRow;
     }
 
-    private void addReviewsSection() {
+    private void loadReviewsSection() {
         // Clear any existing content below header
         if (container.getChildren().size() > 1) {
             container.getChildren().remove(1, container.getChildren().size());
         }
 
-        VBox reviewsSection = new VBox(15);
+        // Create reviews section with loading indicator
+        reviewsSection = new VBox(15);
         reviewsSection.getStyleClass().add("card");
         reviewsSection.setPadding(new Insets(24));
 
         Label reviewsHeader = new Label("Reviews");
         reviewsHeader.getStyleClass().add("section-title");
 
-        // TODO: Load and display reviews here
-        Label placeholder = new Label("Reviews will be displayed here");
-        placeholder.getStyleClass().add("text-muted");
-        placeholder.setStyle("-fx-font-style: italic;");
+        // Loading indicator
+        ProgressIndicator loadingIndicator = new ProgressIndicator();
+        loadingIndicator.setMaxSize(40, 40);
+        VBox loadingBox = new VBox(loadingIndicator);
+        loadingBox.setAlignment(Pos.CENTER);
+        loadingBox.setPadding(new Insets(20));
 
-        reviewsSection.getChildren().addAll(reviewsHeader, placeholder);
+        reviewsSection.getChildren().addAll(reviewsHeader, loadingBox);
         container.getChildren().add(reviewsSection);
+
+        // Fetch reviews asynchronously
+        reviewService.fetchReviews(
+                currentBook.getBookID(),
+                this::displayReviews,
+                this::displayReviewsError
+        );
+    }
+
+    private void displayReviews() {
+        // Clear loading indicator
+        reviewsSection.getChildren().clear();
+
+        Label reviewsHeader = new Label("Reviews");
+        reviewsHeader.getStyleClass().add("section-title");
+        reviewsSection.getChildren().add(reviewsHeader);
+
+        ObservableList<LoadedReview> reviews = reviewService.getReviewList();
+
+        if (reviews.isEmpty()) {
+            Label noReviewsLabel = new Label("No reviews yet. Be the first to review this book!");
+            noReviewsLabel.getStyleClass().add("text-muted");
+            noReviewsLabel.setStyle("-fx-font-style: italic;");
+            reviewsSection.getChildren().add(noReviewsLabel);
+        } else {
+            VBox reviewsList = new VBox(15);
+            for (LoadedReview review : reviews) {
+                reviewsList.getChildren().add(createReviewCard(review));
+            }
+            reviewsSection.getChildren().add(reviewsList);
+        }
+    }
+
+    private void displayReviewsError(String errorMessage) {
+        // Clear loading indicator
+        reviewsSection.getChildren().clear();
+
+        Label reviewsHeader = new Label("Reviews");
+        reviewsHeader.getStyleClass().add("section-title");
+
+        Label errorLabel = new Label("Failed to load reviews: " + errorMessage);
+        errorLabel.getStyleClass().add("error-text");
+        errorLabel.setWrapText(true);
+
+        Button retryButton = new Button("Retry");
+        retryButton.getStyleClass().add("secondary-button");
+        retryButton.setOnAction(e -> loadReviewsSection());
+
+        reviewsSection.getChildren().addAll(reviewsHeader, errorLabel, retryButton);
+    }
+
+    private VBox createReviewCard(LoadedReview loadedReview) {
+        VBox reviewCard = new VBox(12);
+        reviewCard.setPadding(new Insets(20, 24, 20, 24));
+        reviewCard.getStyleClass().add("card");
+
+        Review review = loadedReview.review();
+
+        // Header: username and date
+        HBox headerRow = new HBox(10);
+        headerRow.setAlignment(Pos.CENTER_LEFT);
+
+        Label usernameLabel = new Label("by " + loadedReview.username());
+        usernameLabel.getStyleClass().add("label");
+        usernameLabel.setStyle("-fx-font-weight: bold;");
+
+        if (review.getContent() != null) {
+            Label dateLabel = new Label("• " + review.getCreatedAt().format(DATE_FORMATTER));
+            dateLabel.getStyleClass().add("text-muted");
+            headerRow.getChildren().addAll(usernameLabel, dateLabel);
+        } else {
+            headerRow.getChildren().add(usernameLabel);
+        }
+
+        // Star rating
+        StarRater starRater = new StarRater(false);
+        starRater.setRating(review.getRating());
+
+        reviewCard.getChildren().addAll(headerRow, starRater);
+
+        // Review text (if present)
+        if (review.getContent() != null && !review.getContent().trim().isEmpty()) {
+            Label reviewTextLabel = new Label(review.getContent());
+            reviewTextLabel.setWrapText(true);
+            reviewTextLabel.getStyleClass().add("label");
+            reviewTextLabel.setStyle("-fx-padding: 10 0 0 0;");
+            reviewCard.getChildren().add(reviewTextLabel);
+        }
+
+        return reviewCard;
     }
 
     // ==================== EVENT HANDLERS ====================
@@ -213,7 +310,10 @@ public class BookFocus extends ScrollPane {
                 currentBook.getTitle(),
                 reviewService
         );
-        reviewDialog.showAndWait();
+        reviewDialog.showAndWait().ifPresent(result -> {
+            // Reload reviews after adding a new one
+            loadReviewsSection();
+        });
     }
 
     private void handleRemoveBook() {
