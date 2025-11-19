@@ -438,6 +438,21 @@ public class LibraryRepository {
                 });
     }
 
+    public CompletableFuture<List<Review>> fetchReviewsRecursive(Long bookID, int page, List<Review> accumulator) {
+        TypeReference<PageResponse<Review>> typeRef = new TypeReference<>() {};
+
+        return apiClient.get("/api/books/" + bookID + "/reviews?page=" + page + "&size=100", typeRef)
+                .thenCompose(pageResponse -> {
+                    accumulator.addAll(pageResponse.getContent());
+
+                    if (pageResponse.hasNext()) {
+                        return fetchReviewsRecursive(bookID, page + 1, accumulator);
+                    } else {
+                        return CompletableFuture.completedFuture(accumulator);
+                    }
+                });
+    }
+
     /**
      * Creates or updates a review for a book.
      *
