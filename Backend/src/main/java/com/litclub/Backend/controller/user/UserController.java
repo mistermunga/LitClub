@@ -10,6 +10,7 @@ import com.litclub.Backend.entity.*;
 import com.litclub.Backend.construct.user.*;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
 import com.litclub.Backend.service.low.ReviewService;
+import com.litclub.Backend.service.low.UserBooksService;
 import com.litclub.Backend.service.middle.BookService;
 import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
@@ -37,19 +38,21 @@ public class UserController {
     private final BookService bookService;
     private final DiscussionManagementService discussionManagementService;
     private final ReviewService reviewService;
+    private final UserBooksService userBooksService;
 
     public UserController(UserService userService,
                           UserActivityService userActivityService,
                           LibraryManagementService libraryManagementService,
                           BookService bookService,
                           DiscussionManagementService discussionManagementService,
-                          ReviewService reviewService) {
+                          ReviewService reviewService, UserBooksService userBooksService) {
         this.userService = userService;
         this.userActivityService = userActivityService;
         this.libraryManagementService = libraryManagementService;
         this.bookService = bookService;
         this.discussionManagementService = discussionManagementService;
         this.reviewService = reviewService;
+        this.userBooksService = userBooksService;
     }
 
     // ====== USER INFO ======
@@ -138,6 +141,24 @@ public class UserController {
     ) {
         BookWithStatus book = libraryManagementService.addBookToLibrary(userID, bookAddRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(book);
+    }
+
+    @GetMapping("/{userID}/library/{bookID}")
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public ResponseEntity<BookWithStatus> getBookDetails(
+            @PathVariable("userID") Long userID,
+            @PathVariable("bookID") Long bookID
+    ) {
+        User user = userService.requireUserById(userID);
+        Book book = bookService.getBook(bookID);
+        UserBook userBook = userBooksService.getUserBookByUserAndBook(user, book);
+        return ResponseEntity.ok(new BookWithStatus(
+                book,
+                userBook.getStatus(),
+                userBook.getRating(),
+                userBook.getDateStarted(),
+                userBook.getDateFinished()
+        ));
     }
 
     @PutMapping("/{userID}/library/{bookID}")
