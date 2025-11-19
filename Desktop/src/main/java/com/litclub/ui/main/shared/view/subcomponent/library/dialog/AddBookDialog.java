@@ -153,7 +153,7 @@ public class AddBookDialog extends BaseAsyncDialog<BookData> {
                 userID,
                 request,
                 // Success - return BookData to dialog result
-                bookWithStatus -> onSubmitSuccess(bookData),
+                _ -> onSubmitSuccess(bookData),
                 // Error
                 this::onSubmitError
         );
