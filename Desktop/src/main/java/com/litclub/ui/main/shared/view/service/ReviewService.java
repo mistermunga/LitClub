@@ -3,6 +3,7 @@ package com.litclub.ui.main.shared.view.service;
 import com.litclub.client.api.ApiErrorHandler;
 import com.litclub.construct.Review;
 import com.litclub.construct.interfaces.library.ReviewRequest;
+import com.litclub.construct.interfaces.review.LoadedReview;
 import com.litclub.persistence.repository.LibraryRepository;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
 public class ReviewService {
 
     private final LibraryRepository libraryRepository;
-    private final ObservableList<Review> reviewList = FXCollections.observableArrayList();
+    private final ObservableList<LoadedReview> reviewList = FXCollections.observableArrayList();
 
     public ReviewService() {
         this.libraryRepository = LibraryRepository.getInstance();
@@ -65,7 +66,7 @@ public class ReviewService {
                 });
     }
 
-    public ObservableList<Review> getReviewList() {
+    public ObservableList<LoadedReview> getReviewList() {
         return reviewList;
     }
 }
