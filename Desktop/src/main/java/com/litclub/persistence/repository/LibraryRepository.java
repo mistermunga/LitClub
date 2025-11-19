@@ -11,6 +11,7 @@ import com.litclub.construct.interfaces.library.ReviewRequest;
 import com.litclub.construct.interfaces.library.UserLibrary;
 import com.litclub.construct.interfaces.library.book.BookSearchRequest;
 import com.litclub.construct.interfaces.note.NoteCreateRequest;
+import com.litclub.construct.interfaces.review.LoadedReview;
 import com.litclub.construct.interfaces.user.UserRecord;
 import com.litclub.construct.interfaces.user.UserRegistrationRecord;
 import com.litclub.construct.interfaces.user.UserLoginRecord;
@@ -438,8 +439,8 @@ public class LibraryRepository {
                 });
     }
 
-    public CompletableFuture<List<Review>> fetchReviewsRecursive(Long bookID, int page, List<Review> accumulator) {
-        TypeReference<PageResponse<Review>> typeRef = new TypeReference<>() {};
+    public CompletableFuture<List<LoadedReview>> fetchReviewsRecursive(Long bookID, int page, List<LoadedReview> accumulator) {
+        TypeReference<PageResponse<LoadedReview>> typeRef = new TypeReference<>() {};
 
         return apiClient.get("/api/books/" + bookID + "/reviews?page=" + page + "&size=100", typeRef)
                 .thenCompose(pageResponse -> {
@@ -627,4 +628,7 @@ public class LibraryRepository {
 
         cacheManager.clearCache();
     }
+
+
+
 }
