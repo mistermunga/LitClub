@@ -3,6 +3,7 @@ package com.litclub.ui.main.shared.view.subcomponent.library;
 import com.litclub.construct.Book;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.view.service.LibraryService;
+import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.library.subview.BookFocus;
 import com.litclub.ui.main.shared.view.subcomponent.library.subview.DefaultLibraryCore;
 import javafx.scene.layout.StackPane;
@@ -26,10 +27,11 @@ public class LibraryCore extends StackPane {
 
         // Create library service once
         LibraryService libraryService = new LibraryService();
+        ReviewService reviewService = new ReviewService();
 
         // Create subviews
         defaultLibraryCore = new DefaultLibraryCore(this::navigateToBook);
-        bookFocus = new BookFocus(libraryService, this::navigateBack);
+        bookFocus = new BookFocus(libraryService, this::navigateBack, reviewService);
 
         // Add both to stack (only one visible at a time)
         this.getChildren().addAll(defaultLibraryCore, bookFocus);
