@@ -82,8 +82,17 @@ public class BookController {
 
     @GetMapping("/{bookID}/reviews")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Page<Review>> getBookReviews(@PathVariable Long bookID, Pageable pageable) {
-        return ResponseEntity.ok(reviewService.getReviews(bookService.getBook(bookID), pageable));
+    public ResponseEntity<Page<LoadedReview>> getBookReviews(
+            @PathVariable Long bookID,
+            Pageable pageable
+    ) {
+        Page<Review> page = reviewService.getReviews(bookService.getBook(bookID), pageable);
+
+        Page<LoadedReview> mapped = page.map(r ->
+                new LoadedReview(r.getUser().getUsername(), r)
+        );
+
+        return ResponseEntity.ok(mapped);
     }
 
     @PostMapping("/{bookID}/reviews")
@@ -274,4 +283,7 @@ public class BookController {
             throw new AccessDeniedException("cannot delete another user's reply");
         }
     }
+
+    public record LoadedReview(String username, Review review) {}
+
 }
