@@ -40,7 +40,7 @@ public class SceneManager {
         stage.setMaximized(false);
         stage.setResizable(true);
         stage.setHeight(600);
-        stage.setWidth(550);
+        stage.setWidth(560);
 
         stage.setScene(scene);
         stage.show();
@@ -53,6 +53,10 @@ public class SceneManager {
         Scene scene = new Scene(loginPage);
 
         stage.setTitle("LitClub Desktop - Login");
+        stage.setMaximized(false);
+        stage.setResizable(true);
+        stage.setHeight(600);
+        stage.setWidth(560);
         stage.setScene(scene);
         stage.show();
     }
