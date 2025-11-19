@@ -42,6 +42,8 @@ public class LibraryRepository {
     private final ApiClient apiClient;
     private final CacheManager cacheManager;
 
+    private UserLibrary userLibrary;
+
     // Observable data stores
     private final ObservableList<Book> allBooks;
     private final ObservableList<Book> currentlyReading;
@@ -155,6 +157,8 @@ public class LibraryRepository {
                         currentlyReading.clear();
                         wantToRead.clear();
                         finishedReading.clear();
+
+                        this.userLibrary = library;
 
                         System.out.println("Received library data:");
                         System.out.println("  Currently Reading: " + library.currentlyReading().size());
@@ -588,6 +592,8 @@ public class LibraryRepository {
     public UserRecord getCurrentUser() {
         return currentUser;
     }
+
+    public UserLibrary getUserLibrary() { return userLibrary; }
 
     // ==================== UTILITY ====================
 
