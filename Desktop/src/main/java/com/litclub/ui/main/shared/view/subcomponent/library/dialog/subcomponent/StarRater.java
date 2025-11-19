@@ -1,6 +1,8 @@
 package com.litclub.ui.main.shared.view.subcomponent.library.dialog.subcomponent;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
@@ -13,10 +15,12 @@ import java.util.Objects;
 /**
  * StarRater: A simple JavaFX control for rating out of 10 using 5 stars.
  * Each star represents 0.5 increments.
+ * Can be editable (for setting ratings) or read-only (for display only).
  */
 public class StarRater extends HBox {
 
     private final IntegerProperty rating = new SimpleIntegerProperty(0); // 0–10 inclusive
+    private final BooleanProperty editable = new SimpleBooleanProperty(true);
 
     private final Image fullStar;
     private final Image halfStar;
@@ -27,12 +31,19 @@ public class StarRater extends HBox {
     private final ImageView[] stars = new ImageView[5];
 
     public StarRater() {
+        this(true);
+    }
+
+    public StarRater(boolean editable) {
         setSpacing(4);
         setAlignment(Pos.CENTER_LEFT);
 
         fullStar = loadImage("full-black-star.png");
         halfStar = loadImage("half-black-star.png");
         emptyStar = loadImage("no-star.png");
+
+        this.editable.set(editable);
+        this.editable.addListener((obs, oldVal, newVal) -> updateInteractivity());
 
         initializeStars();
         updateStars();
@@ -48,6 +59,7 @@ public class StarRater extends HBox {
             stars[i] = starView;
             getChildren().add(starView);
         }
+        updateInteractivity();
     }
 
     private ImageView createStarView(int index) {
@@ -55,15 +67,32 @@ public class StarRater extends HBox {
         star.setFitWidth(24);
         star.setFitHeight(24);
 
-        star.addEventHandler(MouseEvent.MOUSE_MOVED, e -> previewRating(index, e));
-        star.addEventHandler(MouseEvent.MOUSE_EXITED, e -> updateStars());
-        star.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> applyRating(index, e));
+        star.addEventHandler(MouseEvent.MOUSE_MOVED, e -> {
+            if (editable.get()) previewRating(index, e);
+        });
+        star.addEventHandler(MouseEvent.MOUSE_EXITED, e -> {
+            if (editable.get()) updateStars();
+        });
+        star.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            if (editable.get()) applyRating(index, e);
+        });
 
         return star;
     }
 
     private Image loadImage(String name) {
         return new Image(Objects.requireNonNull(getClass().getResource(STARPATH + name)).toExternalForm());
+    }
+
+    /* --------------------------
+     *  Interactivity Management
+     * -------------------------- */
+
+    private void updateInteractivity() {
+        String cursorStyle = editable.get() ? "hand" : "default";
+        for (ImageView star : stars) {
+            star.setStyle("-fx-cursor: " + cursorStyle + ";");
+        }
     }
 
     /* --------------------------
@@ -120,5 +149,16 @@ public class StarRater extends HBox {
         rating.set(value);
         updateStars();
     }
-}
 
+    public boolean isEditable() {
+        return editable.get();
+    }
+
+    public BooleanProperty editableProperty() {
+        return editable;
+    }
+
+    public void setEditable(boolean value) {
+        editable.set(value);
+    }
+}
