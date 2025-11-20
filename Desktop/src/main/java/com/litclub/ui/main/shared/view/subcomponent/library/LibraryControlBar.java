@@ -1,6 +1,8 @@
 package com.litclub.ui.main.shared.view.subcomponent.library;
 
 import com.litclub.construct.Book;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.subcomponent.library.dialog.AddBookDialog;
 import javafx.geometry.Insets;
@@ -276,6 +278,7 @@ public class LibraryControlBar extends HBox {
             // Dialog returns book data, service handles the rest
             System.out.println("Book added via dialog: " + bookData.title());
         });
+        EventBus.getInstance().emit(EventType.BOOKS_UPDATED);
     }
 
     // ==================== PUBLIC METHODS ====================
