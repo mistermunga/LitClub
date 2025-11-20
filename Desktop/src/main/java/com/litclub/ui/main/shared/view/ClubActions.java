@@ -3,6 +3,7 @@ package com.litclub.ui.main.shared.view;
 import com.litclub.construct.enums.ClubRole;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.ClubService;
+import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddDiscussionPromptDialog;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -45,11 +46,19 @@ public class ClubActions extends VBox {
             System.out.println("Generated Invite: " + code);
         });
 
-        box.getChildren().addAll(getInviteButton, codeLabel);
+        Button createDiscussionButton = new Button("Create Discussion");
+        createDiscussionButton.setOnAction(e -> createDiscussionPrompt());
+
+        box.getChildren().addAll(getInviteButton, codeLabel, createDiscussionButton);
 
         // TODO add moderator-specific buttons, etc
 
         return box;
+    }
+
+    private void createDiscussionPrompt() {
+        AddDiscussionPromptDialog promptDialog = new AddDiscussionPromptDialog();
+        promptDialog.showAndWait();
     }
 
     private Node createOwnerUI() {
