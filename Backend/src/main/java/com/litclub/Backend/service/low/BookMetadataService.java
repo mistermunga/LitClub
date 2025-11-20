@@ -161,6 +161,11 @@ public class BookMetadataService {
                         dto.getTitle(),
                         dto.getPrimaryAuthor()
                 );
+
+                if (existingByTitle.isEmpty()) {
+                    existingByTitle = bookRepository.findAllByTitle(dto.getTitle()).stream().findFirst();
+                }
+
                 if (existingByTitle.isPresent()) {
                     isbnCache.put(dto.getTitle() + "|" + dto.getPrimaryAuthor(), existingByTitle.get());
                     return existingByTitle;
