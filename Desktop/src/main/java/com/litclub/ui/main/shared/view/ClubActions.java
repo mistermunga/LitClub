@@ -2,6 +2,8 @@ package com.litclub.ui.main.shared.view;
 
 import com.litclub.construct.enums.ClubRole;
 import com.litclub.session.AppSession;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.ClubService;
 import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddDiscussionPromptDialog;
 import javafx.scene.Node;
@@ -58,7 +60,10 @@ public class ClubActions extends VBox {
 
     private void createDiscussionPrompt() {
         AddDiscussionPromptDialog promptDialog = new AddDiscussionPromptDialog();
-        promptDialog.showAndWait();
+        promptDialog.showAndWait().ifPresent(prompt -> {
+            System.out.println("Added Discussion Prompt: " + prompt.getPrompt());
+            EventBus.getInstance().emit(EventType.DISCUSSION_PROMPTS_UPDATED);
+        });
     }
 
     private Node createOwnerUI() {
