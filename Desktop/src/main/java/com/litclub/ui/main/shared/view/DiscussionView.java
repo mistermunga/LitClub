@@ -2,6 +2,8 @@ package com.litclub.ui.main.shared.view;
 
 import com.litclub.construct.DiscussionPrompt;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.DiscussionService;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -23,6 +25,7 @@ public class DiscussionView extends ScrollPane {
 
     public DiscussionView() {
         discussionService = new DiscussionService();
+        EventBus.getInstance().on(EventType.DISCUSSION_PROMPTS_UPDATED, this::loadPrompts);
 
         ThemeManager.getInstance().registerComponent(this);
         this.getStyleClass().addAll("discussion-view", "scroll-pane");
