@@ -2,35 +2,35 @@ package com.litclub.ui.main.shared.view.subcomponent.notes.dialog;
 
 import com.litclub.construct.Book;
 import com.litclub.construct.DiscussionPrompt;
+import com.litclub.construct.Note;
 import com.litclub.construct.interfaces.note.NoteCreateRequest;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.NoteService;
-import javafx.animation.PauseTransition;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
+import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class AddNoteDialog extends Dialog<NoteCreateRequest> {
+import java.util.Objects;
 
-    private final LibraryService libraryService;
-    private final NoteService noteService;
-    private final AppSession session = AppSession.getInstance();
+public class AddNoteDialog extends BaseAsyncDialog<Note> {
 
-    private final boolean isPersonal;
+    // services and session (assigned in constructor)
+    private LibraryService libraryService;
+    private NoteService noteService;
+    private AppSession session;
+
+    // mode
+    private boolean isPersonal;
     private DiscussionPrompt prompt;
 
+    // form controls (created in createFormContent)
     private ComboBox<String> booksComboBox;
     private TextArea noteTextArea;
-    private Label statusLabel;
-    private ProgressIndicator loadingIndicator;
-
-    private final Button addButton;
-    private final Button cancelButton;
-
-    private boolean isSubmitting = false;
 
     // -----------------------
     // Constructors
@@ -39,106 +39,46 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
     public AddNoteDialog(LibraryService libraryService,
                          NoteService noteService,
                          boolean isPersonal) {
+        super("", "Add");
 
         this.libraryService = libraryService;
         this.noteService = noteService;
+        this.session = AppSession.getInstance();
         this.isPersonal = isPersonal;
 
+        setTitle(isPersonal ? "Add personal Note." : "Add " + session.getCurrentClub().getClubName() + " Club Note.");
+
         initializeBooksDropdown();
-        initializeDialogTitle(isPersonal ?
-                "Add personal Note." :
-                "Add " + session.getCurrentClub().getClubName() + " Club Note.");
 
-        setupDialogLayout();
-
-        // Button references
-        addButton = getDialogButton(ButtonBar.ButtonData.OK_DONE);
-        cancelButton = getDialogButton(ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        setupAddButtonBehavior();
+        updateSubmitButtonState();
     }
 
     public AddNoteDialog(LibraryService libraryService,
                          NoteService noteService,
                          DiscussionPrompt prompt) {
+        super("", "Add");
 
         this.libraryService = libraryService;
         this.noteService = noteService;
+        this.session = AppSession.getInstance();
         this.isPersonal = false;
         this.prompt = prompt;
 
+        setTitle(prompt.getPrompt());
+
         initializeBooksDropdown();
-        initializeDialogTitle(prompt.getPrompt());
 
-        setupDialogLayout();
-
-        // Button references
-        addButton = getDialogButton(ButtonBar.ButtonData.OK_DONE);
-        cancelButton = getDialogButton(ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        setupAddButtonBehavior();
+        updateSubmitButtonState();
     }
 
     // -----------------------
-    // Initialization helpers
+    // Abstract implementations from BaseAsyncDialog
     // -----------------------
 
-    private void initializeBooksDropdown() {
-        booksComboBox = new ComboBox<>();
-        booksComboBox.getItems().addAll(
-                libraryService.getCurrentlyReading().stream()
-                        .map(Book::getTitle)
-                        .toList()
-        );
-    }
-
-    private void initializeDialogTitle(String title) {
-        setTitle(title);
-        setResizable(true);
-    }
-
-    private void setupDialogLayout() {
-        ButtonType addButtonType = new ButtonType("Add Book", ButtonBar.ButtonData.OK_DONE);
-        getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
-
-        VBox content = createContent();
-        getDialogPane().setContent(content);
-    }
-
-    private Button getDialogButton(ButtonBar.ButtonData type) {
-        return (Button) getDialogPane().lookupButton(
-                getDialogPane().getButtonTypes().stream()
-                        .filter(bt -> bt.getButtonData() == type)
-                        .findFirst()
-                        .orElseThrow()
-        );
-    }
-
-    private void setupAddButtonBehavior() {
-        addButton.setDisable(true);
-
-        // Enable button only when note is non-empty
-        noteTextArea.textProperty().addListener((obs, old, val) ->
-                addButton.setDisable(val.trim().isEmpty() || isSubmitting)
-        );
-
-        // Prevent dialog from closing automatically
-        addButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-            if (!isSubmitting) {
-                event.consume();
-                handleSubmit();
-            }
-        });
-    }
-
-    // -----------------------
-    // UI creation
-    // -----------------------
-
-    private VBox createContent() {
+    @Override
+    protected Node createFormContent() {
         VBox container = new VBox(15);
         container.getStyleClass().add("container");
-        container.setPadding(new Insets(20));
         container.setMinWidth(500);
 
         GridPane grid = new GridPane();
@@ -150,6 +90,7 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         // Book dropdown
         Label bookLabel = new Label("Book:");
         bookLabel.getStyleClass().add("label");
+        booksComboBox = new ComboBox<>();
         grid.add(bookLabel, 0, row);
         grid.add(booksComboBox, 1, row);
         row++;
@@ -159,7 +100,7 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
             Label clubLabel = new Label("Club:");
             clubLabel.getStyleClass().add("label");
 
-            Label clubName = new Label(session.getCurrentClub().getClubName());
+            Label clubName = new Label(session != null && session.getCurrentClub() != null ? session.getCurrentClub().getClubName() : "");
             clubName.getStyleClass().add("label");
 
             grid.add(clubLabel, 0, row);
@@ -180,144 +121,111 @@ public class AddNoteDialog extends Dialog<NoteCreateRequest> {
         grid.add(noteLabel, 0, row);
         grid.add(noteTextArea, 1, row);
 
-        // Status message
-        statusLabel = new Label();
-        statusLabel.getStyleClass().add("status-label");
-        statusLabel.setVisible(false);
-        statusLabel.setWrapText(true);
-        statusLabel.setMaxWidth(450);
-
-        // Loading indicator
-        loadingIndicator = new ProgressIndicator();
-        loadingIndicator.setMaxSize(30, 30);
-        loadingIndicator.setVisible(false);
-
-        container.getChildren().addAll(grid, statusLabel, loadingIndicator);
-        container.getStyleClass().add("card");
+        container.getChildren().addAll(grid);
 
         return container;
     }
 
-    // -----------------------
-    // Submission logic
-    // -----------------------
-
-    private void handleSubmit() {
-        if (isSubmitting) return;
-
+    @Override
+    protected boolean validateForm() {
         String selectedTitle = booksComboBox.getValue();
-        String note = noteTextArea.getText().trim();
+        String note = noteTextArea.getText() == null ? "" : noteTextArea.getText().trim();
 
-        if (selectedTitle == null) {
+        if (selectedTitle == null || selectedTitle.isEmpty()) {
             showError("Please select a book.");
-            return;
+            return false;
         }
 
         if (note.isEmpty()) {
             showError("Note cannot be empty.");
-            return;
+            return false;
         }
 
-        isSubmitting = true;
-        addButton.setDisable(true);
-        cancelButton.setDisable(true);
-        loadingIndicator.setVisible(true);
-        statusLabel.setVisible(false);
+        // hide any previous error
+        hideStatus();
+        return true;
+    }
+
+    @Override
+    protected void handleAsyncSubmit() {
+        // Build request
+        String selectedTitle = booksComboBox.getValue();
+        String noteText = noteTextArea.getText().trim();
 
         Book selectedBook = libraryService.getAllBooks().stream()
-                .filter(b -> b.getTitle().equals(selectedTitle))
+                .filter(b -> Objects.equals(b.getTitle(), selectedTitle))
                 .findFirst()
                 .orElse(null);
 
         if (selectedBook == null) {
-            showError("Could not find selected book.");
-            resetSubmittingState();
+            onSubmitError("Could not find selected book.");
             return;
         }
 
         NoteCreateRequest createRequest = new NoteCreateRequest(
                 selectedBook.getBookID(),
                 isPersonal ? null : session.getCurrentClub().getClubID(),
-                note,
+                noteText,
                 isPersonal
         );
 
-        submitNote(createRequest);
-    }
-
-    private void submitNote(NoteCreateRequest createRequest) {
-        loadingIndicator.setVisible(true);
-        statusLabel.setVisible(false);
-
-        System.out.println("Submitting note...");
-
-        Runnable onSuccess = () -> Platform.runLater(() -> {
-            showSuccess();
-
-            PauseTransition pause =
-                    new PauseTransition(javafx.util.Duration.seconds(1));
-
-            pause.setOnFinished(event -> {
-                setResult(createRequest);
-                close();
-            });
-            pause.play();
-        });
-
-        java.util.function.Consumer<String> onError = errorMessage -> Platform.runLater(() -> {
-            System.err.println("Failed to add note: " + errorMessage);
-            loadingIndicator.setVisible(false);
-            resetSubmittingState();
-            showError(errorMessage);
-        });
-
+        // perform correct service call depending on mode
         if (isPersonal) {
             noteService.createPersonalNote(
                     session.getUserRecord().userID(),
                     createRequest,
-                    note -> onSuccess.run(),
-                    onError
+                    createdNote -> onSubmitSuccess(createdNote),
+                    this::onSubmitError
             );
         } else if (prompt != null) {
             noteService.createPromptNote(
                     session.getCurrentClub().getClubID(),
                     prompt.getPromptID(),
                     createRequest,
-                    note -> onSuccess.run(),
-                    onError
+                    createdNote -> onSubmitSuccess(createdNote),
+                    this::onSubmitError
             );
         } else {
             noteService.createClubNote(
                     session.getCurrentClub().getClubID(),
                     createRequest,
-                    note -> onSuccess.run(),
-                    onError
+                    createdNote -> onSubmitSuccess(createdNote),
+                    this::onSubmitError
             );
         }
     }
 
-    // -----------------------
-    // UI Helpers
-    // -----------------------
-
-    private void showSuccess() {
-        statusLabel.setText("Note added successfully!");
-        statusLabel.getStyleClass().removeAll("error-label");
-        statusLabel.getStyleClass().add("success-label");
-        statusLabel.setVisible(true);
-        cancelButton.setDisable(true);
+    // Optional hooks to wire up UI -> validation
+    @Override
+    protected void setupFormValidation() {
+        // enable/disable submit when note text changes or book selection changes
+        noteTextArea.textProperty().addListener((obs, oldV, newV) -> updateSubmitButtonState());
+        booksComboBox.valueProperty().addListener((obs, oldV, newV) -> updateSubmitButtonState());
     }
 
-    private void showError(String message) {
-        statusLabel.setText(message);
-        statusLabel.getStyleClass().removeAll("success-label");
-        statusLabel.getStyleClass().add("error-label");
-        statusLabel.setVisible(true);
+    @Override
+    protected boolean isFormValid() {
+        String selected = booksComboBox == null ? null : booksComboBox.getValue();
+        String text = noteTextArea == null ? "" : noteTextArea.getText();
+        return selected != null && !selected.isEmpty() && text != null && !text.trim().isEmpty();
     }
 
-    private void resetSubmittingState() {
-        isSubmitting = false;
-        addButton.setDisable(false);
-        cancelButton.setDisable(false);
+    @Override
+    protected String getSuccessMessage(Note result) {
+        return "Note added successfully!";
+    }
+
+    // -----------------------
+    // Helpers
+    // -----------------------
+
+    private void initializeBooksDropdown() {
+        if (libraryService == null || booksComboBox == null) return;
+        booksComboBox.getItems().clear();
+        booksComboBox.getItems().addAll(
+                libraryService.getCurrentlyReading().stream()
+                        .map(Book::getTitle)
+                        .toList()
+        );
     }
 }
