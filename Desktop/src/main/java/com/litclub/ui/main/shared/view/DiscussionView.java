@@ -40,29 +40,41 @@ public class DiscussionView extends ScrollPane {
         this.setPannable(false);
 
         setupSmoothScrolling();
-
         addHeader();
-        showPrompts();
+        loadPrompts();
 
         this.setContent(container);
     }
 
+    /**
+     * Adds the static header to the view.
+     */
     private void addHeader() {
         Label headerLabel = new Label("Discussion Prompts");
         headerLabel.getStyleClass().add("discussion-header");
         container.getChildren().add(headerLabel);
     }
 
-    public void showPrompts() {
+    /**
+     * Public method to reload prompts from the service and refresh the UI.
+     */
+    public void loadPrompts() {
         prompts = discussionService.getDiscussionPrompts();
         prompts.sort(Comparator.comparing(DiscussionPrompt::getPostedAt).reversed());
+        renderPromptCards();
+    }
 
-        // Clear only prompt cards, keep the header
+    /**
+     * Renders all prompt cards (or empty state) beneath the header.
+     */
+    private void renderPromptCards() {
+        // Remove prompt cards or empty-state messages, but keep the header
         container.getChildren().removeIf(node ->
-                node.getStyleClass().contains("prompt-card")
+                node.getStyleClass().contains("prompt-card") ||
+                        node.getStyleClass().contains("empty-state")
         );
 
-        if (prompts.isEmpty()) {
+        if (prompts == null || prompts.isEmpty()) {
             Label emptyState = new Label("No discussion prompts posted yet");
             emptyState.getStyleClass().add("empty-state");
             container.getChildren().add(emptyState);
@@ -75,6 +87,9 @@ public class DiscussionView extends ScrollPane {
         }
     }
 
+    /**
+     * Creates a visual card for a discussion prompt.
+     */
     private VBox createPromptCard(DiscussionPrompt prompt) {
         VBox promptCard = new VBox(12);
         promptCard.setPadding(new Insets(20, 24, 20, 24));
@@ -85,7 +100,7 @@ public class DiscussionView extends ScrollPane {
         promptLabel.getStyleClass().add("prompt-title");
         promptLabel.setWrapText(true);
 
-        // Posted at timestamp
+        // Posted timestamp
         String postedAt = prompt.getPostedAt().format(TIME_FORMATTER);
         Label postedAtLabel = new Label("📝 Posted " + postedAt);
         postedAtLabel.getStyleClass().add("prompt-timestamp");
@@ -96,6 +111,9 @@ public class DiscussionView extends ScrollPane {
         return promptCard;
     }
 
+    /**
+     * Enables smooth scrolling.
+     */
     private void setupSmoothScrolling() {
         final double SPEED = 0.005;
         this.setOnScroll(event -> {
