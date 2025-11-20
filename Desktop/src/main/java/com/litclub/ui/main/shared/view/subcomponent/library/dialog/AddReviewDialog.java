@@ -3,7 +3,7 @@ package com.litclub.ui.main.shared.view.subcomponent.library.dialog;
 import com.litclub.construct.Review;
 import com.litclub.construct.interfaces.library.ReviewRequest;
 import com.litclub.session.AppSession;
-import com.litclub.ui.dialog.BaseAsyncDialog;
+import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.library.dialog.subcomponent.StarRater;
 

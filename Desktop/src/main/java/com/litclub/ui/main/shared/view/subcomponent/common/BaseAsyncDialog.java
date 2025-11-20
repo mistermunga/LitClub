@@ -1,4 +1,4 @@
-package com.litclub.ui.dialog;
+package com.litclub.ui.main.shared.view.subcomponent.common;
 
 import com.litclub.theme.ThemeManager;
 import javafx.animation.PauseTransition;

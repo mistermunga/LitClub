@@ -1,7 +1,7 @@
 package com.litclub.ui.crossroads.components.subcomponents;
 
 import com.litclub.ui.crossroads.service.CrossRoadsService;
-import com.litclub.ui.dialog.BaseAsyncDialog;
+import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;

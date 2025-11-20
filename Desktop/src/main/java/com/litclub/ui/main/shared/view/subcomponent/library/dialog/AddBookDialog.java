@@ -3,7 +3,7 @@ package com.litclub.ui.main.shared.view.subcomponent.library.dialog;
 import com.litclub.construct.enums.BookStatus;
 import com.litclub.construct.interfaces.library.BookAddRequest;
 import com.litclub.session.AppSession;
-import com.litclub.ui.dialog.BaseAsyncDialog;
+import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
