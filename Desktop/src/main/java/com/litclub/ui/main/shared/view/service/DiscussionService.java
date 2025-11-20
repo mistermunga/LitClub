@@ -35,7 +35,7 @@ public class DiscussionService {
             Long clubID,
             Runnable onSuccess,
             Consumer<String> onError) {
-        clubRepository.fetchClubMeetings(clubID)
+        clubRepository.fetchDiscussions(clubID)
                 .thenRun(() -> Platform.runLater(() -> {
                     System.out.println("Loaded Discussion Prompts");
                     onSuccess.run();

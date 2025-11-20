@@ -1,10 +1,12 @@
 package com.litclub.ui.main.shared.view;
 
 import com.litclub.construct.DiscussionPrompt;
+import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.event.EventBus;
 import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.DiscussionService;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -62,9 +64,17 @@ public class DiscussionView extends ScrollPane {
      * Public method to reload prompts from the service and refresh the UI.
      */
     public void loadPrompts() {
-        prompts = discussionService.getDiscussionPrompts();
-        prompts.sort(Comparator.comparing(DiscussionPrompt::getPostedAt).reversed());
-        renderPromptCards();
+        discussionService.loadPrompts(
+                AppSession.getInstance().getCurrentClub().getClubID(),
+                () -> Platform.runLater(() -> {
+                    prompts = discussionService.getDiscussionPrompts();
+                    prompts.sort(Comparator.comparing(DiscussionPrompt::getPostedAt).reversed());
+                    renderPromptCards();
+                }),
+                error -> Platform.runLater(() -> {
+                    System.out.println(error);
+                })
+        );
     }
 
     /**
