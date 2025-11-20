@@ -1,6 +1,8 @@
 package com.litclub.ui.main.shared.view.subcomponent.notes;
 
 import com.litclub.construct.Note;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.NoteService;
 import com.litclub.ui.main.shared.view.subcomponent.notes.dialog.AddNoteDialog;
@@ -295,6 +297,10 @@ public class NoteControlBar extends HBox {
         noteDialog.showAndWait().ifPresent(note -> {
             System.out.println("Note added via dialog");
         });
+        EventType eventType = isPersonalContext ?
+                EventType.PERSONAL_NOTES_UPDATED :
+                EventType.CLUB_NOTES_UPDATED ;
+        EventBus.getInstance().emit(eventType);
     }
 
     // ==================== PUBLIC METHODS ====================
