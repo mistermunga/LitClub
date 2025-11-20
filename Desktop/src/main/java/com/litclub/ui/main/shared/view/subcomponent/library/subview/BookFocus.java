@@ -4,6 +4,7 @@ import com.litclub.construct.Book;
 import com.litclub.construct.Review;
 import com.litclub.construct.enums.BookStatus;
 import com.litclub.construct.interfaces.review.LoadedReview;
+import com.litclub.ui.main.shared.event.EventBus;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
@@ -247,6 +248,7 @@ public class BookFocus extends AbstractFocusView<Book> {
     private void handleStatusChange(BookStatus newStatus) {
         System.out.println("Changing status to: " + newStatus);
         // TODO: Call library service to update status
+        EventBus.getInstance().emit(EventBus.EventType.PERSONAL_LIBRARY_UPDATED);
     }
 
     private void handleAddReview() {
