@@ -79,8 +79,8 @@ public class DiscussionService {
             Consumer<String> onError
     ) {
         clubRepository.fetchPromptNotes(
-                promptID,
-                AppSession.getInstance().getCurrentClub().getClubID()
+                AppSession.getInstance().getCurrentClub().getClubID(),
+                promptID
         ).thenRun(() -> Platform.runLater(() -> {
             System.out.println("Loaded Prompt Notes");
             setPromptNotes(clubRepository.getClubNotes());
