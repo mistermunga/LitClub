@@ -1,137 +1,51 @@
 package com.litclub.ui.main.shared.view;
 
-import com.litclub.construct.DiscussionPrompt;
-import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.event.EventBus;
 import com.litclub.ui.main.shared.event.EventBus.EventType;
-import com.litclub.ui.main.shared.view.service.DiscussionService;
-import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import com.litclub.ui.main.shared.view.subcomponent.discussions.subview.DiscussionCore;
+import javafx.scene.layout.BorderPane;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
+/**
+ * Main discussion view that manages discussion prompts and their notes.
+ * Follows the same pattern as NotesView with layered navigation.
+ */
+public class DiscussionView extends BorderPane {
 
-public class DiscussionView extends ScrollPane {
-
-    private final DiscussionService discussionService;
-    private ObservableList<DiscussionPrompt> prompts;
-
-    private final VBox container;
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("MMM dd, yyyy  •  h:mm a");
+    private final DiscussionCore discussionCore;
 
     public DiscussionView() {
-        discussionService = new DiscussionService();
-        EventBus.getInstance().on(EventType.DISCUSSION_PROMPTS_UPDATED, this::loadPrompts);
-
         ThemeManager.getInstance().registerComponent(this);
-        this.getStyleClass().addAll("discussion-view", "scroll-pane");
-        this.setFitToWidth(true);
-        this.setFitToHeight(true);
-        this.setHbarPolicy(ScrollBarPolicy.NEVER);
-        this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
 
-        this.container = new VBox(20);
-        this.container.setPadding(new Insets(30, 40, 30, 40));
-        this.container.getStyleClass().add("discussion-container");
-        VBox.setVgrow(this.container, Priority.ALWAYS);
+        // Create core
+        discussionCore = new DiscussionCore();
 
-        this.setVvalue(0);
-        this.setPannable(false);
+        this.setCenter(discussionCore);
 
-        setupSmoothScrolling();
-        addHeader();
-        loadPrompts();
-
-        this.setContent(container);
+        // Subscribe to discussion events
+        EventBus.getInstance().on(EventType.DISCUSSION_PROMPTS_UPDATED, discussionCore::refreshPrompts);
     }
 
     /**
-     * Adds the static header to the view.
+     * Refresh the discussion view.
      */
-    private void addHeader() {
-        Label headerLabel = new Label("Discussion Prompts");
-        headerLabel.getStyleClass().add("discussion-header");
-        container.getChildren().add(headerLabel);
+    public void refresh() {
+        discussionCore.refresh();
     }
 
     /**
-     * Public method to reload prompts from the service and refresh the UI.
+     * Navigate back to prompts grid if currently viewing a focused prompt.
      */
-    public void loadPrompts() {
-        discussionService.loadPrompts(
-                AppSession.getInstance().getCurrentClub().getClubID(),
-                () -> Platform.runLater(() -> {
-                    prompts = discussionService.getDiscussionPrompts();
-                    prompts.sort(Comparator.comparing(DiscussionPrompt::getPostedAt).reversed());
-                    renderPromptCards();
-                }),
-                error -> Platform.runLater(() -> {
-                    System.out.println(error);
-                })
-        );
-    }
-
-    /**
-     * Renders all prompt cards (or empty state) beneath the header.
-     */
-    private void renderPromptCards() {
-        // Remove prompt cards or empty-state messages, but keep the header
-        container.getChildren().removeIf(node ->
-                node.getStyleClass().contains("prompt-card") ||
-                        node.getStyleClass().contains("empty-state")
-        );
-
-        if (prompts == null || prompts.isEmpty()) {
-            Label emptyState = new Label("No discussion prompts posted yet");
-            emptyState.getStyleClass().add("empty-state");
-            container.getChildren().add(emptyState);
-            return;
-        }
-
-        for (DiscussionPrompt prompt : prompts) {
-            VBox card = createPromptCard(prompt);
-            container.getChildren().add(card);
+    public void showPromptsGrid() {
+        if (discussionCore.isViewingFocus()) {
+            discussionCore.showPromptsGrid();
         }
     }
 
     /**
-     * Creates a visual card for a discussion prompt.
+     * Check if currently viewing a focused prompt or note.
      */
-    private VBox createPromptCard(DiscussionPrompt prompt) {
-        VBox promptCard = new VBox(12);
-        promptCard.setPadding(new Insets(20, 24, 20, 24));
-        promptCard.getStyleClass().add("prompt-card");
-
-        // Prompt text
-        Label promptLabel = new Label(prompt.getPrompt());
-        promptLabel.getStyleClass().add("prompt-title");
-        promptLabel.setWrapText(true);
-
-        // Posted timestamp
-        String postedAt = prompt.getPostedAt().format(TIME_FORMATTER);
-        Label postedAtLabel = new Label("📝 Posted " + postedAt);
-        postedAtLabel.getStyleClass().add("prompt-timestamp");
-        postedAtLabel.setWrapText(true);
-
-        promptCard.getChildren().addAll(promptLabel, postedAtLabel);
-
-        return promptCard;
-    }
-
-    /**
-     * Enables smooth scrolling.
-     */
-    private void setupSmoothScrolling() {
-        final double SPEED = 0.005;
-        this.setOnScroll(event -> {
-            double deltaY = event.getDeltaY() * SPEED;
-            this.setVvalue(this.getVvalue() - deltaY);
-        });
+    public boolean isViewingFocus() {
+        return discussionCore.isViewingFocus();
     }
 }
