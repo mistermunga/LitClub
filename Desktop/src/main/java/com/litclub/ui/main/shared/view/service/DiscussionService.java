@@ -2,7 +2,9 @@ package com.litclub.ui.main.shared.view.service;
 
 import com.litclub.client.api.ApiErrorHandler;
 import com.litclub.construct.DiscussionPrompt;
+import com.litclub.construct.Note;
 import com.litclub.persistence.repository.ClubRepository;
+import com.litclub.session.AppSession;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 
@@ -11,6 +13,7 @@ import java.util.function.Consumer;
 public class DiscussionService {
 
     private final ClubRepository clubRepository;
+    private ObservableList<Note> promptNotes;
 
     public DiscussionService() {
         clubRepository = ClubRepository.getInstance();
@@ -18,6 +21,14 @@ public class DiscussionService {
 
     public ObservableList<DiscussionPrompt> getDiscussionPrompts(){
         return clubRepository.getDiscussions();
+    }
+
+    public ObservableList<Note> getPromptNotes() {
+        return promptNotes;
+    }
+
+    public void setPromptNotes(ObservableList<Note> promptNotes) {
+        this.promptNotes = promptNotes;
     }
 
     public void loadPrompts(
@@ -60,6 +71,28 @@ public class DiscussionService {
                     });
                     return null;
                 });
+    }
+
+    public void loadPromptNotes(
+            Long promptID,
+            Runnable onSuccess,
+            Consumer<String> onError
+    ) {
+        clubRepository.fetchPromptNotes(
+                promptID,
+                AppSession.getInstance().getCurrentClub().getClubID()
+        ).thenRun(() -> Platform.runLater(() -> {
+            System.out.println("Loaded Prompt Notes");
+            setPromptNotes(clubRepository.getClubNotes());
+            onSuccess.run();
+        })).exceptionally(throwable -> {
+            Platform.runLater(() -> {
+                String errorMessage = ApiErrorHandler.parseError(throwable);
+                System.err.println("Failed to load Prompt Notes" + errorMessage);
+                onError.accept("Failed to load Prompt Notes" + errorMessage);
+            });
+            return null;
+        });
     }
 
 }
