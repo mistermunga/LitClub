@@ -93,7 +93,7 @@ public class DefaultNoteCore extends ScrollPane {
 
     // ==================== DATA LOADING ====================
 
-    private void loadNotes() {
+    public void loadNotes() {
         if (isPersonal) {
             Long userID = AppSession.getInstance().getUserRecord().userID();
             noteService.loadPersonalNotes(
