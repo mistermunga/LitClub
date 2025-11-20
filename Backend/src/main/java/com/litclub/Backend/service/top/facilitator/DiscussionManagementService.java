@@ -83,15 +83,17 @@ public class DiscussionManagementService {
             throw new MalformedDTOException("Incorrect Club in Request");
         }
         Club club = clubService.requireClubById(clubID);
-        DiscussionPrompt prompt = new DiscussionPrompt();
-        if (promptID != null) prompt = promptService.findPromptById(promptID);
+        DiscussionPrompt prompt = null;
+        if (promptID != null) {
+            prompt = promptService.findPromptById(promptID);
+        }
 
         return noteService.save(
                 customUserDetails.getUser(),
                 bookService.getBook(noteCreateRequest.bookID()),
                 noteCreateRequest.content(),
-                Optional.of(club),
-                Optional.of(prompt),
+                Optional.ofNullable(club),
+                Optional.ofNullable(prompt),
                 false
         );
     }
