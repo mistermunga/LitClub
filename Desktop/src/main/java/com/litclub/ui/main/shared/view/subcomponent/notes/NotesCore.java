@@ -118,4 +118,10 @@ public class NotesCore extends StackPane {
     public void showNotesGrid() {
         navigateBack();
     }
+
+
+    public void refreshNotes() {
+        defaultNoteCore.loadNotes();
+    }
+
 }

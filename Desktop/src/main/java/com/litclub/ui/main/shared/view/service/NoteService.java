@@ -547,4 +547,12 @@ public class NoteService {
         // Same as loadClubNotes - just a semantic alias
         loadClubNotes(clubID, onSuccess, onError);
     }
+
+    public void refresh(boolean isPersonal) {
+        if (isPersonal) {
+            refreshPersonalNotes(getCurrentUserId(), null, null);
+        } else {
+            refreshClubNotes(getCurrentUserId(), null, null);
+        }
+    }
 }
