@@ -1,6 +1,8 @@
 package com.litclub.ui.main.shared.view;
 
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.notes.NoteControlBar;
 import com.litclub.ui.main.shared.view.subcomponent.notes.NotesCore;
 import javafx.scene.layout.BorderPane;
@@ -19,6 +21,10 @@ public class NotesView extends BorderPane {
         this.isPersonal = isPersonal;
         ThemeManager.getInstance().registerComponent(this);
 
+        EventType eventType = isPersonal ?
+                EventType.PERSONAL_NOTES_UPDATED :
+                EventType.CLUB_NOTES_UPDATED;
+
         // Create core first
         notesCore = new NotesCore(isPersonal);
 
@@ -32,6 +38,9 @@ public class NotesView extends BorderPane {
 
         this.setTop(controlBar);
         this.setCenter(notesCore);
+
+        EventBus.getInstance().on(eventType, notesCore::refreshNotes);
+
     }
 
     /**
