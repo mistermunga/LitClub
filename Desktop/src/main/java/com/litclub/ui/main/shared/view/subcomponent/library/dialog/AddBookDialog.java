@@ -32,6 +32,7 @@ public class AddBookDialog extends BaseAsyncDialog<BookData> {
         super("Add Book to Library", "Add Book");
         this.libraryService = libraryService;
         setHeaderText("Enter Book Details");
+        initializeUI();
     }
 
     @Override

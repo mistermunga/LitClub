@@ -20,6 +20,7 @@ public class AddDiscussionPromptDialog extends BaseAsyncDialog<DiscussionPrompt>
         super("Add Discussion Prompt", "Create Prompt");
         discussionService = new DiscussionService();
         setHeaderText("Creating a discussion for " + club.getClubName());
+        initializeUI();
     }
 
     @Override

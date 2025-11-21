@@ -25,6 +25,7 @@ public class AddReviewDialog extends BaseAsyncDialog<Review> {
         this.reviewService = reviewService;
         this.bookID = bookID;
         setHeaderText("Reviewing " + bookTitle);
+        initializeUI();
     }
 
     @Override

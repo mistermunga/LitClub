@@ -21,6 +21,7 @@ public class RedeemInviteDialog extends BaseAsyncDialog<Void> {
         super("Redeem Invite", "Redeem");
         this.crossRoadsService = crossRoadsService;
         setHeaderText("Enter your invitation code to join a club");
+        initializeUI();
     }
 
     @Override
