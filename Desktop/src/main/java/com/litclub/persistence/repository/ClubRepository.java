@@ -641,7 +641,7 @@ public class ClubRepository {
      * @param noteID the note's ID
      * @return CompletableFuture that completes when replies are loaded
      */
-    public CompletableFuture<Void> fetchReplies(Long clubID, Long promptID, Long noteID) {
+    public CompletableFuture<Void> fetchDiscussionReplies(Long clubID, Long promptID, Long noteID) {
         return apiClient.get("/api/clubs/" + clubID + "/discussions/" + promptID + "/notes/" + noteID + "/replies?page=0&size=100",
                         new TypeReference<PageResponse<Reply>>() {})
                 .thenAccept(page -> {
@@ -663,7 +663,7 @@ public class ClubRepository {
      * @param content reply content
      * @return CompletableFuture with the created reply
      */
-    public CompletableFuture<Reply> createReply(Long clubID, Long promptID, Long noteID, String content) {
+    public CompletableFuture<Reply> createDiscussionReply(Long clubID, Long promptID, Long noteID, String content) {
         return apiClient.post("/api/clubs/" + clubID + "/discussions/" + promptID + "/notes/" + noteID + "/replies",
                         content, Reply.class)
                 .thenApply(reply -> {
@@ -686,7 +686,7 @@ public class ClubRepository {
      * @param content updated reply content
      * @return CompletableFuture with the updated reply
      */
-    public CompletableFuture<Reply> updateReply(Long clubID, Long promptID, Long noteID, Long replyID, String content) {
+    public CompletableFuture<Reply> updateDiscussionReply(Long clubID, Long promptID, Long noteID, Long replyID, String content) {
         return apiClient.put("/api/clubs/" + clubID + "/discussions/" + promptID + "/notes/" + noteID + "/replies/" + replyID,
                         content, Reply.class)
                 .thenApply(reply -> {
@@ -710,7 +710,7 @@ public class ClubRepository {
      * @param replyID the reply's ID
      * @return CompletableFuture that completes when reply is deleted
      */
-    public CompletableFuture<Void> deleteReply(Long clubID, Long promptID, Long noteID, Long replyID) {
+    public CompletableFuture<Void> deleteDiscussionReply(Long clubID, Long promptID, Long noteID, Long replyID) {
         return apiClient.delete("/api/clubs/" + clubID + "/discussions/" + promptID + "/notes/" + noteID + "/replies/" + replyID)
                 .thenAccept(v -> {
                     Platform.runLater(() -> {
@@ -720,6 +720,85 @@ public class ClubRepository {
                     cacheManager.saveReplies(new ArrayList<>(replies));
                 });
     }
+
+    /**
+     * Fetches replies for a note in an independent club context.
+     *
+     * @param bookID the book's ID
+     * @param noteID the note's ID
+     * @return CompletableFuture that completes when replies are loaded
+     */
+    public CompletableFuture<Void> fetchIndependentClubReplies(Long bookID, Long noteID) {
+        return apiClient.get("/api/books/" + bookID + "/notes/" + noteID + "/replies?page=0&size=100",
+                        new TypeReference<PageResponse<Reply>>() {})
+                .thenAccept(page -> {
+                    Platform.runLater(() -> {
+                        replies.clear();
+                        replies.addAll(page.getContent());
+                    });
+                    cacheManager.saveReplies(new ArrayList<>(replies));
+                });
+    }
+
+    /**
+     * Creates a reply on a note within an independent club.
+     *
+     * @param noteID the note's ID
+     * @param bookID the book's ID
+     * @param content reply content
+     * @return CompletableFuture with the created reply
+     */
+    public CompletableFuture<Reply> createIndependentClubReply(Long noteID, Long bookID, String content){
+        return apiClient.post("/api/books/" + bookID + "/notes/" + noteID + "/replies",
+                        content, Reply.class)
+                .thenApply(reply -> {
+                    Platform.runLater(() -> {
+                        replies.add(reply);
+                    });
+                    cacheManager.saveReplies(new ArrayList<>(replies));
+                    return reply;
+                });
+    }
+
+    /**
+     * Updates a reply in an independent club.
+     *
+     * @param noteID the note's ID
+     * @param bookID the book's ID
+     * @param content updated reply content
+     * @param replyID the reply's ID
+     * @return CompletableFuture with the updated reply
+     */
+    public CompletableFuture<Reply> updateIndependentClubReply(Long noteID, Long bookID, String content, Long replyID){
+        return apiClient.put("/api/books/" + bookID + "/notes/" + noteID + "/replies/" + replyID, content, Reply.class)
+                .thenApply(reply -> {
+                    Platform.runLater(() -> {
+                        replies.removeIf(r -> r.getNoteID().equals(replyID));
+                        replies.add(reply);
+                    });
+                    cacheManager.saveReplies(new ArrayList<>(replies));
+                    return reply;
+                });
+    }
+
+    /**
+     * Deletes a reply from an independent club note.
+     *
+     * @param noteID the note's ID
+     * @param bookID the book's ID
+     * @param replyID the reply's ID
+     * @return CompletableFuture that completes when the reply is deleted
+     */
+    public CompletableFuture<Void> deleteIndependentClubReply(Long noteID, Long bookID, Long replyID){
+        return apiClient.delete("/api/books/" + bookID + "/notes/" + noteID + "/replies/" + replyID)
+                .thenAccept(v -> {
+                    Platform.runLater(() -> {
+                        replies.removeIf(r -> r.getNoteID().equals(replyID));
+                    });
+                    cacheManager.saveReplies(new ArrayList<>(replies));
+                });
+    }
+
 
     // ==================== GETTERS FOR OBSERVABLE LISTS ====================
 
