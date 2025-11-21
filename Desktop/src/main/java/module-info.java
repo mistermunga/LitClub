@@ -32,4 +32,5 @@ module com.litclub {
     exports com.litclub.construct;
     exports com.litclub.construct.compositeKey;
     exports com.litclub.construct.interfaces.user;
+    exports com.litclub.construct.interfaces.club;
 }
