@@ -243,11 +243,11 @@ public class ClubController {
 
     @PostMapping("/{clubID}/books/{bookID}")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
-    public ResponseEntity<ClubBook> addBookToClub(
+    public ResponseEntity<Book> addBookToClub(
             @PathVariable Long clubID,
             @PathVariable Long bookID
     ) {
-        return ResponseEntity.ok(clubModService.addActiveBook(clubID, bookID));
+        return ResponseEntity.ok(clubModService.addActiveBook(clubID, bookID).getBook());
     }
 
     @PutMapping("/{clubID}/books/{bookID}")
