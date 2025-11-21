@@ -17,63 +17,167 @@ import javafx.scene.layout.VBox;
 
 import java.util.Objects;
 
+/**
+ * Polymorphic dialog for adding notes.
+ * Supports personal notes, club notes, and discussion prompt notes.
+ */
 public class AddNoteDialog extends BaseAsyncDialog<Note> {
 
-    // services and session (assigned in constructor)
-    private LibraryService libraryService;
-    private NoteService noteService;
-    private AppSession session;
+    private final LibraryService libraryService;
+    private final NoteService noteService;
+    private final AppSession session;
+    private final NoteContext context;
 
-    // mode
-    private boolean isPersonal;
-    private DiscussionPrompt prompt;
-
-    // form controls (created in createFormContent)
+    // Form controls
     private ComboBox<String> booksComboBox;
     private TextArea noteTextArea;
 
-    // -----------------------
-    // Constructors
-    // -----------------------
+    // ==================== CONTEXT CLASSES ====================
 
-    public AddNoteDialog(LibraryService libraryService,
-                         NoteService noteService,
-                         boolean isPersonal) {
+    /**
+     * Context information for creating a note.
+     * Sealed interface with three implementations.
+     */
+    private sealed interface NoteContext permits PersonalContext, ClubContext, PromptContext {
+        boolean isPersonal();
+        String getDialogTitle();
+    }
+
+    /**
+     * Context for personal notes.
+     */
+    private record PersonalContext(Long userID) implements NoteContext {
+        @Override
+        public boolean isPersonal() {
+            return true;
+        }
+
+        @Override
+        public String getDialogTitle() {
+            return "Add Personal Note";
+        }
+    }
+
+    /**
+     * Context for club notes (not discussion prompts).
+     */
+    private record ClubContext(Long clubID, String clubName) implements NoteContext {
+        @Override
+        public boolean isPersonal() {
+            return false;
+        }
+
+        @Override
+        public String getDialogTitle() {
+            return "Add " + clubName + " Club Note";
+        }
+    }
+
+    /**
+     * Context for discussion prompt notes.
+     */
+    private record PromptContext(
+            Long clubID,
+            Long promptID,
+            String promptText
+    ) implements NoteContext {
+        @Override
+        public boolean isPersonal() {
+            return false;
+        }
+
+        @Override
+        public String getDialogTitle() {
+            return promptText;
+        }
+    }
+
+    // ==================== PRIVATE CONSTRUCTOR ====================
+
+    /**
+     * Private constructor - use static factory methods instead.
+     */
+    private AddNoteDialog(
+            LibraryService libraryService,
+            NoteService noteService,
+            NoteContext context
+    ) {
         super("", "Add");
 
         this.libraryService = libraryService;
         this.noteService = noteService;
         this.session = AppSession.getInstance();
-        this.isPersonal = isPersonal;
+        this.context = context;
 
-        setTitle(isPersonal ? "Add personal Note." : "Add " + session.getCurrentClub().getClubName() + " Club Note.");
-
-        initializeBooksDropdown();
-
+        setTitle(context.getDialogTitle());
         updateSubmitButtonState();
     }
 
-    public AddNoteDialog(LibraryService libraryService,
-                         NoteService noteService,
-                         DiscussionPrompt prompt) {
-        super("", "Add");
+    // ==================== STATIC FACTORY METHODS ====================
 
-        this.libraryService = libraryService;
-        this.noteService = noteService;
-        this.session = AppSession.getInstance();
-        this.isPersonal = false;
-        this.prompt = prompt;
-
-        setTitle(prompt.getPrompt());
-
-        initializeBooksDropdown();
-
-        updateSubmitButtonState();
+    /**
+     * Create dialog for personal notes.
+     *
+     * @param libraryService the library service
+     * @param noteService the note service
+     * @return configured dialog instance
+     */
+    public static AddNoteDialog forPersonalNote(
+            LibraryService libraryService,
+            NoteService noteService
+    ) {
+        Long userID = AppSession.getInstance().getUserRecord().userID();
+        return new AddNoteDialog(
+                libraryService,
+                noteService,
+                new PersonalContext(userID)
+        );
     }
 
-    // -----------------------
-    // Abstract implementations from BaseAsyncDialog
-    // -----------------------
+    /**
+     * Create dialog for club notes (non-discussion).
+     *
+     * @param libraryService the library service
+     * @param noteService the note service
+     * @return configured dialog instance
+     */
+    public static AddNoteDialog forClubNote(
+            LibraryService libraryService,
+            NoteService noteService
+    ) {
+        AppSession session = AppSession.getInstance();
+        return new AddNoteDialog(
+                libraryService,
+                noteService,
+                new ClubContext(
+                        session.getCurrentClub().getClubID(),
+                        session.getCurrentClub().getClubName()
+                )
+        );
+    }
+
+    /**
+     * Create dialog for discussion prompt notes.
+     *
+     * @param libraryService the library service
+     * @param noteService the note service
+     * @param prompt the discussion prompt
+     * @return configured dialog instance
+     */
+    public static AddNoteDialog forPromptNote(
+            LibraryService libraryService,
+            NoteService noteService,
+            DiscussionPrompt prompt
+    ) {
+        Long clubID = AppSession.getInstance().getCurrentClub().getClubID();
+        return new AddNoteDialog(
+                libraryService,
+                noteService,
+                new PromptContext(clubID, prompt.getPromptID(), prompt.getPrompt())
+        );
+    }
+
+    // ==================== UI CONSTRUCTION ====================
 
     @Override
     protected Node createFormContent() {
@@ -90,21 +194,30 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
         // Book dropdown
         Label bookLabel = new Label("Book:");
         bookLabel.getStyleClass().add("label");
+
         booksComboBox = new ComboBox<>();
+        initializeBooksDropdown();
+
         grid.add(bookLabel, 0, row);
         grid.add(booksComboBox, 1, row);
         row++;
 
-        // Club label (only for club notes)
-        if (!isPersonal) {
+        // Club label (only for club/prompt notes)
+        if (!context.isPersonal()) {
             Label clubLabel = new Label("Club:");
             clubLabel.getStyleClass().add("label");
 
-            Label clubName = new Label(session != null && session.getCurrentClub() != null ? session.getCurrentClub().getClubName() : "");
-            clubName.getStyleClass().add("label");
+            String clubName = switch (context) {
+                case ClubContext cc -> cc.clubName();
+                case PromptContext pc -> session.getCurrentClub().getClubName();
+                default -> "";
+            };
+
+            Label clubNameLabel = new Label(clubName);
+            clubNameLabel.getStyleClass().add("label");
 
             grid.add(clubLabel, 0, row);
-            grid.add(clubName, 1, row);
+            grid.add(clubNameLabel, 1, row);
             row++;
         }
 
@@ -127,6 +240,23 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
     }
 
     @Override
+    protected void setupFormValidation() {
+        // Enable/disable submit when note text or book selection changes
+        noteTextArea.textProperty().addListener((obs, oldV, newV) ->
+                updateSubmitButtonState());
+        booksComboBox.valueProperty().addListener((obs, oldV, newV) ->
+                updateSubmitButtonState());
+    }
+
+    @Override
+    protected boolean isFormValid() {
+        String selected = booksComboBox == null ? null : booksComboBox.getValue();
+        String text = noteTextArea == null ? "" : noteTextArea.getText();
+        return selected != null && !selected.isEmpty() &&
+                text != null && !text.trim().isEmpty();
+    }
+
+    @Override
     protected boolean validateForm() {
         String selectedTitle = booksComboBox.getValue();
         String note = noteTextArea.getText() == null ? "" : noteTextArea.getText().trim();
@@ -141,10 +271,12 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
             return false;
         }
 
-        // hide any previous error
+        // Hide any previous error
         hideStatus();
         return true;
     }
+
+    // ==================== SUBMISSION ====================
 
     @Override
     protected void handleAsyncSubmit() {
@@ -164,68 +296,86 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
 
         NoteCreateRequest createRequest = new NoteCreateRequest(
                 selectedBook.getBookID(),
-                isPersonal ? null : session.getCurrentClub().getClubID(),
+                context.isPersonal() ? null : getCurrentClubID(),
                 noteText,
-                isPersonal
+                context.isPersonal()
         );
 
-        // perform correct service call depending on mode
-        if (isPersonal) {
-            noteService.createPersonalNote(
-                    session.getUserRecord().userID(),
-                    createRequest,
-                    createdNote -> onSubmitSuccess(createdNote),
-                    this::onSubmitError
-            );
-        } else if (prompt != null) {
-            noteService.createPromptNote(
-                    session.getCurrentClub().getClubID(),
-                    prompt.getPromptID(),
-                    createRequest,
-                    createdNote -> onSubmitSuccess(createdNote),
-                    this::onSubmitError
-            );
-        } else {
-            noteService.createClubNote(
-                    session.getCurrentClub().getClubID(),
-                    createRequest,
-                    createdNote -> onSubmitSuccess(createdNote),
-                    this::onSubmitError
-            );
+        // Polymorphic dispatch based on context type
+        switch (context) {
+            case PersonalContext pc -> submitPersonalNote(pc, createRequest);
+            case ClubContext cc -> submitClubNote(cc, createRequest);
+            case PromptContext prc -> submitPromptNote(prc, createRequest);
         }
     }
 
-    // Optional hooks to wire up UI -> validation
-    @Override
-    protected void setupFormValidation() {
-        // enable/disable submit when note text changes or book selection changes
-        noteTextArea.textProperty().addListener((obs, oldV, newV) -> updateSubmitButtonState());
-        booksComboBox.valueProperty().addListener((obs, oldV, newV) -> updateSubmitButtonState());
+    /**
+     * Submit a personal note.
+     */
+    private void submitPersonalNote(PersonalContext ctx, NoteCreateRequest request) {
+        noteService.createPersonalNote(
+                ctx.userID(),
+                request,
+                this::onSubmitSuccess,
+                this::onSubmitError
+        );
     }
 
-    @Override
-    protected boolean isFormValid() {
-        String selected = booksComboBox == null ? null : booksComboBox.getValue();
-        String text = noteTextArea == null ? "" : noteTextArea.getText();
-        return selected != null && !selected.isEmpty() && text != null && !text.trim().isEmpty();
+    /**
+     * Submit a club note.
+     */
+    private void submitClubNote(ClubContext ctx, NoteCreateRequest request) {
+        noteService.createClubNote(
+                ctx.clubID(),
+                request,
+                this::onSubmitSuccess,
+                this::onSubmitError
+        );
     }
 
-    @Override
-    protected String getSuccessMessage(Note result) {
-        return "Note added successfully!";
+    /**
+     * Submit a prompt note.
+     */
+    private void submitPromptNote(PromptContext ctx, NoteCreateRequest request) {
+        noteService.createPromptNote(
+                ctx.clubID(),
+                ctx.promptID(),
+                request,
+                this::onSubmitSuccess,
+                this::onSubmitError
+        );
     }
 
-    // -----------------------
-    // Helpers
-    // -----------------------
+    // ==================== HELPERS ====================
 
     private void initializeBooksDropdown() {
         if (libraryService == null || booksComboBox == null) return;
+
         booksComboBox.getItems().clear();
         booksComboBox.getItems().addAll(
                 libraryService.getCurrentlyReading().stream()
                         .map(Book::getTitle)
                         .toList()
         );
+    }
+
+    private Long getCurrentClubID() {
+        return switch (context) {
+            case ClubContext cc -> cc.clubID();
+            case PromptContext prc -> prc.clubID();
+            default -> null;
+        };
+    }
+
+    // ==================== SUCCESS/ERROR HANDLING ====================
+
+    @Override
+    protected String getSuccessMessage(Note result) {
+        return "Note added successfully!";
+    }
+
+    @Override
+    protected double getSuccessCloseDelay() {
+        return 1.0;
     }
 }
