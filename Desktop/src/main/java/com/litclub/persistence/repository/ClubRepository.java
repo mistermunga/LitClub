@@ -5,6 +5,7 @@ import com.litclub.client.api.ApiClient;
 import com.litclub.construct.*;
 import com.litclub.construct.enums.ClubRole;
 import com.litclub.construct.interfaces.PageResponse;
+import com.litclub.construct.interfaces.club.ActiveFlag;
 import com.litclub.construct.interfaces.club.ClubCreateRequest;
 import com.litclub.construct.interfaces.club.Invite;
 import com.litclub.construct.interfaces.discussion.DiscussionThread;
@@ -45,6 +46,7 @@ public class ClubRepository {
     private final ObservableList<DiscussionPrompt> discussions;
     private final ObservableList<Note> clubNotes;
     private final ObservableList<Reply> replies;
+    private final ObservableList<Book> clubBooks;
 
     private final ObservableList<Meeting> userMeetings;
 
@@ -59,6 +61,7 @@ public class ClubRepository {
         this.discussions = FXCollections.observableArrayList();
         this.clubNotes = FXCollections.observableArrayList();
         this.replies = FXCollections.observableArrayList();
+        this.clubBooks = FXCollections.observableArrayList();
     }
 
     public static synchronized ClubRepository getInstance() {
@@ -799,6 +802,43 @@ public class ClubRepository {
                 });
     }
 
+    public CompletableFuture<Void> fetchClubBooks(Long clubID) {
+        return apiClient.get("/api/clubs/" + clubID + "/books",
+                new TypeReference<List<Book>>() {})
+                .thenAccept(books -> {
+                    Platform.runLater(() -> {
+                        this.clubBooks.clear();
+                        this.clubBooks.addAll(books);
+                    });
+                    cacheManager.saveBooks(new ArrayList<>(this.clubBooks));
+                });
+    }
+
+    public CompletableFuture<Book> addClubBook(Long clubID, Long bookID){
+        return apiClient.post("/api/clubs/" + clubID + "/books/" + bookID, Book.class)
+                .thenApply(clubBook -> {
+                    Platform.runLater(() -> {
+                        clubBooks.add(clubBook);
+                    });
+                    return clubBook;
+                });
+    }
+
+    // TODO make sure this triggers a refresh
+    public CompletableFuture<Void> updateClubBook(Long clubID, Long bookID, ActiveFlag activeFlag){
+        return apiClient.put("/api/clubs/" + clubID + "/books/" + bookID, activeFlag, ClubBook.class)
+                .thenAccept(_ -> {});
+    }
+
+    public CompletableFuture<Void> deleteClubBook(Long clubID, Long bookID) {
+        return apiClient.delete("/api/clubs/" + clubID + "/books/" + bookID)
+                .thenAccept(v -> {
+                    Platform.runLater(() -> {
+                        clubBooks.removeIf(book -> book.getBookID().equals(bookID));
+                    });
+                });
+    }
+
 
     // ==================== GETTERS FOR OBSERVABLE LISTS ====================
 
@@ -820,6 +860,10 @@ public class ClubRepository {
 
     public ObservableList<Note> getClubNotes() {
         return clubNotes;
+    }
+
+    public ObservableList<Book> getClubBooks() {
+        return clubBooks;
     }
 
     public ObservableList<Reply> getReplies() {
