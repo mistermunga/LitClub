@@ -250,7 +250,7 @@ public class ClubController {
         return ResponseEntity.ok(clubModService.addActiveBook(clubID, bookID));
     }
 
-    @PostMapping("/{clubID}/books/{bookID}")
+    @PutMapping("/{clubID}/books/{bookID}")
     @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
     public ResponseEntity<ClubBook> updateClubBookStatus(
             @PathVariable Long clubID,
