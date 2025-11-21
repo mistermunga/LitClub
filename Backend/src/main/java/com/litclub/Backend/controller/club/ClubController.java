@@ -236,7 +236,7 @@ public class ClubController {
     }
 
     @GetMapping("/{clubID}/books")
-    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
     public ResponseEntity<List<Book>> getActiveBooks(@PathVariable Long clubID) {
         return ResponseEntity.ok(clubModService.getActiveBooks(clubID));
     }

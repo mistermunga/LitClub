@@ -55,7 +55,7 @@ public class ClubModService {
     // ====== BOOKS ========
 
     @Transactional(readOnly = true)
-    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or hasRole('ADMINISTRATOR')")
     public List<Book> getActiveBooks(Long clubID) {
         Club club = clubService.requireClubById(clubID);
         return clubBookService.getValidClubBooks(club).stream()
