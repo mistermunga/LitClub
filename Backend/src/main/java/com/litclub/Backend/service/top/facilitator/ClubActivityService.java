@@ -2,6 +2,7 @@ package com.litclub.Backend.service.top.facilitator;
 
 import com.litclub.Backend.construct.club.*;
 import com.litclub.Backend.entity.*;
+import com.litclub.Backend.service.low.ClubBookService;
 import com.litclub.Backend.service.low.ClubMembershipService;
 import com.litclub.Backend.service.low.DiscussionPromptService;
 import com.litclub.Backend.service.low.NoteService;
@@ -28,6 +29,7 @@ public class ClubActivityService {
     private final NoteService noteService;
     private final ClubMembershipService membershipService;
     private final BookService bookService;
+    private final ClubBookService clubBookService;
 
     public ClubActivityService(
             ClubService clubService,
@@ -35,7 +37,7 @@ public class ClubActivityService {
             MeetingService meetingService,
             DiscussionPromptService promptService,
             NoteService noteService,
-            ClubMembershipService membershipService, BookService bookService) {
+            ClubMembershipService membershipService, BookService bookService, ClubBookService clubBookService) {
         this.clubService = clubService;
         this.userService = userService;
         this.meetingService = meetingService;
@@ -43,6 +45,7 @@ public class ClubActivityService {
         this.noteService = noteService;
         this.membershipService = membershipService;
         this.bookService = bookService;
+        this.clubBookService = clubBookService;
     }
 
     // ====== CLUB OVERVIEW ======
@@ -140,10 +143,9 @@ public class ClubActivityService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID) or @userSecurity.isAdmin(authentication)")
-    public List<Book> getCurrentlyReading(Long clubId) {
-        return bookService.getBooksByUser(
-                clubService.getClubOwners(clubId).getFirst()
-        );
+    public Book getCurrentlyReading(Long clubID) {
+        Club club = clubService.requireClubById(clubID);
+        return clubBookService.getValidClubBooks(club).getFirst().getBook();
     }
 
     // Analytics

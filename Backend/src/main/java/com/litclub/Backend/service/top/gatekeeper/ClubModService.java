@@ -6,8 +6,10 @@ import com.litclub.Backend.entity.*;
 import com.litclub.Backend.exception.InsufficientPermissionsException;
 import com.litclub.Backend.security.roles.ClubRole;
 import com.litclub.Backend.security.userdetails.CustomUserDetails;
+import com.litclub.Backend.service.low.ClubBookService;
 import com.litclub.Backend.service.low.ClubMembershipService;
 import com.litclub.Backend.service.low.DiscussionPromptService;
+import com.litclub.Backend.service.middle.BookService;
 import com.litclub.Backend.service.middle.ClubService;
 import com.litclub.Backend.service.middle.MeetingService;
 import com.litclub.Backend.service.middle.UserService;
@@ -16,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -23,24 +26,65 @@ public class ClubModService {
 
     private final MeetingService meetingService;
     private final DiscussionPromptService discussionPromptService;
+    private final BookService bookService;
     private final ClubService clubService;
     private final UserService userService;
     private final ClubMembershipService membershipService;
     private final ClubInviteGenerator clubInviteGenerator;
+    private final ClubBookService clubBookService;
 
     public ClubModService(
             MeetingService meetingService,
             DiscussionPromptService discussionPromptService,
+            BookService bookService,
             ClubService clubService,
             UserService userService,
             ClubMembershipService membershipService,
-            ClubInviteGenerator clubInviteGenerator) {
+            ClubInviteGenerator clubInviteGenerator,
+            ClubBookService clubBookService) {
         this.meetingService = meetingService;
         this.discussionPromptService = discussionPromptService;
+        this.bookService = bookService;
         this.clubService = clubService;
         this.userService = userService;
         this.membershipService = membershipService;
         this.clubInviteGenerator = clubInviteGenerator;
+        this.clubBookService = clubBookService;
+    }
+
+    // ====== BOOKS ========
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public List<Book> getActiveBooks(Long clubID) {
+        Club club = clubService.requireClubById(clubID);
+        return clubBookService.getValidClubBooks(club).stream()
+                .map(ClubBook::getBook)
+                .toList();
+    }
+
+    @Transactional
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ClubBook addActiveBook(Long clubID, Long bookID) {
+        Club club = clubService.requireClubById(clubID);
+        Book book = bookService.getBook(bookID);
+        return clubBookService.createClubBook(club, book);
+    }
+
+    @Transactional
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public ClubBook updateClubBook(Long clubID, Long bookID, boolean active) {
+        Club club = clubService.requireClubById(clubID);
+        Book book = bookService.getBook(bookID);
+        return clubBookService.updateClubBook(club, book, active);
+    }
+
+    @Transactional
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID)")
+    public void deleteClubBook(Long clubID, Long bookID) {
+        Club club = clubService.requireClubById(clubID);
+        Book book = bookService.getBook(bookID);
+        clubBookService.deleteClubBook(club, book);
     }
 
     // ====== MEETING MANAGEMENT ======
