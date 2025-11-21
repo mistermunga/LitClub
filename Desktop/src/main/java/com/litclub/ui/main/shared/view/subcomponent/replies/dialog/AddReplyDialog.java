@@ -68,7 +68,9 @@ public class AddReplyDialog extends BaseAsyncDialog<Reply> {
      */
     public static AddReplyDialog forDiscussionPrompt(Long promptID, Long noteID) {
         Long clubID = AppSession.getInstance().getCurrentClub().getClubID();
-        return new AddReplyDialog(new DiscussionContext(clubID, promptID, noteID));
+        AddReplyDialog dialog = new AddReplyDialog(new DiscussionContext(clubID, promptID, noteID));
+        dialog.initializeUI();
+        return dialog;
     }
 
     /**
@@ -79,7 +81,9 @@ public class AddReplyDialog extends BaseAsyncDialog<Reply> {
      * @return configured dialog instance
      */
     public static AddReplyDialog forIndependentNote(Long bookID, Long noteID) {
-        return new AddReplyDialog(new IndependentContext(bookID, noteID));
+        AddReplyDialog dialog = new AddReplyDialog(new IndependentContext(bookID, noteID));
+        dialog.initializeUI();
+        return dialog;
     }
 
     // ==================== UI CONSTRUCTION ====================

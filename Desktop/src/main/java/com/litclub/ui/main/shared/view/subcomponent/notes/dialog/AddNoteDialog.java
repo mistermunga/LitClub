@@ -127,11 +127,13 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
             NoteService noteService
     ) {
         Long userID = AppSession.getInstance().getUserRecord().userID();
-        return new AddNoteDialog(
+        AddNoteDialog dialog =new AddNoteDialog(
                 libraryService,
                 noteService,
                 new PersonalContext(userID)
         );
+        dialog.initializeUI();
+        return dialog;
     }
 
     /**
@@ -146,7 +148,7 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
             NoteService noteService
     ) {
         AppSession session = AppSession.getInstance();
-        return new AddNoteDialog(
+        AddNoteDialog dialog = new AddNoteDialog(
                 libraryService,
                 noteService,
                 new ClubContext(
@@ -154,6 +156,8 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
                         session.getCurrentClub().getClubName()
                 )
         );
+        dialog.initializeUI();
+        return dialog;
     }
 
     /**
@@ -170,11 +174,13 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
             DiscussionPrompt prompt
     ) {
         Long clubID = AppSession.getInstance().getCurrentClub().getClubID();
-        return new AddNoteDialog(
+        AddNoteDialog dialog = new AddNoteDialog(
                 libraryService,
                 noteService,
                 new PromptContext(clubID, prompt.getPromptID(), prompt.getPrompt())
         );
+        dialog.initializeUI();
+        return dialog;
     }
 
     // ==================== UI CONSTRUCTION ====================
