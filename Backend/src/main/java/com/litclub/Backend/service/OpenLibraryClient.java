@@ -21,7 +21,7 @@ import java.util.Optional;
  *   <li>Search by title and author combination</li>
  * </ul>
  *
- * <p><strong>Note:</strong> ISBN lookups now use the search API instead of the ISBN endpoint
+ * <p><strong>Note:</strong> ISBN lookups use the search API instead of the ISBN endpoint
  * because the ISBN endpoint has poor coverage. The search API is more reliable for finding
  * books by their ISBN.</p>
  *
