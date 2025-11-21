@@ -289,11 +289,10 @@ public class NoteControlBar extends HBox {
     }
 
     private void handleAddNote() {
-        AddNoteDialog noteDialog = new AddNoteDialog(
-                new LibraryService(),
-                noteService,
-                isPersonalContext
-        );
+        AddNoteDialog noteDialog = isPersonalContext ?
+                AddNoteDialog.forPersonalNote(new LibraryService(), noteService) :
+                AddNoteDialog.forClubNote(new LibraryService(), noteService);
+
         noteDialog.showAndWait().ifPresent(note -> {
             System.out.println("Note added via dialog");
         });
