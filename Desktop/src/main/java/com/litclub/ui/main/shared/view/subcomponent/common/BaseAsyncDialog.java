@@ -25,6 +25,7 @@ import javafx.util.Duration;
  * public class MyDialog extends BaseAsyncDialog&lt;MyResultType&gt; {
  *     public MyDialog() {
  *         super("Dialog Title", "Submit");
+ *         initializeUI(); // IMPORTANT: Call this after constructor setup
  *     }
  *
  *     &#64;Override
@@ -65,8 +66,12 @@ public abstract class BaseAsyncDialog<T> extends Dialog<T> {
     private final String submitButtonText;
     private final double defaultSuccessDelay;
 
+    // UI initialization flag
+    private boolean uiInitialized = false;
+
     /**
      * Creates a new async dialog with default settings.
+     * IMPORTANT: Subclasses must call initializeUI() after their constructor completes.
      *
      * @param title dialog title
      * @param submitButtonText text for the submit button (e.g., "Add", "Create", "Submit")
@@ -77,6 +82,7 @@ public abstract class BaseAsyncDialog<T> extends Dialog<T> {
 
     /**
      * Creates a new async dialog with custom success delay.
+     * IMPORTANT: Subclasses must call initializeUI() after their constructor completes.
      *
      * @param title dialog title
      * @param submitButtonText text for the submit button
@@ -88,6 +94,19 @@ public abstract class BaseAsyncDialog<T> extends Dialog<T> {
 
         setTitle(title);
         setResizable(true);
+
+        // Note: UI creation is deferred until initializeUI() is called
+    }
+
+    /**
+     * Initializes the dialog UI.
+     * MUST be called by subclasses after their constructor completes.
+     * This ensures all subclass fields are initialized before UI creation.
+     */
+    protected final void initializeUI() {
+        if (uiInitialized) {
+            throw new IllegalStateException("UI already initialized");
+        }
 
         // Setup dialog buttons
         ButtonType submitButtonType = new ButtonType(submitButtonText, ButtonBar.ButtonData.OK_DONE);
@@ -123,6 +142,8 @@ public abstract class BaseAsyncDialog<T> extends Dialog<T> {
 
         submitButton.getStyleClass().add("button-primary");
         cancelButton.getStyleClass().add("secondary-button");
+
+        uiInitialized = true;
     }
 
     // ==================== ABSTRACT METHODS (must be implemented by subclasses) ====================
@@ -300,7 +321,7 @@ public abstract class BaseAsyncDialog<T> extends Dialog<T> {
      * Call this from field listeners when form values change.
      */
     protected final void updateSubmitButtonState() {
-        if (!isSubmitting) {
+        if (!isSubmitting && uiInitialized) {
             submitButton.setDisable(!isFormValid());
         }
     }
