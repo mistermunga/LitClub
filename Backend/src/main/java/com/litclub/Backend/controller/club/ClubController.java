@@ -235,6 +235,38 @@ public class ClubController {
         return ResponseEntity.ok(clubActivityService.getClubStatistics(clubID));
     }
 
+    @GetMapping("/{clubID}/books")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
+    public ResponseEntity<List<Book>> getActiveBooks(@PathVariable Long clubID) {
+        return ResponseEntity.ok(clubActivityService.getActiveBooks(clubID));
+    }
+
+    @PostMapping("/{clubID}/books/{bookID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
+    public ResponseEntity<ClubBook> addBookToClub(
+            @PathVariable Long clubID,
+            @PathVariable Long bookID
+    ) {
+        return ResponseEntity.ok(clubActivityService.addActiveBook(clubID, bookID));
+    }
+
+    @PostMapping("/{clubID}/books/{bookID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
+    public ResponseEntity<ClubBook> updateClubBookStatus(
+            @PathVariable Long clubID,
+            @PathVariable Long bookID,
+            @RequestBody ActiveFlag flag
+    ) {
+        return ResponseEntity.ok(clubActivityService.updateClubBook(clubID, bookID, flag.valid));
+    }
+
+    @DeleteMapping("/{clubID}/books/{bookID}")
+    @PreAuthorize("@clubSecurity.isModerator(authentication, #clubID) or hasRole('ADMNINISTRATOR')")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long clubID, @PathVariable Long bookID) {
+        clubActivityService.deleteClubBook(clubID, bookID);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{clubID}/meetings")
     @PreAuthorize("@clubSecurity.isMember(authentication, #clubID)")
     public ResponseEntity<Page<Meeting>> getClubMeetings(@PathVariable Long clubID, @PageableDefault Pageable pageable) {
@@ -476,4 +508,6 @@ public class ClubController {
     }
 
     public record Invite(String invite) {}
+
+    public record ActiveFlag(boolean valid) {}
 }
