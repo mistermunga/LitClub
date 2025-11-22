@@ -20,17 +20,15 @@ import javafx.scene.layout.*;
 public class CrossRoadsPage extends BorderPane {
 
     private final CrossRoadsService service;
-    private final ThemeManager themeManager;
     private final StatusBar statusBar;
 
     private VBox contentContainer;
     private CardsGrid CardsGrid;
     private CreateClubSection createClubSection;
-    private ProgressIndicator loadingIndicator;
 
     public CrossRoadsPage() {
         this.service = new CrossRoadsService();
-        this.themeManager = ThemeManager.getInstance();
+        ThemeManager themeManager = ThemeManager.getInstance();
         this.statusBar = new StatusBar();
 
         themeManager.registerComponent(this);
@@ -55,7 +53,7 @@ public class CrossRoadsPage extends BorderPane {
         contentContainer.setAlignment(Pos.TOP_CENTER);
 
         // Loading indicator
-        loadingIndicator = new ProgressIndicator();
+        ProgressIndicator loadingIndicator = new ProgressIndicator();
         loadingIndicator.setMaxSize(50, 50);
 
         VBox loadingBox = new VBox(20, loadingIndicator, new Label("Loading..."));
@@ -111,9 +109,7 @@ public class CrossRoadsPage extends BorderPane {
 
     private void showCreateClubDialog() {
         CreateClubDialog dialog = new CreateClubDialog();
-        dialog.showAndWait().ifPresent(clubData -> {
-            handleCreateClub(clubData.name(), clubData.description());
-        });
+        dialog.showAndWait().ifPresent(clubData -> handleCreateClub(clubData.name(), clubData.description()));
     }
 
     private void handleCreateClub(String clubName, String description) {
