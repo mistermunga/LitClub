@@ -153,6 +153,9 @@ public class CrossRoadsService {
 
         // Fetch the user's role in this club
         fetchAndSetClubRole(club.getClubID(), onSuccess, onError);
+
+        // fetch the club books
+        loadClubBooks(club.getClubID(), onSuccess, onError);
     }
 
     /**
@@ -256,7 +259,7 @@ public class CrossRoadsService {
                 });
     }
 
-    public CompletableFuture<Void> redeemInvite(
+    public void redeemInvite(
             String invite,
             Runnable onSuccess,
             Consumer<String> onError
@@ -264,10 +267,11 @@ public class CrossRoadsService {
         UserRecord user = session.getUserRecord();
         if (user == null) {
             Platform.runLater(() -> onError.accept("User session not found"));
-            return CompletableFuture.completedFuture(null);
+            CompletableFuture.completedFuture(null);
+            return;
         }
 
-        return clubRepository.redeemInvite(invite)
+        clubRepository.redeemInvite(invite)
                 .thenCompose(membership -> {
 
                     // Extract the club ID from the membership
@@ -302,7 +306,14 @@ public class CrossRoadsService {
                 });
     }
 
-
+    public void loadClubBooks(
+            Long clubID,
+            Runnable onSuccess,
+            Consumer<String> onError
+    ) {
+        clubRepository.fetchClubBooks(clubID)
+                .thenAccept(_ -> System.out.println("Load club books for " + clubID));
+    }
 
     // ==================== OBSERVABLE DATA ACCESS ====================
 
