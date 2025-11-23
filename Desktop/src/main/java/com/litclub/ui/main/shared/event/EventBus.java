@@ -110,6 +110,8 @@ public class EventBus {
 
         // Shared events
         BOOKS_UPDATED,
-        USER_PROFILE_UPDATED
+        CLUB_BOOK_UPDATED,
+        USER_PROFILE_UPDATED,
+        REPLIES_ADDED
     }
 }
