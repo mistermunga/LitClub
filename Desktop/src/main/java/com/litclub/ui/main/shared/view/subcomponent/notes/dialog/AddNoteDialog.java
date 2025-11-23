@@ -292,7 +292,12 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
         String selectedTitle = booksComboBox.getValue();
         String noteText = noteTextArea.getText().trim();
 
-        Book selectedBook = libraryService.getAllBooks().stream()
+        // Get books from the correct source based on context
+        List<Book> availableBooks = context.isPersonal()
+                ? libraryService.getCurrentlyReading()
+                : ClubRepository.getInstance().getClubBooks();
+
+        Book selectedBook = availableBooks.stream()
                 .filter(b -> Objects.equals(b.getTitle(), selectedTitle))
                 .findFirst()
                 .orElse(null);
