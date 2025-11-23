@@ -312,7 +312,20 @@ public class CrossRoadsService {
             Consumer<String> onError
     ) {
         clubRepository.fetchClubBooks(clubID)
-                .thenAccept(_ -> System.out.println("Load club books for " + clubID));
+                .thenAccept(_ -> {
+                    Platform.runLater(() -> {
+                        System.out.println("Load club books for " + clubID);
+                        onSuccess.run();
+                    });
+                })
+                .exceptionally(throwable -> {
+                    Platform.runLater(() -> {
+                        String errorMessage = ApiErrorHandler.parseError(throwable);
+                        System.err.println("Failed to load club books: " + errorMessage);
+                        onError.accept("Failed to load club books: " + errorMessage);
+                    });
+                    return null;
+                });
     }
 
     // ==================== OBSERVABLE DATA ACCESS ====================
