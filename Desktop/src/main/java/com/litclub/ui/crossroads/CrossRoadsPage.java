@@ -8,6 +8,7 @@ import com.litclub.theme.ThemeToggleBar;
 import com.litclub.ui.crossroads.components.*;
 import com.litclub.ui.crossroads.components.subcomponents.*;
 import com.litclub.ui.crossroads.service.CrossRoadsService;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -148,7 +149,7 @@ public class CrossRoadsPage extends BorderPane {
 
     private void handleNavigateToPersonal() {
         service.preparePersonalContext();
-        SceneManager.getInstance().showMainPage(true);
+        Platform.runLater(() -> SceneManager.getInstance().showMainPage(true));
     }
 
     private void handleNavigateToClub(Club club) {
