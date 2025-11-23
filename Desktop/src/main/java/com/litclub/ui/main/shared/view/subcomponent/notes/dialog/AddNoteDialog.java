@@ -4,6 +4,7 @@ import com.litclub.construct.Book;
 import com.litclub.construct.DiscussionPrompt;
 import com.litclub.construct.Note;
 import com.litclub.construct.interfaces.note.NoteCreateRequest;
+import com.litclub.persistence.repository.ClubRepository;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.NoteService;
@@ -15,6 +16,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -355,14 +357,21 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
     // ==================== HELPERS ====================
 
     private void initializeBooksDropdown() {
-        if (libraryService == null || booksComboBox == null) return;
+        List<String> titles;
 
-        booksComboBox.getItems().clear();
-        booksComboBox.getItems().addAll(
-                libraryService.getCurrentlyReading().stream()
-                        .map(Book::getTitle)
-                        .toList()
-        );
+        if (context instanceof PersonalContext) {
+            // PERSONAL -> use library service
+            titles = libraryService.getCurrentlyReading().stream()
+                    .map(Book::getTitle)
+                    .toList();
+        } else {
+            // CLUB or PROMPT -> use club repository
+            titles = ClubRepository.getInstance().getClubBooks().stream()
+                    .map(Book::getTitle)
+                    .toList();
+        }
+
+        booksComboBox.getItems().setAll(titles);
     }
 
     private Long getCurrentClubID() {
