@@ -3,7 +3,11 @@ package com.litclub.ui.main.shared.view.subcomponent.discussions;
 import com.litclub.construct.DiscussionPrompt;
 import com.litclub.construct.Note;
 import com.litclub.ui.main.shared.view.service.DiscussionService;
+import com.litclub.ui.main.shared.view.service.LibraryService;
+import com.litclub.ui.main.shared.view.service.NoteService;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
+import com.litclub.ui.main.shared.view.subcomponent.notes.dialog.AddNoteDialog;
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -230,7 +234,16 @@ public class PromptFocus extends AbstractFocusView<DiscussionPrompt> {
 
     private void handleAddResponse() {
         System.out.println("Add response to prompt: " + currentEntity.getPromptID());
-        // TODO: Open dialog to add note for this prompt
+        AddNoteDialog noteDialog = AddNoteDialog.forPromptNote(
+                new LibraryService(),
+                new NoteService(),
+                currentEntity
+        );
+        noteDialog.showAndWait().ifPresent(note -> {
+            Platform.runLater(() -> {
+                System.out.println("Added note: " + note.getContent() + "to prompt: " + currentEntity.getPromptID());
+            });
+        });
     }
 
     /**
