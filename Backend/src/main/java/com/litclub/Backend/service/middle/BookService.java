@@ -12,6 +12,7 @@ import com.litclub.Backend.exception.MalformedDTOException;
 import com.litclub.Backend.repository.BookRepository;
 import com.litclub.Backend.service.low.BookMetadataService;
 import com.litclub.Backend.service.low.UserBooksService;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,10 @@ public class BookService {
     public Book createBook(BookAddRequest book) {
         Book newBook = null;
         boolean alreadySavedByMetadataService = false;
+
+        if (!bookRepository.findAllByTitle(book.title()).isEmpty()) {
+            throw new EntityExistsException("Book already exists");
+        }
 
         if (book.title() != null && book.author() != null) {
 
