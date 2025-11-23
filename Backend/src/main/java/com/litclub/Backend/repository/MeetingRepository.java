@@ -313,4 +313,11 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     Page<Meeting> findMeetingsByClub(Club club, Pageable pageable);
 
     Page<Meeting> findAllByClubIn(Collection<Club> clubs, Pageable pageable);
+
+    List<Meeting> findByClubAndStartTimeLessThanAndEndTimeGreaterThan(
+            Club club,
+            LocalDateTime newEnd,
+            LocalDateTime newStart
+    );
+
 }
