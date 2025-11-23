@@ -824,10 +824,11 @@ public class ClubRepository {
                 });
     }
 
-    // TODO make sure this triggers a refresh
-    public CompletableFuture<Void> updateClubBook(Long clubID, Long bookID, ActiveFlag activeFlag){
+    public CompletableFuture<Void> updateClubBook(Long clubID, Long bookID, ActiveFlag activeFlag) {
         return apiClient.put("/api/clubs/" + clubID + "/books/" + bookID, activeFlag, ClubBook.class)
-                .thenAccept(_ -> {});
+                .thenCompose(_ -> {
+                    return fetchClubBooks(clubID);
+                });
     }
 
     public CompletableFuture<Void> deleteClubBook(Long clubID, Long bookID) {
