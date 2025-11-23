@@ -97,6 +97,7 @@ public class MeetingService {
                                  LocalDateTime startTime, LocalDateTime endTime,
                                  String location, String link) {
         validateMeetingTimes(startTime, endTime);
+        validateNoOverlap(club, startTime, endTime, null);
 
         if (title == null || title.isBlank()) {
             throw new MalformedDTOException("Meeting title cannot be null or blank");
@@ -343,6 +344,7 @@ public class MeetingService {
         LocalDateTime newStart = startTime != null ? startTime : meeting.getStartTime();
         LocalDateTime newEnd = endTime != null ? endTime : meeting.getEndTime();
         validateMeetingTimes(newStart, newEnd);
+        validateNoOverlap(meeting.getClub(), newStart, newEnd, meetingID);
 
         if (title != null && !title.isBlank()) meeting.setTitle(title);
         if (startTime != null) meeting.setStartTime(startTime);
@@ -380,6 +382,7 @@ public class MeetingService {
     public Meeting rescheduleMeeting(Long meetingID, LocalDateTime newStartTime, LocalDateTime newEndTime) {
         validateMeetingTimes(newStartTime, newEndTime);
         Meeting meeting = requireById(meetingID);
+        validateNoOverlap(meeting.getClub(), newStartTime, newEndTime, meetingID);
         meeting.setStartTime(newStartTime);
         meeting.setEndTime(newEndTime);
         return meetingRepository.save(meeting);
@@ -618,4 +621,32 @@ public class MeetingService {
             throw new MalformedDTOException("End time cannot be the same as start time");
         }
     }
+
+    private void validateNoOverlap(Club club,
+                                   LocalDateTime startTime,
+                                   LocalDateTime endTime,
+                                   Long excludeMeetingId) {
+
+        List<Meeting> overlaps =
+                meetingRepository.findByClubAndStartTimeLessThanAndEndTimeGreaterThan(
+                        club,
+                        endTime,
+                        startTime
+                );
+
+        // If updating a meeting, ignore itself
+        if (excludeMeetingId != null) {
+            overlaps = overlaps.stream()
+                    .filter(m -> !m.getMeetingID().equals(excludeMeetingId))
+                    .toList();
+        }
+
+        if (!overlaps.isEmpty()) {
+            throw new MalformedDTOException(
+                    "This club already has a meeting scheduled that overlaps with "
+                            + "the selected time window (" + startTime + " → " + endTime + ")."
+            );
+        }
+    }
+
 }
