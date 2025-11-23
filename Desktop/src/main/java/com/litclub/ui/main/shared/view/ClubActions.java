@@ -4,7 +4,9 @@ import com.litclub.construct.enums.ClubRole;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.event.EventBus;
 import com.litclub.ui.main.shared.event.EventBus.EventType;
+import com.litclub.ui.main.shared.view.service.ClubBookService;
 import com.litclub.ui.main.shared.view.service.ClubService;
+import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddClubBookDialog;
 import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddDiscussionPromptDialog;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -15,11 +17,13 @@ import javafx.scene.layout.VBox;
 public class ClubActions extends VBox {
 
     private final ClubService clubService;
+    private final ClubBookService clubBookService;
 
     public ClubActions() {
         this.setSpacing(12);
         this.getStyleClass().add("club-actions");
         this.clubService = new ClubService();
+        this.clubBookService = new ClubBookService();
 
         ClubRole highestRole = AppSession.getInstance().getHighestRole();
         Node content = switch (highestRole) {
@@ -74,8 +78,20 @@ public class ClubActions extends VBox {
 
         box.getChildren().add(new Label("Owner Tools"));
         // TODO add owner-specific controls
+        Button clubBookButton = new Button("Add new club book");
+        clubBookButton.setOnAction(e -> createClubBookDialog());
+        box.getChildren().add(clubBookButton);
 
         return box;
+    }
+
+    private void createClubBookDialog() {
+        AddClubBookDialog bookDialog = new AddClubBookDialog();
+
+        bookDialog.showAndWait().ifPresent(book -> {
+            System.out.println("Set Club Book to " + book.getTitle());
+            EventBus.getInstance().emit(EventType.CLUB_BOOK_UPDATED);
+        });
     }
 
     private Node createDefaultUI() {
