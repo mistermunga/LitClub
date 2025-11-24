@@ -18,7 +18,7 @@ public class DiscussionCore extends StackPane {
 
     private final DefaultDiscussionCore defaultDiscussionCore;
     private final PromptFocus promptFocus;
-    private final NoteFocus noteFocus;
+    private NoteFocus noteFocus; // Remove final
 
     public DiscussionCore() {
         ThemeManager.getInstance().registerComponent(this);
@@ -62,6 +62,14 @@ public class DiscussionCore extends StackPane {
      */
     private void navigateToNoteFromPrompt(Note note) {
         System.out.println("Navigating to note from prompt: " + note.getNoteID());
+
+        // Get the current prompt
+        DiscussionPrompt currentPrompt = promptFocus.getCurrentPrompt();
+
+        // Remove old noteFocus and create new one with prompt
+        this.getChildren().remove(noteFocus);
+        noteFocus = new NoteFocus(this::navigateBackFromNote, currentPrompt);
+        this.getChildren().add(noteFocus);
 
         // Load the note into focus view
         noteFocus.loadNote(note);
