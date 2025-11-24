@@ -64,7 +64,7 @@ public class Note {
     private Long noteID;
 
     @ManyToOne
-    @JoinColumn(name = "book_id", nullable = false)
+    @JoinColumn(name = "book_id")
     private Book book;
 
     @ManyToOne
