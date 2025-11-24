@@ -8,10 +8,12 @@ import com.litclub.ui.main.shared.view.service.ClubBookService;
 import com.litclub.ui.main.shared.view.service.ClubService;
 import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddClubBookDialog;
 import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddDiscussionPromptDialog;
+import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddMeetingDialog;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class ClubActions extends VBox {
@@ -57,6 +59,16 @@ public class ClubActions extends VBox {
 
         box.getChildren().addAll(getInviteButton, codeLabel, createDiscussionButton);
 
+        HBox meetingBox = new HBox();
+        Label meetingLabel = new Label("Add Meeting");
+        Button offlineMeetingButton = new Button("Offline Meeting");
+        Button onlineMeetingButton = new Button("Physical Meeting");
+        offlineMeetingButton.setOnAction(e -> createMeetingDialog(false));
+        onlineMeetingButton.setOnAction(e -> createMeetingDialog(true));
+        meetingBox.getChildren().addAll(meetingLabel, offlineMeetingButton, onlineMeetingButton);
+
+        box.getChildren().add(meetingBox);
+
         // TODO add moderator-specific buttons, etc
 
         return box;
@@ -91,6 +103,14 @@ public class ClubActions extends VBox {
         bookDialog.showAndWait().ifPresent(book -> {
             System.out.println("Set Club Book to " + book.getTitle());
             EventBus.getInstance().emit(EventType.CLUB_BOOK_UPDATED);
+        });
+    }
+
+    private void createMeetingDialog(boolean isOnline) {
+        AddMeetingDialog meetingDialog = new AddMeetingDialog(isOnline);
+        meetingDialog.showAndWait().ifPresent(meeting -> {
+            System.out.println("Added Meeting " + meeting.getTitle());
+            EventBus.getInstance().emit(EventType.CLUB_MEETINGS_UPDATED);
         });
     }
 
