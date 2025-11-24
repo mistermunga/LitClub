@@ -1,30 +1,44 @@
 package com.litclub.ui.main.shared.view.subcomponent.notes.subview;
 
+import com.litclub.construct.DiscussionPrompt;
 import com.litclub.construct.Note;
+import com.litclub.construct.Reply;
+import com.litclub.session.AppSession;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.view.service.ReplyService;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
-import javafx.geometry.Insets;
+import com.litclub.ui.main.shared.view.subcomponent.replies.dialog.AddReplyDialog;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.time.format.DateTimeFormatter;
 
 /**
  * Focused view showing a single note with its details and replies.
- * Currently displays note details at the top - replies to be implemented.
  */
 public class NoteFocus extends AbstractFocusView<Note> {
 
     private final boolean isPersonal;
+    private final ReplyService replyService = new  ReplyService();
+    private final AppSession session = AppSession.getInstance();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM, yyyy 'at' hh:mm a");
+    private FlowPane replyPane;
+    private DiscussionPrompt prompt;
+    private ObservableList<Reply> replies = FXCollections.observableArrayList();
 
     public NoteFocus(boolean isPersonal, Runnable onBack) {
         super("notes-core", onBack);
         this.isPersonal = isPersonal;
+    }
+
+    public NoteFocus(Runnable onBack, DiscussionPrompt prompt) {
+        super("notes-core", onBack);
+        this.isPersonal = false;
+        this.prompt = prompt;
     }
 
     /**
@@ -64,8 +78,34 @@ public class NoteFocus extends AbstractFocusView<Note> {
     @Override
     protected void buildContent() {
         // TODO: Load and display replies here
-        // For now, just show a placeholder
-        addRepliesPlaceholder();
+        if (isPersonal) { return; }
+        if (prompt != null) {
+            replyService.loadDiscussionReplies(
+                    session.getCurrentClub().getClubID(),
+                    prompt.getPromptID(),
+                    currentEntity.getNoteID(),
+                    // success
+                    () -> System.out.println("loaded replies for ptompt note"),
+                    // error
+                    null
+            );
+        } else {
+            replyService.loadIndependentReplies(
+                    currentEntity.getBook().getBookID(),
+                    currentEntity.getNoteID(),
+                    () -> System.out.println("Loaded replies"),
+                    error -> System.out.println("Failed to fetch Replies " + error)
+            );
+        }
+
+        this.replies = replyService.getReplies();
+
+        if (replies.isEmpty()) {
+            addRepliesPlaceholder();
+            return;
+        }
+
+        createRepliesSection();
     }
 
     private HBox createMetadataRow() {
@@ -81,7 +121,7 @@ public class NoteFocus extends AbstractFocusView<Note> {
             String author = currentEntity.getUser() != null && currentEntity.getUser().getUsername() != null
                     ? currentEntity.getUser().getUsername()
                     : "Unknown author";
-            Label authorLabel = new Label("✍️ " + author);
+            Label authorLabel = new Label("✍" + author);
             authorLabel.getStyleClass().add("note-shared-indicator");
             metadata.getChildren().add(authorLabel);
         }
@@ -110,6 +150,13 @@ public class NoteFocus extends AbstractFocusView<Note> {
             deleteButton.setOnAction(e -> handleDeleteNote());
 
             metadata.getChildren().addAll(editButton, deleteButton);
+        }
+
+        if (!isPersonal) {
+            Button addReply = new Button("Add Reply");
+            addReply.getStyleClass().add("button-primary");
+            addReply.setOnAction(e -> handleAddReply());
+            metadata.getChildren().add(addReply);
         }
 
         return metadata;
@@ -163,4 +210,129 @@ public class NoteFocus extends AbstractFocusView<Note> {
     public Note getCurrentNote() {
         return currentEntity;
     }
+
+    public void handleAddReply() {
+        AddReplyDialog dialog;
+        if (prompt != null) {
+            dialog = AddReplyDialog.forDiscussionPrompt(
+                    prompt.getPromptID(),
+                    currentEntity.getNoteID()
+            );
+        } else {
+            dialog = AddReplyDialog.forIndependentNote(
+                    currentEntity.getBook().getBookID(),
+                    currentEntity.getNoteID()
+            );
+        }
+        dialog.showAndWait();
+        EventBus.getInstance().emit(EventBus.EventType.REPLIES_ADDED);
+    }
+
+    private void createRepliesSection() {
+        clearContent();
+
+        // Create replies section container
+        VBox repliesSection = createCardSection();
+
+        // Section header
+        Label repliesHeader = new Label("Replies (" + replies.size() + ")");
+        repliesHeader.getStyleClass().add("section-title");
+
+        // Replies container with proper spacing
+        VBox repliesContainer = new VBox(15);
+        repliesContainer.getStyleClass().add("replies-container");
+        repliesContainer.setPadding(new javafx.geometry.Insets(10, 0, 0, 0));
+
+        // Populate replies
+        for (Reply reply : replies) {
+            VBox replyCard = createReplyCard(reply);
+            repliesContainer.getChildren().add(replyCard);
+        }
+
+        repliesSection.getChildren().addAll(repliesHeader, repliesContainer);
+        addContentSection(repliesSection);
+    }
+
+    private VBox createReplyCard(Reply reply) {
+        VBox card = new VBox(12);
+        card.getStyleClass().add("reply-card");
+        card.setPadding(new javafx.geometry.Insets(16));
+
+        // Header with author and date
+        HBox header = new HBox(15);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        // Author name
+        String authorName = reply.getUser() != null && reply.getUser().getUsername() != null
+                ? reply.getUser().getUsername()
+                : "Unknown User";
+        Label authorLabel = new Label("✍️ " + authorName);
+        authorLabel.getStyleClass().add("reply-author");
+        authorLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+
+        // Date
+        String dateStr = reply.getCreatedAt() != null
+                ? reply.getCreatedAt().format(DATE_FORMATTER)
+                : "Unknown date";
+        Label dateLabel = new Label(dateStr);
+        dateLabel.getStyleClass().add("reply-date");
+        dateLabel.setStyle("-fx-text-fill: -fx-text-muted;");
+
+        // Spacer
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        header.getChildren().addAll(authorLabel, spacer, dateLabel);
+
+        // Reply content
+        Label contentLabel = new Label(reply.getContent());
+        contentLabel.getStyleClass().add("reply-content");
+        contentLabel.setWrapText(true);
+        contentLabel.setMaxWidth(Double.MAX_VALUE);
+        contentLabel.setStyle("-fx-font-size: 14px; -fx-line-spacing: 0.3em;");
+
+        card.getChildren().addAll(header, contentLabel);
+
+        // Add edit/delete buttons if current user is the owner
+        if (isCurrentUserReplyOwner(reply)) {
+            HBox actionButtons = new HBox(10);
+            actionButtons.setAlignment(Pos.CENTER_RIGHT);
+            actionButtons.setPadding(new javafx.geometry.Insets(8, 0, 0, 0));
+
+            Button editButton = new Button("Edit");
+            editButton.getStyleClass().add("secondary-button");
+            editButton.setStyle("-fx-font-size: 12px; -fx-padding: 4 12;");
+            editButton.setOnAction(e -> handleEditReply(reply));
+
+            Button deleteButton = new Button("Delete");
+            deleteButton.getStyleClass().add("secondary-button");
+            deleteButton.setStyle("-fx-font-size: 12px; -fx-padding: 4 12;");
+            deleteButton.setOnAction(e -> handleDeleteReply(reply));
+
+            actionButtons.getChildren().addAll(editButton, deleteButton);
+            card.getChildren().add(actionButtons);
+        }
+
+        return card;
+    }
+
+    private boolean isCurrentUserReplyOwner(Reply reply) {
+        if (reply == null || reply.getUser() == null) {
+            return false;
+        }
+
+        Long currentUserId = session.getUserRecord().userID();
+        return reply.getUser().getUserID().equals(currentUserId);
+    }
+
+    private void handleEditReply(Reply reply) {
+        System.out.println("Edit reply: " + reply.getNoteID());
+        // TODO: Implement edit dialog
+    }
+
+    private void handleDeleteReply(Reply reply) {
+        System.out.println("Delete reply: " + reply.getNoteID());
+        // TODO: Implement delete confirmation
+    }
+
 }
