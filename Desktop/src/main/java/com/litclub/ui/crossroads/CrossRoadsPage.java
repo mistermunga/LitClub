@@ -8,6 +8,7 @@ import com.litclub.theme.ThemeToggleBar;
 import com.litclub.ui.crossroads.components.*;
 import com.litclub.ui.crossroads.components.subcomponents.*;
 import com.litclub.ui.crossroads.service.CrossRoadsService;
+import com.litclub.ui.main.shared.event.EventBus;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -143,6 +144,7 @@ public class CrossRoadsPage extends BorderPane {
         LogoutConfirmation.show(() -> {
             AppSession.getInstance().clearClubContext();
             AppSession.getInstance().setUserRecord(null);
+            EventBus.getInstance().clearAllListeners();
             SceneManager.getInstance().showLogin();
         });
     }
