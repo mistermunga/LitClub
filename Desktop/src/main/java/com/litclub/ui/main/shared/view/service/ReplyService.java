@@ -51,7 +51,7 @@ public class ReplyService {
     /**
      * Load replies for a note within a discussion prompt.
      */
-    public void loadDiscussionReplies(
+    public void loadRepliesToPromptNote(
             Long clubID,
             Long promptID,
             Long noteID,
