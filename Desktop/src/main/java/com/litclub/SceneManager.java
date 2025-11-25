@@ -7,6 +7,7 @@ import com.litclub.ui.LandingPage;
 import com.litclub.ui.authentication.LoginPage;
 import com.litclub.ui.authentication.RegistrationPage;
 import com.litclub.ui.main.MainPage;
+import com.litclub.ui.main.shared.event.EventBus;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -92,8 +93,10 @@ public class SceneManager {
         Scene scene = new Scene(mainPage);
 
         if (isPersonal) {
+            EventBus.getInstance().off(EventBus.clubEvents());
             stage.setTitle("LitClub Desktop - " + AppSession.getInstance().getUserRecord().username());
         } else {
+            EventBus.getInstance().off(EventBus.personalEvents());
             stage.setTitle("LitClub Desktop - " + AppSession.getInstance().getCurrentClub().getClubName());
         }
         stage.setMaximized(true);
