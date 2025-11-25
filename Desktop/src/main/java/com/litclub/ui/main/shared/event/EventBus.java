@@ -103,6 +103,29 @@ public class EventBus {
         }
     }
 
+    public static EnumSet<EventType> clubEvents() {
+        return EnumSet.of(
+                EventType.DISCUSSION_PROMPTS_UPDATED,
+                EventType.CLUB_NOTES_UPDATED,
+                EventType.CLUB_MEETINGS_UPDATED,
+                EventType.CLUB_MEMBERS_UPDATED,
+                EventType.CLUB_BOOK_UPDATED,
+                EventType.PROMPT_NOTE_UPDATED,
+                EventType.INDEPENDENT_NOTE_REPLIES_ADDED,
+                EventType.PROMPT_NOTE_REPLY_ADDED
+        );
+    }
+
+    public static EnumSet<EventType> personalEvents() {
+        return EnumSet.of(
+                EventType.PERSONAL_NOTES_UPDATED,
+                EventType.PERSONAL_LIBRARY_UPDATED,
+                EventType.PERSONAL_REVIEWS_UPDATED,
+                EventType.BOOKS_UPDATED,
+                EventType.USER_PROFILE_UPDATED
+        );
+    }
+
     /**
      * Event types for the application.
      */
