@@ -2,8 +2,6 @@ package com.litclub.ui.main.shared.view;
 
 import com.litclub.construct.enums.ClubRole;
 import com.litclub.session.AppSession;
-import com.litclub.ui.main.shared.event.EventBus;
-import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.ClubBookService;
 import com.litclub.ui.main.shared.view.service.ClubService;
 import com.litclub.ui.main.shared.view.subcomponent.clubactions.dialog.AddClubBookDialog;
@@ -78,7 +76,6 @@ public class ClubActions extends VBox {
         AddDiscussionPromptDialog promptDialog = new AddDiscussionPromptDialog();
         promptDialog.showAndWait().ifPresent(prompt -> {
             System.out.println("Added Discussion Prompt: " + prompt.getPrompt());
-            EventBus.getInstance().emit(EventType.DISCUSSION_PROMPTS_UPDATED);
         });
     }
 
@@ -102,7 +99,6 @@ public class ClubActions extends VBox {
 
         bookDialog.showAndWait().ifPresent(book -> {
             System.out.println("Set Club Book to " + book.getTitle());
-            EventBus.getInstance().emit(EventType.CLUB_BOOK_UPDATED);
         });
     }
 
@@ -110,7 +106,6 @@ public class ClubActions extends VBox {
         AddMeetingDialog meetingDialog = new AddMeetingDialog(isOnline);
         meetingDialog.showAndWait().ifPresent(meeting -> {
             System.out.println("Added Meeting " + meeting.getTitle());
-            EventBus.getInstance().emit(EventType.CLUB_MEETINGS_UPDATED);
         });
     }
 
