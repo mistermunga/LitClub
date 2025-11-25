@@ -1,8 +1,6 @@
 package com.litclub.ui.main.shared.event;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -93,6 +91,18 @@ public class EventBus {
         }
     }
 
+    public void off(EventType eventType) {
+        // Remove all listeners for the given event type
+        listeners.remove(eventType);
+    }
+
+    public void off(Collection<EventType> eventTypes) {
+        // Remove listeners for all specified event types
+        for (EventType eventType : eventTypes) {
+            listeners.remove(eventType);
+        }
+    }
+
     /**
      * Event types for the application.
      */
@@ -112,6 +122,9 @@ public class EventBus {
         BOOKS_UPDATED,
         CLUB_BOOK_UPDATED,
         USER_PROFILE_UPDATED,
-        REPLIES_ADDED
+        PROMPT_NOTE_UPDATED,
+
+        INDEPENDENT_NOTE_REPLIES_ADDED,
+        PROMPT_NOTE_REPLY_ADDED
     }
 }
