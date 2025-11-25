@@ -3,6 +3,8 @@ package com.litclub.ui.main.shared.view.subcomponent.library.dialog;
 import com.litclub.construct.Review;
 import com.litclub.construct.interfaces.library.ReviewRequest;
 import com.litclub.session.AppSession;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.library.dialog.subcomponent.StarRater;
@@ -63,7 +65,10 @@ public class AddReviewDialog extends BaseAsyncDialog<Review> {
                 bookID,
                 request,
                 // success
-                this::onSubmitSuccess,
+                review -> {
+                    onSubmitSuccess(review);
+                    EventBus.getInstance().emit(EventType.PERSONAL_REVIEWS_UPDATED);
+                },
                 // error
                 this::onSubmitError
         );

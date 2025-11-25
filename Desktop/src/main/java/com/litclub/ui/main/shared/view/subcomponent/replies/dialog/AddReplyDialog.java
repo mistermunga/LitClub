@@ -3,6 +3,8 @@ package com.litclub.ui.main.shared.view.subcomponent.replies.dialog;
 import com.litclub.construct.Reply;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.ReplyService;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -174,7 +176,10 @@ public class AddReplyDialog extends BaseAsyncDialog<Reply> {
                 ctx.noteID(),
                 ctx.bookID(),
                 content,
-                this::onSubmitSuccess,
+                reply -> {
+                    onSubmitSuccess(reply);
+                    EventBus.getInstance().emit(EventType.INDEPENDENT_NOTE_REPLIES_ADDED);
+                },
                 this::onSubmitError
         );
     }

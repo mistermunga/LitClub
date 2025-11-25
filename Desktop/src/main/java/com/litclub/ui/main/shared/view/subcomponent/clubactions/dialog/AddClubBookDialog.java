@@ -4,6 +4,8 @@ import com.litclub.construct.Book;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.ClubBookService;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -87,7 +89,10 @@ public class AddClubBookDialog extends BaseAsyncDialog<Book> {
         clubBookService.addBook(
                 clubID,
                 selectedBook.getBookID(),
-                this::onSubmitSuccess,
+                clubBook -> {
+                    onSubmitSuccess(clubBook);
+                    EventBus.getInstance().emit(EventType.CLUB_BOOK_UPDATED);
+                },
                 this::onSubmitError
         );
     }

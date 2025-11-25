@@ -4,6 +4,8 @@ import com.litclub.construct.Club;
 import com.litclub.construct.DiscussionPrompt;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.DiscussionService;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -47,7 +49,10 @@ public class AddDiscussionPromptDialog extends BaseAsyncDialog<DiscussionPrompt>
                 clubID,
                 prompt,
                 // success
-                this::onSubmitSuccess,
+                discussionPrompt -> {
+                    onSubmitSuccess(discussionPrompt);
+                    EventBus.getInstance().emit(EventType.DISCUSSION_PROMPTS_UPDATED);
+                },
                 // fail
                 this::onSubmitError
         );

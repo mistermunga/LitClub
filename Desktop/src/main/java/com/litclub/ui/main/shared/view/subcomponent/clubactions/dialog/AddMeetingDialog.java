@@ -5,6 +5,8 @@ import com.litclub.construct.interfaces.meeting.MeetingCreateRequest;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.MeetingService;
 import com.litclub.ui.main.shared.view.subcomponent.clubactions.subcomponents.Scheduler;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -114,7 +116,10 @@ public class AddMeetingDialog extends BaseAsyncDialog<Meeting> {
 
         meetingService.addMeeting(
                 meetingCreateRequest,
-                this::onSubmitSuccess,
+                meeting -> {
+                    onSubmitSuccess(meeting);
+                    EventBus.getInstance().emit(EventType.CLUB_MEETINGS_UPDATED);
+                },
                 this::onSubmitError
         );
     }

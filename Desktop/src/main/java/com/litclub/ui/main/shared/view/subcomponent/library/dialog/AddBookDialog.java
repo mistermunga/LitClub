@@ -3,6 +3,8 @@ package com.litclub.ui.main.shared.view.subcomponent.library.dialog;
 import com.litclub.construct.enums.BookStatus;
 import com.litclub.construct.interfaces.library.BookAddRequest;
 import com.litclub.session.AppSession;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import javafx.scene.Node;
@@ -154,7 +156,10 @@ public class AddBookDialog extends BaseAsyncDialog<BookData> {
                 userID,
                 request,
                 // Success - return BookData to dialog result
-                _ -> onSubmitSuccess(bookData),
+                _ -> {
+                    onSubmitSuccess(bookData);
+                    EventBus.getInstance().emit(EventType.BOOKS_UPDATED);
+                },
                 // Error
                 this::onSubmitError
         );

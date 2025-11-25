@@ -8,6 +8,8 @@ import com.litclub.persistence.repository.ClubRepository;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.NoteService;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.BaseAsyncDialog;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -329,7 +331,10 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
         noteService.createPersonalNote(
                 ctx.userID(),
                 request,
-                this::onSubmitSuccess,
+                note -> {
+                    onSubmitSuccess(note);
+                    EventBus.getInstance().emit(EventType.PERSONAL_NOTES_UPDATED);
+                },
                 this::onSubmitError
         );
     }
@@ -341,7 +346,10 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
         noteService.createClubNote(
                 ctx.clubID(),
                 request,
-                this::onSubmitSuccess,
+                note -> {
+                    onSubmitSuccess(note);
+                    EventBus.getInstance().emit(EventType.CLUB_NOTES_UPDATED);
+                },
                 this::onSubmitError
         );
     }
@@ -354,7 +362,10 @@ public class AddNoteDialog extends BaseAsyncDialog<Note> {
                 ctx.clubID(),
                 ctx.promptID(),
                 request,
-                this::onSubmitSuccess,
+                note -> {
+                    onSubmitSuccess(note);
+                    EventBus.getInstance().emit(EventType.PROMPT_NOTE_UPDATED);
+                },
                 this::onSubmitError
         );
     }
