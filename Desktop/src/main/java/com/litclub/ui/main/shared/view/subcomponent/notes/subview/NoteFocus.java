@@ -8,6 +8,7 @@ import com.litclub.ui.main.shared.event.EventBus;
 import com.litclub.ui.main.shared.view.service.ReplyService;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
 import com.litclub.ui.main.shared.view.subcomponent.replies.dialog.AddReplyDialog;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -33,12 +34,20 @@ public class NoteFocus extends AbstractFocusView<Note> {
     public NoteFocus(boolean isPersonal, Runnable onBack) {
         super("notes-core", onBack);
         this.isPersonal = isPersonal;
+
+        if (!isPersonal) {
+            EventBus.getInstance().on(EventType.INDEPENDENT_NOTE_REPLIES_ADDED, this::buildContent);
+        }
+
     }
 
     public NoteFocus(Runnable onBack, DiscussionPrompt prompt) {
         super("notes-core", onBack);
         this.isPersonal = false;
         this.prompt = prompt;
+
+        EventBus.getInstance().on(EventType.PROMPT_NOTE_REPLY_ADDED, this::buildContent);
+
     }
 
     /**
@@ -80,7 +89,7 @@ public class NoteFocus extends AbstractFocusView<Note> {
         // TODO: Load and display replies here
         if (isPersonal) { return; }
         if (prompt != null) {
-            replyService.loadDiscussionReplies(
+            replyService.loadRepliesToPromptNote(
                     session.getCurrentClub().getClubID(),
                     prompt.getPromptID(),
                     currentEntity.getNoteID(),
@@ -225,7 +234,7 @@ public class NoteFocus extends AbstractFocusView<Note> {
             );
         }
         dialog.showAndWait();
-        EventBus.getInstance().emit(EventBus.EventType.REPLIES_ADDED);
+        EventBus.getInstance().emit(EventBus.EventType.INDEPENDENT_NOTE_REPLIES_ADDED);
     }
 
     private void createRepliesSection() {
