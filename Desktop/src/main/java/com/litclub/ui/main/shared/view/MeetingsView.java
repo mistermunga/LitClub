@@ -1,8 +1,11 @@
 package com.litclub.ui.main.shared.view;
 
 import com.litclub.construct.Meeting;
+import com.litclub.persistence.repository.ClubRepository;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.MeetingService;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -48,6 +51,14 @@ public class MeetingsView extends ScrollPane {
         showMeetings();
 
         this.setContent(container);
+
+        EventBus.getInstance().on(
+                EventType.CLUB_MEETINGS_UPDATED,
+                () -> {
+                    ClubRepository.getInstance().fetchClubMeetings(
+                            AppSession.getInstance().getCurrentClub().getClubID()
+                    );
+                });
     }
 
     private void addHeader() {
