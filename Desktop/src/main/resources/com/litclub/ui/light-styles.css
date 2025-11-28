@@ -277,11 +277,14 @@
 }
 
 .btn-ghost:hover,
-.theme-toggle:hover,
 .user-button:hover {
     -fx-text-fill: #5D6E5A;
     -fx-opacity: 1.0;
     -fx-background-color: rgba(168, 181, 162, 0.1);
+}
+
+.theme-toggle:hover {
+    -fx-text-fill: #5D6E5A;
 }
 
 /* User button specific styling */

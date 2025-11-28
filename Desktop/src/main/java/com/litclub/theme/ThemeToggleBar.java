@@ -22,9 +22,9 @@ public class ThemeToggleBar extends VBox {
 
         // Update button text on theme change
         ThemeManager.getInstance().brightModeProperty().addListener(
-                (observable, oldValue, newValue) -> updateToggleButtonText(newValue, toggleButton)
+                (_, _, newValue) -> updateToggleButtonText(newValue, toggleButton)
         );
-        toggleButton.setOnAction(event -> ThemeManager.getInstance().toggleTheme());
+        toggleButton.setOnAction(_ -> ThemeManager.getInstance().toggleTheme());
 
         this.getChildren().add(toggleButton);
     }
