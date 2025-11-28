@@ -1,0 +1,833 @@
+/* ===============================================
+   LitClub - Valid JavaFX CSS Dark Mode
+   Organized by User Flow & Component Type
+   =============================================== */
+
+/* ===============================================
+   SECTION 1: FOUNDATION & LAYOUT
+   Base application structure
+   =============================================== */
+
+/* ------- Root Container ------- */
+.root,
+.page-root {
+    -fx-background-color: linear-gradient(to bottom, #0D0E10 0%, #1A1B1E 100%);
+    -fx-font-family: "Lora Regular", "Lora", serif;
+    -fx-text-fill: #E8E9EA;
+    -fx-accent: #4A9EFF;
+}
+
+/* ------- Logo Styling ------- */
+.page-logo {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0.4, 0, 4);
+    -fx-padding: 12 0 30 0;
+}
+
+/* ------- Header Bar ------- */
+.header-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0.3, 0, 2);
+}
+
+.app-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E8E9EA;
+}
+
+.greeting-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #B8BCC2;
+}
+
+/* ------- Navigation Sidebar ------- */
+.nav-sidebar {
+    -fx-background-color: rgba(168, 181, 162, 0.04);
+    -fx-border-color: rgba(168, 181, 162, 0.2);
+    -fx-border-width: 0 1.5 0 0;
+}
+
+
+/* ===============================================
+   SECTION 2: TYPOGRAPHY SYSTEM
+   Consistent text hierarchy across the app
+   =============================================== */
+
+/* ------- Primary Text (Headers & Titles) ------- */
+.text-primary,
+.title,
+.section-title,
+.meetings-header,
+.meeting-title,
+.prompt-title,
+.discussion-header {
+    -fx-font-size: 24px;
+    -fx-text-fill: #E8E9EA;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 12 0;
+}
+
+/* Size variations for primary text */
+.text-primary.text-lg { -fx-font-size: 28px; }
+.text-primary.text-md { -fx-font-size: 20px; }
+.text-primary.text-sm { -fx-font-size: 18px; }
+
+/* ------- Secondary Text (Subtitles & Descriptions) ------- */
+.text-secondary,
+.section-subtitle,
+.meeting-time,
+.note-book-reference,
+.book-author {
+    -fx-font-size: 12px;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-weight: 500;
+}
+
+/* ------- Muted Text (Supporting Info) ------- */
+.text-muted,
+.meeting-location,
+.note-date,
+.book-genre,
+.prompt-timestamp {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7A7D84;
+}
+
+/* ------- Labels (Form Labels) ------- */
+.label {
+    -fx-font-size: 15px;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-weight: 600;
+    -fx-padding: 0 0 5 0;
+}
+
+
+/* ===============================================
+   SECTION 3: CARD COMPONENTS
+   Unified card system for all content containers
+   =============================================== */
+
+/* ------- Base Card ------- */
+.card-base,
+.card,
+.container {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 12;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.3, 0, 3);
+}
+
+/* Container variant - slightly different opacity */
+.container {
+    -fx-background-color: rgba(255, 255, 255, 0.03);
+    -fx-padding: 30 40;
+}
+
+/* ------- Interactive Cards ------- */
+.card-interactive,
+.meeting-card,
+.note-card,
+.book-card,
+.prompt-card {
+    -fx-background-color: rgba(168, 181, 162, 0.08);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(168, 181, 162, 0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+
+/* Interactive card hover state */
+.card-interactive:hover,
+.meeting-card:hover,
+.note-card:hover,
+.book-card:hover,
+.prompt-card:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.12);
+    -fx-border-color: rgba(168, 181, 162, 0.4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0.4, 0, 2);
+    -fx-translate-y: -2;
+}
+
+/* Interactive card pressed state */
+.card-interactive:pressed,
+.meeting-card:pressed,
+.note-card:pressed,
+.book-card:pressed,
+.prompt-card:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.18);
+    -fx-translate-y: 0;
+}
+
+/* ------- Specific Card Layouts ------- */
+.meeting-card {
+    -fx-padding: 20 24;
+}
+
+.note-card {
+    -fx-padding: 16;
+    -fx-min-width: 300;
+    -fx-max-width: 320;
+    -fx-min-height: 180;
+}
+
+.book-card {
+    -fx-padding: 12;
+    -fx-alignment: top-center;
+    -fx-pref-width: 140;
+    -fx-max-width: 140;
+    -fx-min-height: 220;
+}
+
+.prompt-card {
+    -fx-padding: 20 24;
+}
+
+/* ------- Special Card Types ------- */
+.invite-card {
+    -fx-pref-width: 280;
+    -fx-min-height: 200;
+    -fx-alignment: center;
+    -fx-padding: 20;
+    -fx-background-color: transparent;
+    -fx-border-color: #888888;
+    -fx-border-width: 4;
+    -fx-border-style: dotted;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+}
+
+.invite-card:hover {
+    -fx-border-color: #666666;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+
+/* ===============================================
+   SECTION 4: BUTTON SYSTEM
+   Unified button styles for all interactions
+   =============================================== */
+
+/* ------- Primary Button ------- */
+.btn-primary,
+.button-primary {
+    -fx-background-color: linear-gradient(to bottom, #B4C1AE 0%, #A8B5A2 100%);
+    -fx-text-fill: #0D0E10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.3), 8, 0.4, 0, 2);
+}
+
+.btn-primary:hover,
+.button-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #C1CDBB 0%, #B4C1AE 100%);
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.5), 12, 0.5, 0, 3);
+}
+
+.btn-primary:pressed,
+.button-primary:pressed {
+    -fx-background-color: #9DAA94;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0.3, 0, 1);
+    -fx-translate-y: 1;
+}
+
+/* ------- Secondary Button ------- */
+.btn-secondary,
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 12 24;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover,
+.secondary-button:hover {
+    -fx-border-color: #A8B5A2;
+    -fx-background-color: rgba(168, 181, 162, 0.08);
+}
+
+.btn-secondary:pressed,
+.secondary-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-translate-y: 1;
+}
+
+/* ------- Ghost/Text Button ------- */
+.btn-ghost,
+.theme-toggle,
+.user-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #9DAA94;
+    -fx-font-size: 12px;
+    -fx-underline: false;
+    -fx-cursor: hand;
+    -fx-padding: 8 0;
+    -fx-opacity: 0.8;
+}
+
+.btn-ghost:hover,
+.theme-toggle:hover,
+.user-button:hover {
+    -fx-text-fill: #B4C1AE;
+    -fx-opacity: 1.0;
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+}
+
+/* User button specific styling */
+.user-button {
+    -fx-text-fill: #E8E9EA;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 4 8;
+    -fx-background-radius: 6;
+}
+
+/* ------- Navigation Button ------- */
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 14 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+}
+
+.nav-button:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.1);
+    -fx-text-fill: #E8E9EA;
+}
+
+.nav-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.18);
+    -fx-translate-y: 0.5;
+}
+
+.nav-button:focused {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-text-fill: #B4C1AE;
+    -fx-font-weight: 600;
+}
+
+/* ------- Special Button: Club Button ------- */
+.club-button {
+    -fx-background-color: linear-gradient(to bottom, rgba(168, 181, 162, 0.12), rgba(168, 181, 162, 0.05));
+    -fx-border-color: #A8B5A2;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #D8DCE2;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-padding: 16 28;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(168, 181, 162, 0.25), 8, 0, 0, 2);
+}
+
+.club-button:hover {
+    -fx-background-color: linear-gradient(to bottom, rgba(168, 181, 162, 0.2), rgba(168, 181, 162, 0.12));
+    -fx-border-color: #B8C5AC;
+    -fx-effect: dropshadow(gaussian, rgba(168, 181, 162, 0.4), 12, 0, 0, 3);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.club-button:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.3);
+    -fx-border-color: #8FA388;
+    -fx-translate-y: 1;
+    -fx-effect: dropshadow(gaussian, rgba(168, 181, 162, 0.2), 4, 0, 0, 1);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+
+/* ===============================================
+   SECTION 5: INPUT FIELDS
+   Form inputs and search fields
+   =============================================== */
+
+/* ------- Standard Input Field ------- */
+.input-field,
+.text-input,
+.text-field,
+.text-area,
+.password-field {
+    -fx-background-color: #0D0E10;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+    -fx-text-fill: #E8E9EA;
+    -fx-prompt-text-fill: #5A5D64;
+}
+
+.input-field:focused,
+.text-input:focused,
+.text-field:focused,
+.text-area:focused,
+.password-field:focused {
+    -fx-border-color: #A8B5A2;
+    -fx-border-width: 2;
+    -fx-background-color: #12131A;
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.25), 8, 0.4, 0, 2);
+}
+
+/* ------- Search Field ------- */
+.search-field {
+    -fx-background-color: #0D0E10;
+    -fx-text-fill: #E8E9EA;
+    -fx-prompt-text-fill: #5A5D64;
+    -fx-padding: 8 12;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-font-size: 12px;
+}
+
+.search-field:focused {
+    -fx-border-color: #A8B5A2;
+    -fx-border-width: 2;
+    -fx-background-color: #12131A;
+    -fx-effect: dropshadow(gaussian, rgba(168,181,162,0.2), 6, 0.3, 0, 1);
+}
+
+
+/* ===============================================
+   SECTION 6: BADGES & INDICATORS
+   Status indicators and tags
+   =============================================== */
+
+/* ------- Base Badge ------- */
+.badge,
+.meeting-club-badge,
+.note-private-indicator,
+.note-shared-indicator {
+    -fx-background-color: rgba(168, 181, 162, 0.15);
+    -fx-background-radius: 6;
+    -fx-padding: 4 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #B4C1AE;
+}
+
+/* Badge variants */
+.badge.badge-success {
+    -fx-background-color: rgba(95, 168, 86, 0.2);
+    -fx-text-fill: #5fa856;
+}
+
+.badge.badge-error {
+    -fx-background-color: rgba(229, 115, 104, 0.2);
+    -fx-text-fill: #E57368;
+}
+
+.badge.badge-info {
+    -fx-background-color: rgba(74, 158, 255, 0.2);
+    -fx-text-fill: #4A9EFF;
+}
+
+
+/* ===============================================
+   SECTION 7: STATUS & FEEDBACK
+   Success, error, and info messages
+   =============================================== */
+
+/* ------- Status Labels ------- */
+.status-label {
+    -fx-font-size: 12px;
+    -fx-padding: 12 0 0 0;
+}
+
+/* ------- Status Variants ------- */
+.status-success,
+.success-label {
+    -fx-text-fill: #5fa856;
+    -fx-font-weight: 600;
+}
+
+.status-error,
+.error-label {
+    -fx-text-fill: #E57368;
+    -fx-font-weight: 600;
+}
+
+.status-info,
+.info-label {
+    -fx-text-fill: #4A9EFF;
+    -fx-font-weight: 600;
+}
+
+/* ------- Empty States ------- */
+.empty-state,
+.empty-notes-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #5A5D64;
+    -fx-font-style: italic;
+    -fx-padding: 40 0 0 0;
+    -fx-alignment: center;
+}
+
+
+/* ===============================================
+   SECTION 8: LAYOUT CONTAINERS
+   Grid and flow layouts for content
+   =============================================== */
+
+/* ------- Section Container ------- */
+.layout-section,
+.library-section,
+.notes-section {
+    -fx-spacing: 12;
+}
+
+/* ------- Grid Layout ------- */
+.layout-grid,
+.books-container,
+.notes-container {
+    -fx-hgap: 12;
+    -fx-vgap: 12;
+    -fx-padding: 12 0 0 0;
+}
+
+/* ------- Flow Layout ------- */
+.layout-flow,
+.meetings-container {
+    -fx-spacing: 20;
+    -fx-padding: 30 40;
+}
+
+
+/* ===============================================
+   SECTION 9: CONTROL BARS
+   Top action bars for views
+   =============================================== */
+
+/* ------- Control Bar ------- */
+.control-bar,
+.library-control-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.02);
+    -fx-border-color: rgba(168, 181, 162, 0.15);
+    -fx-border-width: 0 0 1.5 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0.3, 0, 1);
+}
+
+/* ------- Stats Label ------- */
+.stats-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #B8BCC2;
+    -fx-font-weight: 500;
+}
+
+/* ------- Options Menu ------- */
+.options-menu {
+    -fx-background-color: transparent;
+    -fx-border-color: #2F3238;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 8 16;
+    -fx-cursor: hand;
+}
+
+.options-menu:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.1);
+    -fx-border-color: #A8B5A2;
+}
+
+.options-menu:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.18);
+}
+
+.options-menu .label {
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+
+/* ===============================================
+   SECTION 10: MENU ITEMS
+   Context menus and dropdowns
+   =============================================== */
+
+/* ------- Menu Item ------- */
+.menu-item {
+    -fx-padding: 8 16;
+}
+
+.menu-item:focused {
+    -fx-background-color: rgba(168, 181, 162, 0.12);
+}
+
+.menu-item .label {
+    -fx-text-fill: #B8BCC2;
+    -fx-font-size: 12px;
+}
+
+/* ------- Radio Menu Item (Selected State) ------- */
+.radio-menu-item:selected .label {
+    -fx-text-fill: #B4C1AE;
+    -fx-font-weight: 600;
+}
+
+
+/* ===============================================
+   SECTION 11: SCROLLBARS
+   Custom scrollbar styling
+   =============================================== */
+
+/* ------- ScrollPane Base ------- */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .corner {
+    -fx-background-color: #1A1B1E;
+}
+
+/* ------- Scrollbar Track ------- */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-bar:vertical .track,
+.scroll-bar:horizontal .track {
+    -fx-background-color: rgba(168, 181, 162, 0.06);
+    -fx-background-radius: 4;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:vertical .track-background,
+.scroll-bar:horizontal .track-background {
+    -fx-background-color: transparent;
+}
+
+/* ------- Scrollbar Thumb ------- */
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: rgba(168, 181, 162, 0.3);
+    -fx-background-radius: 4;
+    -fx-background-insets: 2;
+}
+
+.scroll-bar:vertical .thumb:hover,
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: rgba(168, 181, 162, 0.5);
+}
+
+.scroll-bar:vertical .thumb:pressed,
+.scroll-bar:horizontal .thumb:pressed {
+    -fx-background-color: rgba(168, 181, 162, 0.65);
+}
+
+/* ------- Scrollbar Arrows ------- */
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-button .increment-arrow,
+.scroll-bar .decrement-button .decrement-arrow {
+    -fx-background-color: rgba(184, 188, 194, 0.5);
+    -fx-padding: 0.25em;
+    -fx-shape: " ";
+}
+
+.scroll-bar:vertical .increment-button .increment-arrow {
+    -fx-shape: "M 0 0 L 4 0 L 2 4 Z";
+}
+
+.scroll-bar:vertical .decrement-button .decrement-arrow {
+    -fx-shape: "M 0 4 L 4 4 L 2 0 Z";
+}
+
+.scroll-bar:horizontal .increment-button .increment-arrow {
+    -fx-shape: "M 0 0 L 0 4 L 4 2 Z";
+}
+
+.scroll-bar:horizontal .decrement-button .decrement-arrow {
+    -fx-shape: "M 4 0 L 4 4 L 0 2 Z";
+}
+
+
+/* ===============================================
+   SECTION 12: SPECIAL COMPONENTS
+   Unique components with specific styling
+   =============================================== */
+
+/* ------- Book Cover Display ------- */
+.book-cover {
+    -fx-background-color: linear-gradient(to bottom, #8FA388, #768773);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(0, 0, 0, 0.3);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-pref-width: 116;
+    -fx-pref-height: 160;
+    -fx-max-width: 116;
+    -fx-max-height: 160;
+    -fx-alignment: center;
+}
+
+.book-cover-icon {
+    -fx-font-size: 32px;
+}
+
+/* ------- Book Info Section ------- */
+.book-info {
+    -fx-spacing: 3;
+    -fx-alignment: top-left;
+}
+
+.book-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E8E9EA;
+    -fx-wrap-text: true;
+    -fx-max-width: 116;
+}
+
+/* ------- Note Content ------- */
+.note-content {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #E8E9EA;
+    -fx-wrap-text: true;
+    -fx-line-spacing: 2;
+}
+
+/* ------- Meeting Info Section ------- */
+.meeting-info-section {
+    -fx-spacing: 8;
+    -fx-padding: 8 0 0 0;
+}
+
+.meeting-location-link {
+    -fx-text-fill: #A8B5A2;
+    -fx-font-weight: 500;
+}
+
+/* ------- Invite Card Special Elements ------- */
+.invite-plus {
+    -fx-font-size: 64px;
+    -fx-font-weight: bold;
+}
+
+.invite-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 600;
+    -fx-text-alignment: center;
+}
+
+
+/* ===============================================
+   SECTION 13: VIEW-SPECIFIC OVERRIDES
+   Special cases for specific views
+   =============================================== */
+
+/* ------- Library Core ------- */
+.library-core {
+    -fx-background-color: transparent;
+}
+
+/* ------- Notes Core ------- */
+.notes-core {
+    -fx-background-color: transparent;
+}
+
+/* ------- Discussion Core ------- */
+.discussion-core {
+    -fx-background-color: transparent;
+}
+
+/* ------- Meetings View ------- */
+.meetings-view {
+    -fx-background-color: transparent;
+}
+
+
+/* ===============================================
+   SECTION 14: FORM-SPECIFIC STYLES
+   Login, registration, and dialog forms
+   =============================================== */
+
+/* ------- Login Form ------- */
+.login-form {
+    -fx-spacing: 12;
+}
+
+/* ------- Add Book Button (Special Primary) ------- */
+.add-book-button {
+    -fx-font-size: 14px;
+}
+
+
+/* ===============================================
+   SECTION 15: UTILITY CLASSES
+   Helper classes for common modifications
+   =============================================== */
+
+/* ------- Text Alignment ------- */
+.text-center {
+    -fx-text-alignment: center;
+}
+
+.text-left {
+    -fx-text-alignment: left;
+}
+
+.text-right {
+    -fx-text-alignment: right;
+}
+
+/* ------- Spacing Utilities ------- */
+.spacing-sm { -fx-spacing: 8; }
+.spacing-md { -fx-spacing: 12; }
+.spacing-lg { -fx-spacing: 16; }
+.spacing-xl { -fx-spacing: 20; }
+
+/* ------- Padding Utilities ------- */
+.padding-sm { -fx-padding: 8; }
+.padding-md { -fx-padding: 12; }
+.padding-lg { -fx-padding: 16; }
+.padding-xl { -fx-padding: 20; }
+
+/* ------- Display Utilities ------- */
+.hidden {
+    -fx-opacity: 0;
+    -fx-visibility: hidden;
+}
+
+.visible {
+    -fx-opacity: 1;
+    -fx-visibility: visible;
+}
+
+
+/* ===============================================
+   END OF JAVAFX CSS DARK MODE
+   =============================================== */
