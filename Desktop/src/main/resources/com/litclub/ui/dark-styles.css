@@ -1,5 +1,5 @@
 /* ===============================================
-   LitClub - Valid JavaFX CSS Dark Mode
+   LitClub - JavaFX CSS Dark Mode
    Organized by User Flow & Component Type
    =============================================== */
 
@@ -277,11 +277,14 @@
 }
 
 .btn-ghost:hover,
-.theme-toggle:hover,
 .user-button:hover {
     -fx-text-fill: #B4C1AE;
     -fx-opacity: 1.0;
     -fx-background-color: rgba(168, 181, 162, 0.15);
+}
+
+.theme-toggle:hover {
+    -fx-text-fill: #B4C1AE;
 }
 
 /* User button specific styling */
