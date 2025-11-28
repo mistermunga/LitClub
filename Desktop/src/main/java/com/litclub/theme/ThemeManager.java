@@ -11,8 +11,8 @@ import java.util.Objects;
 
 public class ThemeManager {
 
-    private static final String DEFAULT_STYLE = "/com/litclub/ui/styles.css";
-    private static final String DARKMODE_STYLE = "/com/litclub/ui/styles-dark.css";
+    private static final String DEFAULT_STYLE = "/com/litclub/ui/light-styles.css";
+    private static final String DARKMODE_STYLE = "/com/litclub/ui/dark-styles.css";
 
     private static ThemeManager instance;
     private final BooleanProperty brightModeProperty;
