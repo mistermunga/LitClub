@@ -20,6 +20,8 @@ public class UserMessage extends HBox {
         userButton.getStyleClass().add("user-button");
 
         userButton.setOnAction(e -> {
+            System.out.println("Usercard clicked! Event: " + e);
+            System.out.println("Component still in scene: " + (getScene() != null));
             AppSession.getInstance().clearClubContext();
             SceneManager.getInstance().showMainPage(true);
         });
