@@ -43,8 +43,8 @@ public class DiscussionService {
                 .exceptionally(throwable -> {
                     Platform.runLater(() -> {
                         String errorMessage = ApiErrorHandler.parseError(throwable);
-                        System.err.println("Failed to load Discussion Prompts");
-                        onError.accept("Failed to load Discussion Prompts");
+                        System.err.println("Failed to load Discussion Prompts " + errorMessage);
+                        onError.accept("Failed to load Discussion Prompts " + errorMessage);
                     });
                     return null;
                 });
