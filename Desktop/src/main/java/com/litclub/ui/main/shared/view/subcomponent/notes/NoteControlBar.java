@@ -100,6 +100,7 @@ public class NoteControlBar extends HBox {
                 ? noteService.getPersonalNotes()
                 : noteService.getClubNotes())
                 .stream()
+                .filter(note -> note.getBook() != null)
                 .map(note -> note.getBook().getBookID())
                 .distinct()
                 .count();
