@@ -12,14 +12,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class ClubActions extends VBox {
+public class ClubActions extends ScrollPane {
 
     private final ClubService clubService;
     private final ClubBookService clubBookService;
     private final AppSession session;
+
+    private final VBox container;
 
     public ClubActions() {
         this.clubService = new ClubService();
@@ -29,11 +32,17 @@ public class ClubActions extends VBox {
         ThemeManager.getInstance().registerComponent(this);
         this.getStyleClass().add("root");
 
-        this.setAlignment(Pos.TOP_CENTER);
-        this.setSpacing(30);
-        this.setPadding(new Insets(40, 40, 40, 40));
+        this.setFitToWidth(true);
+        this.setHbarPolicy(ScrollBarPolicy.NEVER);
+        this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+
+        container = new VBox(30);
+        container.setAlignment(Pos.TOP_CENTER);
+        container.setPadding(new Insets(40, 40, 40, 40));
 
         buildActionsPage();
+
+        this.setContent(container);
     }
 
     private void buildActionsPage() {
@@ -49,13 +58,13 @@ public class ClubActions extends VBox {
             return;
         }
 
-        this.getChildren().add(header);
+        container.getChildren().add(header);
 
         // Build sections based on role
         if (highestRole == ClubRole.MODERATOR) {
-            this.getChildren().add(createModeratorSection());
+            container.getChildren().add(createModeratorSection());
         } else if (highestRole == ClubRole.OWNER) {
-            this.getChildren().addAll(
+            container.getChildren().addAll(
                     createOwnerSection(),
                     createModeratorSection()
             );
@@ -81,7 +90,7 @@ public class ClubActions extends VBox {
         subtitle.setAlignment(Pos.CENTER);
 
         noPermBox.getChildren().addAll(icon, message, subtitle);
-        this.getChildren().add(noPermBox);
+        container.getChildren().add(noPermBox);
     }
 
     private VBox createOwnerSection() {
