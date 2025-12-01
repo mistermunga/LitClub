@@ -300,6 +300,9 @@ public class LibraryService {
 
     public int getBooksReadThisYear() {
         UserLibrary userLibrary = libraryRepository.getUserLibrary();
+        if (userLibrary == null || userLibrary.read() == null) {
+            return 0;
+        }
         return userLibrary.read().size();
     }
 }
