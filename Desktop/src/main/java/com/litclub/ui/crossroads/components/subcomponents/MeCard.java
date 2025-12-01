@@ -58,7 +58,11 @@ public class MeCard extends VBox {
         getChildren().addAll(icon, title, subtitle, stats);
 
         // Click handler
-        setOnMouseClicked(e -> onNavigate.run());
+        setOnMouseClicked(e -> {
+            System.out.println("MeCard clicked! Event: " + e);
+            System.out.println("Component still in scene: " + (getScene() != null));
+            onNavigate.run();
+        });
 
         // Hover effects
         setOnMouseEntered(e -> setStyle("-fx-scale-x: 1.03; -fx-scale-y: 1.03;"));
