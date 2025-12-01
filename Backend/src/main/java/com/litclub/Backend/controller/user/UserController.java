@@ -15,6 +15,7 @@ import com.litclub.Backend.service.middle.BookService;
 import com.litclub.Backend.service.middle.UserService;
 import com.litclub.Backend.service.top.facilitator.DiscussionManagementService;
 import com.litclub.Backend.service.top.facilitator.LibraryManagementService;
+import com.litclub.Backend.service.top.facilitator.RecommenderService;
 import com.litclub.Backend.service.top.facilitator.UserActivityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,13 +40,16 @@ public class UserController {
     private final DiscussionManagementService discussionManagementService;
     private final ReviewService reviewService;
     private final UserBooksService userBooksService;
+    private final RecommenderService recommenderService;
 
     public UserController(UserService userService,
                           UserActivityService userActivityService,
                           LibraryManagementService libraryManagementService,
                           BookService bookService,
                           DiscussionManagementService discussionManagementService,
-                          ReviewService reviewService, UserBooksService userBooksService) {
+                          ReviewService reviewService,
+                          UserBooksService userBooksService,
+                          RecommenderService recommenderService) {
         this.userService = userService;
         this.userActivityService = userActivityService;
         this.libraryManagementService = libraryManagementService;
@@ -53,6 +57,7 @@ public class UserController {
         this.discussionManagementService = discussionManagementService;
         this.reviewService = reviewService;
         this.userBooksService = userBooksService;
+        this.recommenderService = recommenderService;
     }
 
     // ====== USER INFO ======
@@ -179,6 +184,15 @@ public class UserController {
     ) {
         userService.removeBookFromLibrary(userID, bookService.getBook(bookID));
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("{userID}/recommendations")
+    @PreAuthorize("@userSecurity.isCurrentUserOrAdmin(authentication, #userID)")
+    public ResponseEntity<Page<Book>> getRecommendedBooks(
+            @PathVariable("userID") Long userID,
+            Pageable pageable) {
+        User user = userService.requireUserById(userID);
+        return ResponseEntity.ok(recommenderService.findRecommendedBooks(user, pageable));
     }
 
 
