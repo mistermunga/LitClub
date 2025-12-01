@@ -236,6 +236,10 @@
     -fx-translate-y: 1;
 }
 
+.button-primary .label {
+    -fx-text-fill: #000000;
+}
+
 /* ------- Secondary Button ------- */
 .btn-secondary,
 .secondary-button {
