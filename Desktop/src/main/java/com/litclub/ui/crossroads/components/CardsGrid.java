@@ -56,6 +56,9 @@ public class CardsGrid extends VBox {
     }
 
     private void populateGrid() {
+        System.out.println(">>> populateGrid() called - Stack trace:");
+        Thread.dumpStack();
+
         grid.getChildren().clear();
 
         // Add "Me" card first
