@@ -10,14 +10,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.*;
 
-public class HomeView extends VBox {
+public class HomeView extends ScrollPane {
 
     private final boolean isPersonal;
     private final LibraryRepository libraryRepository;
     private final ClubRepository clubRepository;
     private final AppSession session;
+
+    private final VBox container;
 
     public HomeView(boolean isPersonal) {
         this.isPersonal = isPersonal;
@@ -26,13 +29,23 @@ public class HomeView extends VBox {
         this.session = AppSession.getInstance();
 
         ThemeManager.getInstance().registerComponent(this);
-        this.getStyleClass().add("root");
+        this.getStyleClass().addAll("root", "scroll-pane");
 
-        this.setAlignment(Pos.TOP_CENTER);
-        this.setSpacing(40);
-        this.setPadding(new Insets(60, 40, 40, 40));
+        this.setFitToWidth(true);
+        this.setFitToHeight(true);
+        this.setHbarPolicy(ScrollBarPolicy.NEVER);
+        this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+        this.setPannable(false);
+
+        container = new VBox();
+        container.setAlignment(Pos.TOP_CENTER);
+        container.setSpacing(40);
+        container.setPadding(new Insets(60, 40, 40, 40));
 
         buildHome();
+        this.setContent(container);
+
+        setupSmoothScrolling();
     }
 
     private void buildHome() {
@@ -57,7 +70,7 @@ public class HomeView extends VBox {
         // Hero buttons
         FlowPane heroButtons = createPersonalHeroButtons();
 
-        this.getChildren().addAll(header, statsSection, heroButtons);
+        container.getChildren().addAll(header, statsSection, heroButtons);
     }
 
     private VBox createPersonalStatsSection() {
@@ -73,20 +86,16 @@ public class HomeView extends VBox {
         HBox statsRow = new HBox(40);
         statsRow.setAlignment(Pos.CENTER);
 
-        // Total books
         int totalBooks = libraryRepository.getAllBooks().size();
         VBox totalBooksBox = createStatItem("📚", String.valueOf(totalBooks), "Total Books");
 
-        // Currently reading
         int currentlyReading = libraryRepository.getCurrentlyReading().size();
         VBox currentlyReadingBox = createStatItem("📖", String.valueOf(currentlyReading), "Currently Reading");
 
-        // Personal notes
         int personalNotes = libraryRepository.getPersonalNotes().size();
         VBox notesBox = createStatItem("📝", String.valueOf(personalNotes), "Notes Written");
 
         statsRow.getChildren().addAll(totalBooksBox, currentlyReadingBox, notesBox);
-
         statsBox.getChildren().addAll(statsTitle, statsRow);
         return statsBox;
     }
@@ -123,10 +132,7 @@ public class HomeView extends VBox {
         return buttonPane;
     }
 
-    // ==================== CLUB HOME ====================
-
     private void buildClubHome() {
-        // Header with club name
         String clubName = session.getCurrentClub() != null
                 ? session.getCurrentClub().getClubName()
                 : "Book Club";
@@ -135,7 +141,6 @@ public class HomeView extends VBox {
         header.getStyleClass().add("section-title");
         header.setStyle("-fx-font-size: 32px;");
 
-        // Club description
         String description = session.getCurrentClub() != null
                 && session.getCurrentClub().getDescription() != null
                 ? session.getCurrentClub().getDescription()
@@ -148,13 +153,10 @@ public class HomeView extends VBox {
         descLabel.setMaxWidth(800);
         descLabel.setAlignment(Pos.CENTER);
 
-        // Stats section
         VBox statsSection = createClubStatsSection();
-
-        // Hero buttons
         FlowPane heroButtons = createClubHeroButtons();
 
-        this.getChildren().addAll(header, descLabel, statsSection, heroButtons);
+        container.getChildren().addAll(header, descLabel, statsSection, heroButtons);
     }
 
     private VBox createClubStatsSection() {
@@ -170,24 +172,19 @@ public class HomeView extends VBox {
         HBox statsRow = new HBox(40);
         statsRow.setAlignment(Pos.CENTER);
 
-        // Club books
         int clubBooks = clubRepository.getClubBooks().size();
         VBox booksBox = createStatItem("📚", String.valueOf(clubBooks), "Club Books");
 
-        // Discussions
         int discussions = clubRepository.getDiscussions().size();
         VBox discussionsBox = createStatItem("💬", String.valueOf(discussions), "Discussions");
 
-        // Meetings
         int meetings = clubRepository.getMeetings().size();
         VBox meetingsBox = createStatItem("📅", String.valueOf(meetings), "Meetings");
 
-        // Your notes
         int yourNotes = clubRepository.getClubNotes().size();
         VBox notesBox = createStatItem("📝", String.valueOf(yourNotes), "Club Notes");
 
         statsRow.getChildren().addAll(booksBox, discussionsBox, meetingsBox, notesBox);
-
         statsBox.getChildren().addAll(statsTitle, statsRow);
         return statsBox;
     }
@@ -237,8 +234,6 @@ public class HomeView extends VBox {
         return buttonPane;
     }
 
-    // ==================== HELPER METHODS ====================
-
     private VBox createStatItem(String emoji, String number, String label) {
         VBox statBox = new VBox(8);
         statBox.setAlignment(Pos.CENTER);
@@ -282,7 +277,6 @@ public class HomeView extends VBox {
     }
 
     private ContentArea findContentArea() {
-        // Walk up the scene graph to find ContentArea
         javafx.scene.Parent parent = this.getParent();
         while (parent != null) {
             if (parent instanceof ContentArea) {
@@ -291,5 +285,13 @@ public class HomeView extends VBox {
             parent = parent.getParent();
         }
         return null;
+    }
+
+    private void setupSmoothScrolling() {
+        final double SPEED = 0.005;
+        this.setOnScroll(event -> {
+            double deltaY = event.getDeltaY() * SPEED;
+            this.setVvalue(this.getVvalue() - deltaY);
+        });
     }
 }
