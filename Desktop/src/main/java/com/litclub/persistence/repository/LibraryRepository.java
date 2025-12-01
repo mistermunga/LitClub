@@ -52,6 +52,7 @@ public class LibraryRepository {
     private final ObservableList<Book> finishedReading;
     private final ObservableList<Review> userReviews;
     private final ObservableList<Note> personalNotes;
+    private final ObservableList<Book> recommendations;
 
     // Current userRecord context
     private UserRecord currentUser;
@@ -67,6 +68,7 @@ public class LibraryRepository {
         this.finishedReading = FXCollections.observableArrayList();
         this.userReviews = FXCollections.observableArrayList();
         this.personalNotes = FXCollections.observableArrayList();
+        this.recommendations = FXCollections.observableArrayList();
     }
 
     public static synchronized LibraryRepository getInstance() {
@@ -496,6 +498,15 @@ public class LibraryRepository {
                 });
     }
 
+    public CompletableFuture<Void> fetchRecommendations(Long userID) {
+        TypeReference<PageResponse<Book>> typeRef = new TypeReference<>() {};
+
+        return apiClient.get("/api/users/" + userID + "recommendations?page=0&size=10", typeRef)
+                .thenAccept(pageResponse -> {
+                    this.recommendations.addAll(pageResponse.getContent());
+                });
+    }
+
     // ==================== PERSONAL NOTES ====================
 
     /**
@@ -610,6 +621,10 @@ public class LibraryRepository {
     }
 
     public UserLibrary getUserLibrary() { return userLibrary; }
+
+    public ObservableList<Book> getRecommendations() {
+        return recommendations;
+    }
 
     // ==================== UTILITY ====================
 
