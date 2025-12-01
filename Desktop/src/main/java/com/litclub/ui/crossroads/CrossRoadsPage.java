@@ -2,6 +2,7 @@ package com.litclub.ui.crossroads;
 
 import com.litclub.SceneManager;
 import com.litclub.construct.Club;
+import com.litclub.persistence.repository.LibraryRepository;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.theme.ThemeToggleBar;
@@ -150,8 +151,27 @@ public class CrossRoadsPage extends BorderPane {
     }
 
     private void handleNavigateToPersonal() {
-        service.preparePersonalContext();
-        Platform.runLater(() -> SceneManager.getInstance().showMainPage(true));
+        statusBar.showLoading();
+        CardsGrid.setDisable(true);
+
+        Long userID = service.getCurrentUser().userID();
+        LibraryRepository.getInstance().fetchUserLibrary(userID)
+                .thenRun(() -> {
+                    service.preparePersonalContext();
+                    Platform.runLater(() -> {
+                        statusBar.hideLoading();
+                        CardsGrid.setDisable(false);
+                        SceneManager.getInstance().showMainPage(true);
+                    });
+                })
+                .exceptionally(throwable -> {
+                    Platform.runLater(() -> {
+                        statusBar.hideLoading();
+                        CardsGrid.setDisable(false);
+                        statusBar.showError("Failed to load personal library");
+                    });
+                    return null;
+                });
     }
 
     private void handleNavigateToClub(Club club) {
