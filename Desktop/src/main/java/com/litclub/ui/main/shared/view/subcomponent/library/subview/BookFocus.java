@@ -4,7 +4,9 @@ import com.litclub.construct.Book;
 import com.litclub.construct.Review;
 import com.litclub.construct.enums.BookStatus;
 import com.litclub.construct.interfaces.review.LoadedReview;
+import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
@@ -34,6 +36,7 @@ public class BookFocus extends AbstractFocusView<Book> {
         super("library-core", onBack);
         this.libraryService = libraryService;
         this.reviewService = reviewService;
+        EventBus.getInstance().on(EventType.PERSONAL_REVIEWS_UPDATED, this::loadReviewsSection);
     }
 
     /**
@@ -245,10 +248,18 @@ public class BookFocus extends AbstractFocusView<Book> {
 
     // ==================== EVENT HANDLERS ====================
 
+    // In handleStatusChange method:
     private void handleStatusChange(BookStatus newStatus) {
         System.out.println("Changing status to: " + newStatus);
-        // TODO: Call library service to update status
-        EventBus.getInstance().emit(EventBus.EventType.PERSONAL_LIBRARY_UPDATED);
+        libraryService.updateBookStatus(
+                AppSession.getInstance().getUserRecord().userID(),
+                currentEntity.getBookID(),
+                newStatus,
+                result -> {
+                    EventBus.getInstance().emit(EventType.PERSONAL_LIBRARY_UPDATED);
+                },
+                error -> System.err.println("Failed to update status: " + error)
+        );
     }
 
     private void handleAddReview() {

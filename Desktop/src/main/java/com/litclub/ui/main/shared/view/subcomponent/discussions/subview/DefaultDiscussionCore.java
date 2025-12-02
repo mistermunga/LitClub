@@ -4,6 +4,8 @@ import com.litclub.construct.DiscussionPrompt;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.view.service.DiscussionService;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -57,6 +59,9 @@ public class DefaultDiscussionCore extends ScrollPane {
 
         // Load data
         loadPrompts();
+
+        EventBus.getInstance().on(EventType.DISCUSSION_PROMPTS_UPDATED, this::refreshPrompts);
+
     }
 
     private void setupSmoothScrolling() {

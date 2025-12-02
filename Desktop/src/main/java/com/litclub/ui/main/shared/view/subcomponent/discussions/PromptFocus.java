@@ -5,6 +5,8 @@ import com.litclub.construct.Note;
 import com.litclub.ui.main.shared.view.service.DiscussionService;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.NoteService;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
 import com.litclub.ui.main.shared.view.subcomponent.notes.dialog.AddNoteDialog;
 import javafx.application.Platform;
@@ -38,6 +40,7 @@ public class PromptFocus extends AbstractFocusView<DiscussionPrompt> {
         super("discussion-focus", onBack);
         this.discussionService = discussionService;
         this.onNoteClick = onNoteClick;
+        EventBus.getInstance().on(EventType.PROMPT_NOTE_UPDATED, this::loadNotesSection);
     }
 
     /**

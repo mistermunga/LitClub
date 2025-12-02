@@ -6,6 +6,8 @@ import com.litclub.persistence.repository.LibraryRepository;
 import com.litclub.session.AppSession;
 import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.ContentArea;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -44,6 +46,16 @@ public class HomeView extends ScrollPane {
 
         buildHome();
         this.setContent(container);
+
+        if (isPersonal) {
+            EventBus.getInstance().on(EventType.PERSONAL_LIBRARY_UPDATED, this::buildPersonalHome);
+            EventBus.getInstance().on(EventType.PERSONAL_NOTES_UPDATED, this::buildPersonalHome);
+        } else {
+            EventBus.getInstance().on(EventType.CLUB_BOOK_UPDATED, this::buildClubHome);
+            EventBus.getInstance().on(EventType.CLUB_NOTES_UPDATED, this::buildClubHome);
+            EventBus.getInstance().on(EventType.DISCUSSION_PROMPTS_UPDATED, this::buildClubHome);
+            EventBus.getInstance().on(EventType.CLUB_MEETINGS_UPDATED, this::buildClubHome);
+        }
 
         setupSmoothScrolling();
     }

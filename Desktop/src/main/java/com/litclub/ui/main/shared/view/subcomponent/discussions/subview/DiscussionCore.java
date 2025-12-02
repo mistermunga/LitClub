@@ -3,6 +3,8 @@ package com.litclub.ui.main.shared.view.subcomponent.discussions.subview;
 import com.litclub.construct.DiscussionPrompt;
 import com.litclub.construct.Note;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.DiscussionService;
 import com.litclub.ui.main.shared.view.subcomponent.discussions.PromptFocus;
 import com.litclub.ui.main.shared.view.subcomponent.notes.subview.NoteFocus;
@@ -35,6 +37,12 @@ public class DiscussionCore extends StackPane {
 
         // Add all to stack (only one visible at a time)
         this.getChildren().addAll(defaultDiscussionCore, promptFocus, noteFocus);
+
+        EventBus.getInstance().on(EventType.PROMPT_NOTE_UPDATED, () -> {
+            if (promptFocus.isVisible()) {
+                promptFocus.loadPrompt(promptFocus.getCurrentPrompt());
+            }
+        });
 
         // Show default view initially
         showDefaultView();

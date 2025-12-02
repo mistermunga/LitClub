@@ -8,6 +8,8 @@ import com.litclub.theme.ThemeManager;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.RecommendationsService;
 import com.litclub.ui.main.shared.view.subcomponent.library.util.BookCoverLoader;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -268,6 +270,7 @@ public class RecommendationsView extends ScrollPane {
                     Platform.runLater(() -> {
                         // Show success feedback
                         card.setStyle("-fx-background-color: rgba(95, 168, 86, 0.2);");
+                        EventBus.getInstance().emit(EventType.PERSONAL_LIBRARY_UPDATED);
 
                         // Update hint label
                         VBox infoBox = (VBox) ((HBox) card.getChildren().getFirst()).getChildren().get(1);
