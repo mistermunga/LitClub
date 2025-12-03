@@ -501,9 +501,10 @@ public class LibraryRepository {
     public CompletableFuture<Void> fetchRecommendations(Long userID) {
         TypeReference<PageResponse<Book>> typeRef = new TypeReference<>() {};
 
-        return apiClient.get("/api/users/" + userID + "recommendations?page=0&size=10", typeRef)
+        return apiClient.get("/api/users/" + userID + "/recommendations?page=0&size=10", typeRef)
                 .thenAccept(pageResponse -> {
                     this.recommendations.addAll(pageResponse.getContent());
+                    System.out.println("Recommendations: " + this.recommendations.stream());
                 });
     }
 
