@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.litclub'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.5-SNAPSHOT'
 description = 'Backend for LitClub'
 
 java {
