@@ -13,6 +13,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -203,16 +204,17 @@ public class ClubActions extends ScrollPane {
         Button generateButton = new Button("Generate Code");
         generateButton.getStyleClass().add("button-primary");
 
-        Label codeLabel = new Label();
-        codeLabel.getStyleClass().add("label");
-        codeLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        TextField codeField = new TextField();
+        codeField.setEditable(false);
+        codeField.getStyleClass().add("label");
+        codeField.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         generateButton.setOnAction(e -> {
             String code = clubService.generateInvite().invite();
-            codeLabel.setText(code);
+            codeField.setText(code);
         });
 
-        buttonRow.getChildren().addAll(generateButton, codeLabel);
+        buttonRow.getChildren().addAll(generateButton, codeField);
 
         card.getChildren().addAll(topRow, buttonRow);
         return card;
