@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class RecommendationsService {
 
@@ -43,8 +44,10 @@ public class RecommendationsService {
         ObservableList<Book> allReadBooks = FXCollections.observableArrayList();
         allReadBooks.addAll(libraryRepository.getCurrentlyReading());
         allReadBooks.addAll(libraryRepository.getFinishedReading());
-        recommendations.removeIf(allReadBooks::contains);
-        return allReadBooks;
+
+        return recommendations.stream()
+                .filter(book -> !allReadBooks.contains(book))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
     }
 
 }
