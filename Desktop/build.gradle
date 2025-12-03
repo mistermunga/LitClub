@@ -47,18 +47,37 @@ jlink {
     jpackage {
         appVersion = project.version
 
-        installerType = 'exe'
+        // Detect OS and set installer type accordingly
+        def osName = System.getProperty('os.name').toLowerCase()
+        if (osName.contains('linux')) {
+            installerType = 'deb'
+        } else if (osName.contains('windows')) {
+            installerType = 'exe'
+        }
 
-        installerOptions = [
-                '--win-per-user-install',
-                '--win-dir-chooser',
-                '--win-menu',
-                '--win-shortcut'
-        ]
+        // Platform-specific installer options
+        if (osName.contains('linux')) {
+            installerOptions = [
+                    '--linux-shortcut',
+                    '--linux-menu-group', 'Utility',
+                    '--linux-app-category', 'utils'
+            ]
 
-        imageOptions = [
-                '--icon', file('src/main/resources/com/litclub/ui/icons/litclub.ico').absolutePath
-        ]
+            imageOptions = [
+                    '--icon', file('src/main/resources/com/litclub/ui/icons/litclub.png').absolutePath
+            ]
+        } else if (osName.contains('windows')) {
+            installerOptions = [
+                    '--win-per-user-install',
+                    '--win-dir-chooser',
+                    '--win-menu',
+                    '--win-shortcut'
+            ]
+
+            imageOptions = [
+                    '--icon', file('src/main/resources/com/litclub/ui/icons/litclub.ico').absolutePath
+            ]
+        }
 
         jvmArgs = [
                 '--enable-native-access=javafx.graphics,javafx.web,javafx.media'
