@@ -320,7 +320,7 @@ public class LibraryService {
 
         libraryRepository.fetchUserLibrary(userID)
                 .thenRun(() -> Platform.runLater(() -> {
-                    EventBus.getInstance().emit(EventType.PERSONAL_LIBRARY_UPDATED);
+                    System.out.println("Silent refresh library");
                 }))
                 .exceptionally(throwable -> {
                     // Silent fail — log only
