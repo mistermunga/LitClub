@@ -5,18 +5,24 @@ import com.litclub.construct.Note;
 import com.litclub.construct.Reply;
 import com.litclub.session.AppSession;
 import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.view.service.NoteService;
 import com.litclub.ui.main.shared.view.service.ReplyService;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
 import com.litclub.ui.main.shared.view.subcomponent.replies.dialog.AddReplyDialog;
 import com.litclub.ui.main.shared.event.EventBus.EventType;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.stage.Popup;
 
 import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 
 /**
  * Focused view showing a single note with its details and replies.
@@ -25,6 +31,7 @@ public class NoteFocus extends AbstractFocusView<Note> {
 
     private final boolean isPersonal;
     private final ReplyService replyService = new  ReplyService();
+    private final NoteService noteService = new NoteService();
     private final AppSession session = AppSession.getInstance();
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM, yyyy 'at' hh:mm a");
     private FlowPane replyPane;
@@ -158,7 +165,7 @@ public class NoteFocus extends AbstractFocusView<Note> {
             deleteButton.getStyleClass().add("secondary-button");
             deleteButton.setOnAction(e -> handleDeleteNote());
 
-            metadata.getChildren().addAll(editButton, deleteButton);
+            metadata.getChildren().addAll(deleteButton);
         }
 
         if (!isPersonal) {
@@ -210,8 +217,54 @@ public class NoteFocus extends AbstractFocusView<Note> {
 
     private void handleDeleteNote() {
         System.out.println("Delete note: " + currentEntity.getNoteID());
-        // TODO: Show confirmation dialog and delete
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Remove Note");
+        alert.setHeaderText("Are you sure?");
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response != ButtonType.OK) return;
+            Platform.runLater(this::performDelete);
+        });
     }
+
+    private void performDelete() {
+
+        Runnable successHandler = () -> {
+            emitUpdateEvent();
+            Platform.runLater(onBack);
+        };
+
+        Consumer<String> errorHandler = this::showErrorPopup;
+
+        Long userId = AppSession.getInstance().getUserRecord().userID();
+        Long clubId = AppSession.getInstance().getCurrentClub() != null ?
+                AppSession.getInstance().getCurrentClub().getClubID() : null;
+
+        if (isPersonal) {
+            noteService.deletePersonalNote(userId, currentEntity.getNoteID(), successHandler, errorHandler);
+        } else if (prompt != null) {
+            noteService.deletePromptNote(clubId, prompt.getPromptID(), currentEntity.getNoteID(), successHandler, errorHandler);
+        } else {
+            noteService.deleteClubNote(clubId, currentEntity.getNoteID(), successHandler, errorHandler);
+        }
+    }
+
+    private void emitUpdateEvent() {
+        EventType event = isPersonal ? EventType.PERSONAL_NOTES_UPDATED :
+                (prompt != null ? EventType.PROMPT_NOTE_UPDATED : EventType.CLUB_NOTES_UPDATED);
+
+        EventBus.getInstance().emit(event);
+    }
+
+    private void showErrorPopup(String error) {
+        System.err.println("Failed to remove note: " + error);
+        Popup popup = new Popup();
+        popup.getContent().add(new Label(error));
+        popup.setAutoHide(true);
+        popup.show(this.getScene().getWindow());
+    }
+
 
     /**
      * Get the currently displayed note.
@@ -318,7 +371,7 @@ public class NoteFocus extends AbstractFocusView<Note> {
             deleteButton.setStyle("-fx-font-size: 12px; -fx-padding: 4 12;");
             deleteButton.setOnAction(e -> handleDeleteReply(reply));
 
-            actionButtons.getChildren().addAll(editButton, deleteButton);
+            actionButtons.getChildren().addAll(deleteButton);
             card.getChildren().add(actionButtons);
         }
 
