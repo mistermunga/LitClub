@@ -47,6 +47,12 @@ public class EventBus {
         listeners.computeIfAbsent(eventType, k -> new ArrayList<>()).add(listener);
     }
 
+    public void on(EnumSet<EventType> eventTypes, Runnable listener) {
+        for (EventType eventType : eventTypes) {
+            listeners.computeIfAbsent(eventType, k -> new ArrayList<>()).add(listener);
+        }
+    }
+
     /**
      * Emit an event, notifying all subscribers.
      *
