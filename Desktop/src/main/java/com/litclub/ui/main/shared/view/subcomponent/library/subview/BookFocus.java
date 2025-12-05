@@ -12,11 +12,13 @@ import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.common.AbstractFocusView;
 import com.litclub.ui.main.shared.view.subcomponent.library.dialog.AddReviewDialog;
 import com.litclub.ui.main.shared.view.subcomponent.library.dialog.subcomponent.StarRater;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Popup;
 
 import java.time.format.DateTimeFormatter;
 
@@ -277,7 +279,33 @@ public class BookFocus extends AbstractFocusView<Book> {
 
     private void handleRemoveBook() {
         System.out.println("Remove book: " + currentEntity.getTitle());
-        // TODO: Show confirmation dialog and remove book
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Remove book");
+        alert.setHeaderText("Are you sure?");
+
+        alert.showAndWait().ifPresent(result -> {
+            if (result == ButtonType.OK) {
+                libraryService.removeBook(
+                        AppSession.getInstance().getUserRecord().userID(),
+                        this.getCurrentBook().getBookID(),
+                        () -> {
+                            System.out.println("Removed: " + currentEntity.getTitle());
+                            EventBus.getInstance().emit(EventType.PERSONAL_LIBRARY_UPDATED);
+                            Platform.runLater(onBack);
+                        },
+                        error -> {
+                            Platform.runLater(() -> {
+                                System.out.println("Failed to remove book: " + error);
+                                Popup popup = new Popup();
+                                Label errorLabel = new Label(error);
+                                popup.getContent().add(errorLabel);
+                                popup.setAutoHide(true);
+                                popup.show(this.getScene().getWindow());
+                            });
+                        }
+                );
+            }
+        });
     }
 
     /**
