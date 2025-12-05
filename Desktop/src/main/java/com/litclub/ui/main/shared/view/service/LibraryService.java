@@ -7,6 +7,8 @@ import com.litclub.construct.interfaces.library.BookAddRequest;
 import com.litclub.construct.interfaces.library.BookWithStatus;
 import com.litclub.construct.interfaces.library.UserLibrary;
 import com.litclub.construct.interfaces.library.book.BookSearchRequest;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.persistence.repository.LibraryRepository;
 import com.litclub.session.AppSession;
 import javafx.application.Platform;
@@ -23,6 +25,8 @@ public class LibraryService {
     public LibraryService() {
         this.libraryRepository = LibraryRepository.getInstance();
         this.session = AppSession.getInstance();
+
+        EventBus.getInstance().on(EventBus.personalEvents(), this::refreshLibrarySilently);
     }
 
     // ==================== DATA ACCESS (delegates to repository) ====================
@@ -305,4 +309,24 @@ public class LibraryService {
         }
         return userLibrary.read().size();
     }
+
+    /**
+     * Refresh the user's entire library silently in the background.
+     * No popups, no UI messages — emits PERSONAL_LIBRARY_UPDATED on success.
+     */
+    public void refreshLibrarySilently() {
+        Long userID = getCurrentUserId();
+        if (userID == null) return;
+
+        libraryRepository.fetchUserLibrary(userID)
+                .thenRun(() -> Platform.runLater(() -> {
+                    EventBus.getInstance().emit(EventType.PERSONAL_LIBRARY_UPDATED);
+                }))
+                .exceptionally(throwable -> {
+                    // Silent fail — log only
+                    System.err.println("Silent library refresh failed: " + ApiErrorHandler.parseError(throwable));
+                    return null;
+                });
+    }
+
 }
