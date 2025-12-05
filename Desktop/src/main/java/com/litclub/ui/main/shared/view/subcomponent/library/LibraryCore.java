@@ -2,6 +2,8 @@ package com.litclub.ui.main.shared.view.subcomponent.library;
 
 import com.litclub.construct.Book;
 import com.litclub.theme.ThemeManager;
+import com.litclub.ui.main.shared.event.EventBus;
+import com.litclub.ui.main.shared.event.EventBus.EventType;
 import com.litclub.ui.main.shared.view.service.LibraryService;
 import com.litclub.ui.main.shared.view.service.ReviewService;
 import com.litclub.ui.main.shared.view.subcomponent.library.subview.BookFocus;
@@ -35,6 +37,9 @@ public class LibraryCore extends StackPane {
 
         // Add both to stack (only one visible at a time)
         this.getChildren().addAll(defaultLibraryCore, bookFocus);
+
+        // Events
+        EventBus.getInstance().on(EventBus.personalEvents(), this::refresh);
 
         // Show default view initially
         showDefaultView();
